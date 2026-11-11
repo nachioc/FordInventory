@@ -155,7 +155,7 @@ function ingresar(){
   '<label for="modelo">Modelo</label><select id="modelo" required>'+opts(MODELOS,"Elegir modelo")+'</select>'+
   '<label for="version">Versión</label><input id="version" required autocomplete="off">'+
   '<label for="color">Color</label><input id="color" required autocomplete="off">'+
-  '<label for="vin">VIN <small>17 caracteres</small></label><div class="vinrow"><input id="vin" required maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><button type="button" class="btn g" id="scan">Escanear</button></div><input type="file" id="foto" accept="image/*" capture="environment" class="hide"><div id="scanmsg" role="status" style="color:var(--mu);font-size:14px;margin-top:6px"></div>'+
+  '<label for="vin">VIN <small>17 caracteres</small></label><div class="vinrow"><input id="vin" required maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><button type="button" class="btn g" id="scan">Escanear</button></div><input type="file" id="foto" accept="image/*" capture="environment" class="hide"><div id="scanmsg" role="status" style="color:var(--mu);font-size:14px;margin-top:6px">Apunta al código cuadrado del parabrisas o a la etiqueta del VIN.</div>'+
   '<label for="fe">Fecha de entrada</label><input type="date" id="fe" value="'+hoy()+'" required>'+
   '<label for="ubic">Inventario</label><select id="ubic" required>'+opts(UBIC,"Elegir ubicación")+'</select>'+'<label for="estado">Estado</label><select id="estado">'+ESTADOS.map(function(x){return'<option>'+x+'</option>'}).join("")+'</select>'+(editando()&&editando().fechaSalida?'<label for="fsal">Fecha de salida</label><input type="date" id="fsal">':'')+
   '<label for="vend">Vendedor <small>(opcional)</small></label><input id="vend" autocomplete="off">'+
@@ -255,13 +255,25 @@ function llenar(){
 }
 function vinDe(t){t=String(t||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/[OQ]/g,"0").replace(/I/g,"1");var m=t.match(/[A-HJ-NPR-Z0-9]{17}/);return m?m[0]:null}
 function buscarVin(txt){var ls=String(txt||"").split(/\n/);for(var i=0;i<ls.length;i++){var m=vinDe(ls[i]);if(m)return m}return vinDe(txt)}
+function cargarZx(){return new Promise(function(ok,no){if(window.ZXingWASM)return ok();var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.6/dist/iife/reader/index.js";s.onload=ok;s.onerror=function(){no(new Error("sin conexión"))};document.head.appendChild(s)})}
+async function leerCodigo(img){
+  var tam=[1600,2400];
+  for(var k=0;k<tam.length;k++){
+    var w=Math.min(tam[k],img.width),h=Math.round(img.height*w/img.width),c=document.createElement("canvas");c.width=w;c.height=h;
+    var cx=c.getContext("2d",{willReadFrequently:true});cx.drawImage(img,0,0,w,h);
+    var rs=await ZXingWASM.readBarcodes(cx.getImageData(0,0,w,h),{formats:["DataMatrix","QRCode","Code128","Code39"],tryHarder:true,tryRotate:true,tryInvert:true,tryDownscale:true});
+    for(var i=0;i<rs.length;i++){var v=buscarVin(rs[i].text);if(v)return v}
+    if(w>=img.width)break;
+  }
+  return null;
+}
 function cargarOcr(){return new Promise(function(ok,no){if(window.Tesseract)return ok();var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=ok;s.onerror=function(){no(new Error("sin conexión"))};document.head.appendChild(s)})}
 async function leerVin(){
   var f=this.files[0],msg=$("#scanmsg");this.value="";if(!f)return;
   msg.textContent="Leyendo la foto...";
   try{
     var img=await createImageBitmap(f),vin=null;
-    if(window.BarcodeDetector){try{var bd=new BarcodeDetector({formats:["code_39","code_128","data_matrix","qr_code"]});var rs=await bd.detect(img);for(var i=0;i<rs.length&&!vin;i++)vin=buscarVin(rs[i].rawValue)}catch(e){}}
+    try{msg.textContent="Buscando el código 2D...";await cargarZx();vin=await leerCodigo(img)}catch(e){}
     if(!vin){
       var w=Math.min(1600,img.width),h=Math.round(img.height*w/img.width),c=document.createElement("canvas");c.width=w;c.height=h;
       var cx=c.getContext("2d");cx.filter="grayscale(1) contrast(1.4)";cx.drawImage(img,0,0,w,h);
