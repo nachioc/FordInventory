@@ -67,6 +67,9 @@ body:not(.r-admin) .adm{display:none}
 body.r-consulta .pn,body.r-consulta .pe{display:none}
 .pv{display:flex;gap:8px;margin-top:10px}.pv .btn{min-height:38px;font-size:14px;padding:0 12px}.pv select{flex:1;min-height:38px;padding:6px 8px}
 .sug{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--bd);border-radius:9px;padding:10px 12px;margin-top:6px;font:inherit;color:var(--tx);cursor:pointer;min-height:44px}
+.pw{position:relative}.pw input{padding-right:48px}
+.eye{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;background:none;color:var(--mu);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.eye:focus-visible{outline:3px solid var(--pr);border-radius:8px}
 h2.sec{font-size:15px;margin:16px 0 8px;color:var(--mu)}
 .vb select{flex:1}
 .hide{display:none}
@@ -486,6 +489,16 @@ async function guardarClave(e){
   recup=false;toast("Contraseña actualizada");history.replaceState(null,"",location.pathname);await cargarTodo();render();
 }
 db.auth.onAuthStateChange(function(ev,ses){if(ev==="PASSWORD_RECOVERY"){recup=true;sesion=ses;setTimeout(render,0)}});
+var SV='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
+OJO=SV+'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+OJOX=SV+'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function ojos(){document.querySelectorAll("#app input[type=password]").forEach(function(i){
+  if(i.parentNode.classList.contains("pw"))return;
+  var w=document.createElement("div");w.className="pw";i.parentNode.insertBefore(w,i);w.appendChild(i);
+  var b=document.createElement("button");b.type="button";b.className="eye";b.setAttribute("aria-label","Mostrar contraseña");b.innerHTML=OJO;
+  b.onclick=function(){var ver=i.type==="password";i.type=ver?"text":"password";b.setAttribute("aria-label",ver?"Ocultar contraseña":"Mostrar contraseña");b.innerHTML=ver?OJOX:OJO};
+  w.appendChild(b)})}
+new MutationObserver(ojos).observe(document.getElementById("app"),{childList:true,subtree:true});
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 window.addEventListener("hashchange",render);iniciar();
 </script>
