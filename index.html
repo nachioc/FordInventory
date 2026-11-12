@@ -114,6 +114,7 @@ body.conav{padding-left:232px;padding-bottom:24px}
 #fIng>button[type=submit],#fp>button[type=submit],#fSal>button[type=submit]{width:auto;justify-self:start;min-width:240px}
 #app>.btn.full{width:auto;min-width:280px}
 }
+@media(prefers-reduced-motion:no-preference){#app.sw{animation:swp .2s ease-out}@keyframes swp{from{opacity:.4;transform:translateX(var(--dx))}}}
 @media(prefers-reduced-motion:no-preference){.toast{animation:t .2s}@keyframes t{from{opacity:0}}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
@@ -568,6 +569,25 @@ function pintaNav(){
   n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("");
   n.hidden=false;document.body.classList.add("conav");
 }
+(function(){
+  var ORD=["portada","inicio","plan","alertas"],HASH=["","inv","plan","alertas"],t0=null;
+  document.addEventListener("touchstart",function(e){
+    t0=null;
+    if(e.touches.length!==1||!matchMedia("(max-width:899px)").matches||$("#nav").hidden)return;
+    if(e.target.closest&&e.target.closest("input,select,textarea,[data-noswipe]"))return;
+    var t=e.touches[0];if(t.clientX<24||t.clientX>innerWidth-24)return;
+    t0={x:t.clientX,y:t.clientY,t:Date.now()};
+  },{passive:true});
+  document.addEventListener("touchend",function(e){
+    if(!t0)return;
+    var t=e.changedTouches[0],dx=t.clientX-t0.x,dy=t.clientY-t0.y,dt=Date.now()-t0.t;t0=null;
+    if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.6||dt>700)return;
+    var i=ORD.indexOf(vista()),j=i+(dx<0?1:-1);
+    if(i<0||j<0||j>=ORD.length)return;
+    var a=$("#app");a.style.setProperty("--dx",(dx<0?28:-28)+"px");a.classList.remove("sw");void a.offsetWidth;a.classList.add("sw");
+    go(HASH[j]);
+  },{passive:true});
+})();
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 window.addEventListener("hashchange",render);iniciar();
 </script>
