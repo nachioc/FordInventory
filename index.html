@@ -19,8 +19,8 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .wrap{max-width:none;padding:0}
-#app>*:not(header){width:calc(100% - 32px);max-width:688px;margin-left:auto;margin-right:auto}
-#app>header{position:sticky;top:0;z-index:4;display:flex;align-items:center;gap:8px;background:var(--hd);color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,calc((100% - 688px)/2)) 10px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,20,60,.25)}
+#app>*:not(header){width:calc(100% - 32px);max-width:var(--w);margin-left:auto;margin-right:auto}
+#app>header{position:sticky;top:0;z-index:4;display:flex;align-items:center;gap:8px;background:var(--hd);color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,calc((100% - var(--w))/2)) 10px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,20,60,.25)}
 header h1{flex:1;margin:0;font-size:18px;font-weight:700;letter-spacing:.2px;line-height:1.2}
 .back{background:none;border:0;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;min-height:44px;padding:0 8px 0 0;margin-left:-4px}
 .logo{height:34px;width:auto;flex:none}
@@ -82,6 +82,38 @@ body.r-consulta .vb,body.r-consulta .bigbtn:not(.pb),body.r-vendedor .vb,body.r-
 body:not(.r-admin) .adm{display:none}
 body.r-consulta .pn,body.r-consulta .pe{display:none}
 .hide{display:none}
+
+:root{--w:688px}
+.cards,#lst,#pl,#ul,#hl{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.cards .v,#lst .v,#pl .v,#ul .v,#hl .v{margin-bottom:0}
+#pl h2.sec{grid-column:1/-1;margin:12px 0 0}
+.cards .empty,#lst .empty,#pl .empty,#ul .empty,#hl .empty{grid-column:1/-1}
+.f{margin-top:16px}form>.f:first-child{margin-top:0}.f label{margin-top:0}
+.row2{display:grid;gap:12px}.row2 .full{margin-top:0}
+.brand{display:none}
+@media(min-width:900px){
+:root{--w:1180px}
+body.conav{padding-left:232px;padding-bottom:24px}
+#nav{top:0;right:auto;width:232px;flex-direction:column;gap:4px;padding:16px 12px;background:var(--hd);border:0;box-shadow:none}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;padding:4px 8px 20px}.brand img{height:44px;width:auto}.brand b{font-size:16px;line-height:1.2}
+#nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:48px;padding:0 14px;border-radius:12px;font-size:15px;color:rgba(255,255,255,.8)}
+#nav button:hover{background:rgba(255,255,255,.08)}
+#nav button[aria-current=page]{background:rgba(255,255,255,.16);color:#fff}
+#nav button[aria-current=page]::before{display:none}
+.bdg{position:static;margin-left:auto}
+.logo{display:none}
+.toast{bottom:24px}
+#app>*:not(header){margin-left:max(16px,calc((100% - var(--w))/2));margin-right:auto}
+#app>#fLog,#app>#fRec{max-width:440px;margin-left:auto;margin-right:auto}
+.big,.row2{grid-template-columns:1fr 1fr}
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.tools{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.tools .wide,.tools #pe{grid-column:auto}
+#fIng,#fp,#fSal{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;align-content:start;max-width:900px}
+#fIng .f,#fp .f,#fSal .f{margin-top:0}
+.f:has(textarea),#fIng>.err,#fp>.err,#fSal>.err,#fIng>button[type=submit],#fp>button[type=submit],#fSal>button[type=submit],#fSal>.panel{grid-column:1/-1}
+#fIng>button[type=submit],#fp>button[type=submit],#fSal>button[type=submit]{width:auto;justify-self:start;min-width:240px}
+#app>.btn.full{width:auto;min-width:280px}
+}
 @media(prefers-reduced-motion:no-preference){.toast{animation:t .2s}@keyframes t{from{opacity:0}}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
@@ -115,7 +147,7 @@ async function entrar(registro){
 async function salir(){if(canal){db.removeChannel(canal);canal=null}await db.auth.signOut();sesion=null;perfil=null;data=[];document.body.className="";go("");render()}
 function loginView(){return'<div class="hero"><img src="'+LOGO+'" alt="Ford Inventario"><h1>Inventario Ford</h1><p>Inventario y planificador de entregas</p></div><form id="fLog" novalidate><label for="em">Correo</label><input id="em" type="email" autocomplete="username"><label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Entrar</button><button class="btn g full" type="button" id="reg">Crear cuenta</button><button type="button" class="back" id="olv" style="display:block;margin:14px auto 0">¿Olvidaste tu contraseña?</button></form>'}
 function render(){
-  var a=$("#app");$("#nav").hidden=true;
+  var a=$("#app");$("#nav").hidden=true;document.body.classList.remove("conav");
   if(recup){a.innerHTML=recupView();$("#fRec").onsubmit=guardarClave;return}
   if(!sesion){a.innerHTML=loginView();$("#fLog").onsubmit=function(e){e.preventDefault();entrar(false)};$("#reg").onclick=function(){entrar(true)};$("#olv").onclick=olvide;return}
   if(!perfil||!perfil.activo){a.innerHTML='<header><h1>Cuenta pendiente</h1></header><div class="panel">Tu cuenta ('+esc(sesion.user.email)+') está esperando la aprobación de un administrador.</div><button class="btn g full" id="rt">Reintentar</button><button class="btn g full" onclick="salir()">Cerrar sesión</button>';$("#rt").onclick=async function(){await cargarTodo();render()};return}
@@ -367,7 +399,7 @@ function portada(){
   return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.email)+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
-  (perfil.rol==="admin"?'<h2 class="sec">Administración</h2><button class="btn g full" style="margin-top:0" onclick="go(&quot;usuarios&quot;)">Usuarios y roles</button><button class="btn g full" onclick="go(&quot;historial&quot;)">Historial de cambios</button>':'')+
+  (perfil.rol==="admin"?'<h2 class="sec">Administración</h2><div class="row2"><button class="btn g full" onclick="go(&quot;usuarios&quot;)">Usuarios y roles</button><button class="btn g full" onclick="go(&quot;historial&quot;)">Historial de cambios</button></div>':'')+
   '<button class="btn d full" style="margin-top:24px" onclick="salir()">Cerrar sesión</button>';
 }
 function planVista(){
@@ -478,9 +510,9 @@ async function guardarEntrega(ev){
 }
 function alertasVista(){
   var al=alertasPlazo();
-  return head("Alertas")+'<h2 class="sec">Plazos de entrega ('+al.length+')</h2>'+
-  (al.map(function(e){var d=dias(e.fecha_entrega);return'<div class="v out"><h3>'+esc(e.modelo)+' · '+esc(e.color)+'</h3><div class="m">'+(d<0?"Atrasada "+(-d)+" día(s)":d===0?"Entrega HOY":"Entrega MAÑANA")+' · '+fmt(e.fecha_entrega)+' '+hh(e)+' · '+esc(e.vendedor)+'</div><div class="m">'+e.estado+' · Grabado: '+e.grabado_patente+'</div></div>'}).join("")||'<div class="empty">Sin plazos próximos.</div>')+
-  (perfil.rol==="admin"?'<h2 class="sec">Cambios en entregas</h2><button class="btn g full" id="mk">Marcar todas como leídas</button>'+(notifs.map(function(n){return'<div class="v'+(n.leida?"":" out")+'"><div>'+esc(n.mensaje)+'</div><div class="m">'+esc(n.autor||"")+' · '+new Date(n.created_at).toLocaleString("es-CL")+'</div></div>'}).join("")||'<div class="empty">Sin avisos.</div>'):'');
+  return head("Alertas")+'<h2 class="sec">Plazos de entrega ('+al.length+')</h2><div class="cards">'+
+  (al.map(function(e){var d=dias(e.fecha_entrega);return'<div class="v out"><h3>'+esc(e.modelo)+' · '+esc(e.color)+'</h3><div class="m">'+(d<0?"Atrasada "+(-d)+" día(s)":d===0?"Entrega HOY":"Entrega MAÑANA")+' · '+fmt(e.fecha_entrega)+' '+hh(e)+' · '+esc(e.vendedor)+'</div><div class="m">'+e.estado+' · Grabado: '+e.grabado_patente+'</div></div>'}).join("")||'<div class="empty">Sin plazos próximos.</div>')+'</div>'+
+  (perfil.rol==="admin"?'<h2 class="sec">Cambios en entregas</h2><button class="btn g full" id="mk">Marcar todas como leídas</button><div class="cards">'+(notifs.map(function(n){return'<div class="v'+(n.leida?"":" out")+'"><div>'+esc(n.mensaje)+'</div><div class="m">'+esc(n.autor||"")+' · '+new Date(n.created_at).toLocaleString("es-CL")+'</div></div>'}).join("")||'<div class="empty">Sin avisos.</div>')+'</div>':'');
 }
 function bindAlertas(){if($("#mk"))$("#mk").onclick=async function(){await db.from("notificaciones").update({leida:true}).eq("usuario_id",sesion.user.id).eq("leida",false);await cargarNotifs();renderApp()}}
 async function olvide(){
@@ -510,15 +542,21 @@ function ojos(){document.querySelectorAll("#app input[type=password]").forEach(f
   var b=document.createElement("button");b.type="button";b.className="eye";b.setAttribute("aria-label","Mostrar contraseña");b.innerHTML=OJO;
   b.onclick=function(){var ver=i.type==="password";i.type=ver?"text":"password";b.setAttribute("aria-label",ver?"Ocultar contraseña":"Mostrar contraseña");b.innerHTML=ver?OJOX:OJO};
   w.appendChild(b)})}
-new MutationObserver(ojos).observe(document.getElementById("app"),{childList:true,subtree:true});
+function agrupa(){["fIng","fp","fSal"].forEach(function(id){
+  var f=document.getElementById(id);if(!f||f.dataset.g)return;f.dataset.g="1";
+  var g=null;Array.prototype.slice.call(f.children).forEach(function(c){
+    if(c.tagName==="LABEL"){g=document.createElement("div");g.className="f";f.insertBefore(g,c);g.appendChild(c)}
+    else if(c.classList.contains("err")||c.classList.contains("panel")||c.type==="submit"){g=null}
+    else if(g){g.appendChild(c)}})})}
+new MutationObserver(function(){ojos();agrupa()}).observe(document.getElementById("app"),{childList:true,subtree:true});
 var SI='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
 IC={home:SI+'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',car:SI+'<path d="M3 13l2-6h14l2 6v4H3z"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>',cal:SI+'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 16l2 2 4-4"/></svg>',bell:SI+'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>'};
 function pintaNav(){
   var v=vista(),n=$("#nav"),b=badge();
   var act=v==="plan"||v==="pform"?"plan":v==="alertas"?"alertas":(["inicio","ingresar","salida","inventario","editar"].indexOf(v)>-1?"inv":"home");
   var it=[["home","","Inicio",IC.home],["inv","inv","Inventario",IC.car],["plan","plan","Planificador",IC.cal],["alertas","alertas","Alertas",IC.bell]];
-  n.innerHTML=it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("");
-  n.hidden=false;
+  n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("");
+  n.hidden=false;document.body.classList.add("conav");
 }
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 window.addEventListener("hashchange",render);iniciar();
