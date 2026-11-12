@@ -50,7 +50,7 @@ button:focus-visible{outline:3px solid var(--pr);outline-offset:2px}
 .full{display:flex;width:100%;margin-top:14px}
 .err{color:var(--bad);font-size:14px;margin-top:8px;min-height:1em}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--tx);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;z-index:9;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tools .wide,.tools #pe{grid-column:1/-1}.tools select{font-size:14px;padding:10px 6px}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tools .wide,.tools #pe,.tools #pq{grid-column:1/-1}.tools select{font-size:14px;padding:10px 6px}
 form .back{color:var(--pr);font-weight:600}
 .chips{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .chip{border:1.5px solid var(--bd);background:var(--card);color:var(--tx);border-radius:99px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer;min-height:44px}
@@ -63,7 +63,7 @@ form .back{color:var(--pr);font-weight:600}
 .tag.dis{background:var(--okbg);color:var(--ok)}.tag.res{background:var(--pr2);color:var(--pr)}
 .tag.o{background:var(--warnbg);color:var(--warn)}.tag.ven{background:var(--bd);color:var(--tx)}
 .vb{display:flex;gap:8px;margin-top:12px}.vb .btn{min-height:40px;font-size:14px;padding:0 14px}.vb select{flex:1}
-.pv{display:flex;gap:8px;margin-top:12px}.pv .btn{min-height:40px;font-size:14px;padding:0 14px}.pv select{flex:1;min-height:40px;padding:6px 10px}
+.pv{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.pv .btn{min-height:40px;font-size:14px;padding:0 14px}.pv select{flex:1;min-width:130px;min-height:40px;padding:6px 10px}
 .vinrow{display:flex;gap:8px}.vinrow input{flex:1}.vinrow .btn{flex:none}
 .empty{text-align:center;color:var(--mu);padding:32px 12px}
 .sug{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--bd);border-radius:12px;padding:10px 14px;margin-top:6px;font:inherit;color:var(--tx);cursor:pointer;min-height:48px}
@@ -80,7 +80,7 @@ h2.sec{font-size:13px;margin:20px auto 8px;color:var(--mu);text-transform:upperc
 body:not(.r-admin) .vb .btn.d{display:none}
 body.r-consulta .vb,body.r-consulta .bigbtn:not(.pb),body.r-vendedor .vb,body.r-vendedor .bigbtn:not(.pb){display:none}
 body:not(.r-admin) .adm{display:none}
-body.r-consulta .pn,body.r-consulta .pe{display:none}
+body.r-consulta .pn,body.r-preparador .pn,body.r-consulta .pe{display:none}
 .hide{display:none}
 
 :root{--w:688px}
@@ -107,7 +107,7 @@ body.conav{padding-left:232px;padding-bottom:24px}
 #app>#fLog,#app>#fRec{max-width:440px;margin-left:auto;margin-right:auto}
 .big,.row2{grid-template-columns:1fr 1fr}
 .stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-.tools{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.tools .wide,.tools #pe{grid-column:auto}
+.tools{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.tools .wide,.tools #pe,.tools #pq{grid-column:auto}
 #fIng,#fp,#fSal{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;align-content:start;max-width:900px}
 #fIng .f,#fp .f,#fSal .f{margin-top:0}
 .f:has(textarea),#fIng>.err,#fp>.err,#fSal>.err,#fIng>button[type=submit],#fp>button[type=submit],#fSal>button[type=submit],#fSal>.panel{grid-column:1/-1}
@@ -163,7 +163,7 @@ async function usuarios(){
   var r=await db.from("perfiles").select("*").order("created_at");
   $("#ul").className="";
   $("#ul").innerHTML=(r.data||[]).map(function(u){var me=u.id===sesion.user.id,d=me?" disabled":"";
-    return'<div class="v'+(u.activo?"":" out")+'"><h3>'+esc(u.email)+(me?" (tú)":"")+'</h3><div class="vb"><select data-id="'+u.id+'" data-k="rol" aria-label="Rol"'+d+'>'+["admin","operador","vendedor","consulta"].map(function(x){return'<option'+(x===u.rol?" selected":"")+'>'+x+'</option>'}).join("")+'</select><select data-id="'+u.id+'" data-k="activo" aria-label="Acceso"'+d+'><option value="true"'+(u.activo?" selected":"")+'>Activo</option><option value="false"'+(u.activo?"":" selected")+'>Pendiente o bloqueado</option></select></div></div>'}).join("");
+    return'<div class="v'+(u.activo?"":" out")+'"><h3>'+esc(u.email)+(me?" (tú)":"")+'</h3><div class="vb"><select data-id="'+u.id+'" data-k="rol" aria-label="Rol"'+d+'>'+["admin","preparador","vendedor","consulta"].map(function(x){return'<option'+(x===u.rol?" selected":"")+'>'+x+'</option>'}).join("")+'</select><select data-id="'+u.id+'" data-k="activo" aria-label="Acceso"'+d+'><option value="true"'+(u.activo?" selected":"")+'>Activo</option><option value="false"'+(u.activo?"":" selected")+'>Pendiente o bloqueado</option></select></div></div>'}).join("");
   document.querySelectorAll("#ul select").forEach(function(s){s.onchange=async function(){var c={};c[s.dataset.k]=s.dataset.k==="activo"?s.value==="true":s.value;var x=await db.from("perfiles").update(c).eq("id",s.dataset.id).select();toast(x.error||!x.data.length?"No se pudo cambiar":"Cambio guardado")}});
 }
 async function historial(){
@@ -193,7 +193,7 @@ function renderApp(){
   else if(v==="salida"){a.innerHTML=salida();bindSalida()}
   else if(v==="portada"){a.innerHTML=portada()}
   else if(v==="plan"){a.innerHTML=planVista();bindPlan();listaPlan()}
-  else if(v==="pform"){a.innerHTML=pform();bindPform()}
+  else if(v==="pform"){var ee=editE?ent.filter(function(x){return x.id===editE})[0]:null;if(editE?!(ee&&(puedeEditar(ee)||perfil.rol==="preparador")):!puedeCrear()){go("plan");return}a.innerHTML=pform();bindPform()}
   else if(v==="alertas"){a.innerHTML=alertasVista();bindAlertas()}
   else if(v==="usuarios"){usuarios()}
   else if(v==="historial"){historial()}
@@ -383,7 +383,7 @@ function atras(){var v=vista();return["inicio","usuarios","historial","plan","al
 function dias(f){return Math.round((new Date(f+"T00:00:00")-new Date(hoy()+"T00:00:00"))/864e5)}
 function hh(e){return String(e.hora||"").slice(0,5)}
 async function cargarEntregas(){var r=await db.from("entregas").select("*").order("fecha_entrega").order("hora");ent=r.data||[]}
-async function cargarNotifs(){if(perfil.rol!=="admin"){notifs=[];return}var r=await db.from("notificaciones").select("*").eq("usuario_id",sesion.user.id).order("created_at",{ascending:false}).limit(50);notifs=r.data||[]}
+async function cargarNotifs(){if(perfil.rol!=="admin"&&perfil.rol!=="preparador"){notifs=[];return}var r=await db.from("notificaciones").select("*").eq("usuario_id",sesion.user.id).order("created_at",{ascending:false}).limit(50);notifs=r.data||[]}
 function alertasPlazo(){return ent.filter(function(e){return e.estado!=="Entregado"&&dias(e.fecha_entrega)<=1})}
 function badge(){return notifs.filter(function(n){return!n.leida}).length+alertasPlazo().length}
 function refrescaVista(){pintaNav();var v=vista();if(v==="plan")listaPlan();else if(v==="alertas"||v==="portada")renderApp()}
@@ -404,7 +404,7 @@ function portada(){
 }
 function planVista(){
   var al=alertasPlazo();
-  return head("Planificador Ford")+
+  return head("Planificador Ford")+ayudaRol()+
   (al.length?'<button class="v out" style="display:block;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--tx)" onclick="go(&quot;alertas&quot;)"><b>'+al.length+' entrega(s) con plazo para hoy, mañana o vencido</b><div class="m">Toca para ver el detalle</div></button>':'')+
   '<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button></div>'+
   '<div class="tools"><select id="pe" aria-label="Estado">'+opts(PEST,"Todos los estados")+'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button></div>'+
@@ -430,20 +430,28 @@ function listaPlan(){
   $("#pl").innerHTML=ord.filter(function(k){return g[k]}).map(function(k){return'<h2 class="sec">'+k+' ('+g[k].length+')</h2>'+g[k].map(cardE).join("")}).join("")||'<div class="empty">No hay entregas con estos filtros.</div>';
 }
 function cardE(e){
-  var urg=e.estado!=="Entregado"&&dias(e.fecha_entrega)<=1,q='&quot;'+e.id+'&quot;';
+  var urg=e.estado!=="Entregado"&&dias(e.fecha_entrega)<=1,q='&quot;'+e.id+'&quot;',pr=perfil.rol==="preparador",ed=puedeEditar(e),tuya=perfil.rol==="vendedor"&&e.creado_por===sesion.user.id;
   return'<div class="v'+(urg?" out":"")+'"><h3>'+esc(e.modelo)+' · '+esc(e.color)+'</h3><div class="vin">'+esc(e.vin)+'</div>'+
-  '<div style="margin:8px 0 2px"><span class="tag '+PC[e.estado]+'">'+e.estado+'</span><span class="tag '+(e.grabado_patente==="OK"?"dis":"o")+'">Grabado: '+e.grabado_patente+'</span></div>'+
+  '<div style="margin:8px 0 2px"><span class="tag '+PC[e.estado]+'">'+e.estado+'</span><span class="tag '+(e.grabado_patente==="OK"?"dis":"o")+'">Grabado: '+e.grabado_patente+'</span>'+(tuya?'<span class="tag res">Tuya</span>':'')+'</div>'+
   '<div class="m">Entrega: <b>'+fmt(e.fecha_entrega)+' '+hh(e)+'</b>'+(e.fecha_entrega!==e.fecha_inicial?' (inicial '+fmt(e.fecha_inicial)+')':'')+'</div>'+
   '<div class="m">Alistamiento: '+fmt(e.fecha_alistamiento)+' · Vendedor: '+esc(e.vendedor)+'</div>'+
   (e.campanas?'<div class="m">Campañas: '+esc(e.campanas)+'</div>':'')+(e.accesorios?'<div class="m">Accesorios: '+esc(e.accesorios)+'</div>':'')+
   '<div class="m">Preparador: '+esc(e.preparador)+'</div>'+
-  '<div class="pv"><select class="pe" aria-label="Cambiar estado" onchange="cambiarEstado('+q+',this.value)">'+PEST.map(function(x){return'<option'+(x===e.estado?" selected":"")+'>'+x+'</option>'}).join("")+'</select><button class="btn g pe" onclick="editE='+q+';go(&quot;pform&quot;)">Editar</button><button class="btn d adm" onclick="borrarEntrega('+q+')">Eliminar</button></div></div>';
+  ((ed||pr)?'<div class="pv"><select class="pe" aria-label="Cambiar estado" onchange="cambiarEstado('+q+',this.value)">'+PEST.map(function(x){return'<option'+(x===e.estado?" selected":"")+'>'+x+'</option>'}).join("")+'</select>'+(pr?'<select class="pe" aria-label="Grabado de patente" onchange="cambiarGrabado('+q+',this.value)">'+["Falta","OK"].map(function(x){return'<option value="'+x+'"'+(x===e.grabado_patente?" selected":"")+'>Grabado: '+x+'</option>'}).join("")+'</select>':'')+'<button class="btn g pe" onclick="editE='+q+';go(&quot;pform&quot;)">'+(pr?"Comentar":"Editar")+'</button>'+(perfil.rol==="admin"?'<button class="btn d adm" onclick="borrarEntrega('+q+')">Eliminar</button>':'')+'</div>':'')+'</div>';
 }
 async function cambiarEstado(id,v){
   var e=ent.filter(function(x){return x.id===id})[0];
-  if(v==="Reagendado"){editE=id;prefE=v;go("pform");return}
+  if(v==="Reagendado"&&perfil.rol!=="preparador"){editE=id;prefE=v;go("pform");return}
   if((v==="Lista para entregar"||v==="Entregado")&&e.grabado_patente!=="OK"&&!confirm("El grabado de patente está pendiente. ¿Continuar igual?")){listaPlan();return}
   var r=await db.from("entregas").update({estado:v}).eq("id",id).select();
+  if(r.error||!r.data.length)toast("No tienes permiso para cambiar esta entrega");
+  await cargarEntregas();listaPlan();
+}
+function puedeEditar(e){return perfil.rol==="admin"||(perfil.rol==="vendedor"&&e.creado_por===sesion.user.id)}
+function puedeCrear(){return perfil.rol==="admin"||perfil.rol==="vendedor"}
+function ayudaRol(){var m={vendedor:"Ves todas las entregas, pero solo puedes editar las que tú creaste.",preparador:"Puedes cambiar el estado, el grabado de patente y comentar los accesorios de cada entrega.",consulta:"Modo consulta: puedes ver las entregas, no editarlas."}[perfil.rol];return m?'<p class="hola">'+m+'</p>':''}
+async function cambiarGrabado(id,v){
+  var r=await db.from("entregas").update({grabado_patente:v}).eq("id",id).select();
   if(r.error||!r.data.length)toast("No tienes permiso para cambiar esta entrega");
   await cargarEntregas();listaPlan();
 }
@@ -478,6 +486,7 @@ function bindPform(){
   else $("#pfi").value=hoy();
   if(prefE){$("#pes").value=prefE;prefE=null}
   $("#pvin").oninput=vinPlan;$("#fp").onsubmit=guardarEntrega;
+  if(perfil.rol==="preparador"){document.querySelectorAll("#fp input,#fp select,#fp textarea").forEach(function(c){if(["pacc","pgr","pes"].indexOf(c.id)<0)c.disabled=true});var hp=document.createElement("p");hp.className="hola";hp.style.gridColumn="1/-1";hp.textContent="Como preparador puedes comentar los accesorios, cambiar el grabado de patente y el estado.";$("#fp").insertBefore(hp,$("#fp").firstChild)}
 }
 function vinPlan(){
   var vin=this.value.trim().toUpperCase(),n=$("#pinv"),sg=$("#psug");
@@ -504,6 +513,7 @@ async function guardarEntrega(ev){
   if(g("pfa")>fe){er.textContent="El alistamiento no puede ser después de la fecha de entrega.";return}
   if((g("pes")==="Lista para entregar"||g("pes")==="Entregado")&&g("pgr")!=="OK"&&!confirm("El grabado de patente está pendiente. ¿Guardar igual?"))return;
   var r={vin:vin,modelo:g("pmod"),color:g("pcol"),vendedor:g("pven"),fecha_inicial:g("pfi"),fecha_entrega:fe,hora:g("phr"),fecha_alistamiento:g("pfa"),accesorios:g("pacc")||null,campanas:g("pcam")||null,grabado_patente:g("pgr"),preparador:g("ppr")||"Ignacio Castillo",estado:g("pes")};
+  if(editE&&perfil.rol==="preparador")r={accesorios:r.accesorios,grabado_patente:r.grabado_patente,estado:r.estado};
   var x=editE?await db.from("entregas").update(r).eq("id",editE).select():await db.from("entregas").insert(r).select();
   if(x.error||!x.data.length){er.textContent="No se pudo guardar (revisa tu permiso o tu conexión).";return}
   await cargarEntregas();toast("Entrega guardada");editE=null;go("plan");
@@ -512,7 +522,7 @@ function alertasVista(){
   var al=alertasPlazo();
   return head("Alertas")+'<h2 class="sec">Plazos de entrega ('+al.length+')</h2><div class="cards">'+
   (al.map(function(e){var d=dias(e.fecha_entrega);return'<div class="v out"><h3>'+esc(e.modelo)+' · '+esc(e.color)+'</h3><div class="m">'+(d<0?"Atrasada "+(-d)+" día(s)":d===0?"Entrega HOY":"Entrega MAÑANA")+' · '+fmt(e.fecha_entrega)+' '+hh(e)+' · '+esc(e.vendedor)+'</div><div class="m">'+e.estado+' · Grabado: '+e.grabado_patente+'</div></div>'}).join("")||'<div class="empty">Sin plazos próximos.</div>')+'</div>'+
-  (perfil.rol==="admin"?'<h2 class="sec">Cambios en entregas</h2><button class="btn g full" id="mk">Marcar todas como leídas</button><div class="cards">'+(notifs.map(function(n){return'<div class="v'+(n.leida?"":" out")+'"><div>'+esc(n.mensaje)+'</div><div class="m">'+esc(n.autor||"")+' · '+new Date(n.created_at).toLocaleString("es-CL")+'</div></div>'}).join("")||'<div class="empty">Sin avisos.</div>')+'</div>':'');
+  ((perfil.rol==="admin"||perfil.rol==="preparador")?'<h2 class="sec">Cambios en entregas</h2><button class="btn g full" id="mk">Marcar todas como leídas</button><div class="cards">'+(notifs.map(function(n){return'<div class="v'+(n.leida?"":" out")+'"><div>'+esc(n.mensaje)+'</div><div class="m">'+esc(n.autor||"")+' · '+new Date(n.created_at).toLocaleString("es-CL")+'</div></div>'}).join("")||'<div class="empty">Sin avisos.</div>')+'</div>':'');
 }
 function bindAlertas(){if($("#mk"))$("#mk").onclick=async function(){await db.from("notificaciones").update({leida:true}).eq("usuario_id",sesion.user.id).eq("leida",false);await cargarNotifs();renderApp()}}
 async function olvide(){
