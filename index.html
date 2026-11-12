@@ -17,6 +17,7 @@
 :root[data-theme="dark"]{--bg:#0a1220;--card:#121c2f;--tx:#e8eef8;--mu:#9fb0c7;--pr:#7db0ff;--pr2:#1a2c4d;--on:#06101f;--bd:#26364f;--ok:#5fd18f;--okbg:#12301f;--warn:#f2b660;--warnbg:#38280f;--bad:#ff9a92;--hd:#00204d;}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+html,body{overflow-x:clip}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .wrap{max-width:none;padding:0}
 #app>*:not(header){width:calc(100% - 32px);max-width:var(--w);margin-left:auto;margin-right:auto}
@@ -114,7 +115,7 @@ body.conav{padding-left:232px;padding-bottom:24px}
 #fIng>button[type=submit],#fp>button[type=submit],#fSal>button[type=submit]{width:auto;justify-self:start;min-width:240px}
 #app>.btn.full{width:auto;min-width:280px}
 }
-@media(prefers-reduced-motion:no-preference){#app.sw{animation:swp .2s ease-out}@keyframes swp{from{opacity:.4;transform:translateX(var(--dx))}}}
+@media(prefers-reduced-motion:no-preference){#app.sw>*:not(header){animation:swp .2s ease-out}@keyframes swp{from{opacity:.35;transform:translateX(var(--dx))}}}
 @media(prefers-reduced-motion:no-preference){.toast{animation:t .2s}@keyframes t{from{opacity:0}}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
@@ -584,7 +585,7 @@ function pintaNav(){
     if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.6||dt>700)return;
     var i=ORD.indexOf(vista()),j=i+(dx<0?1:-1);
     if(i<0||j<0||j>=ORD.length)return;
-    var a=$("#app");a.style.setProperty("--dx",(dx<0?28:-28)+"px");a.classList.remove("sw");void a.offsetWidth;a.classList.add("sw");
+    var a=$("#app");a.style.setProperty("--dx",(dx<0?12:-12)+"px");a.classList.remove("sw");void a.offsetWidth;a.classList.add("sw");setTimeout(function(){a.classList.remove("sw")},230);
     go(HASH[j]);
   },{passive:true});
 })();
