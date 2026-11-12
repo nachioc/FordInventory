@@ -165,7 +165,7 @@ async function usuarios(){
   var r=await db.from("perfiles").select("*").order("created_at");
   $("#ul").className="";
   $("#ul").innerHTML=(r.data||[]).map(function(u){var me=u.id===sesion.user.id,d=me?" disabled":"";
-    return'<div class="v'+(u.activo?"":" out")+'"><h3>'+esc(u.email)+(me?" (tú)":"")+'</h3><div class="vb"><select data-id="'+u.id+'" data-k="rol" aria-label="Rol"'+d+'>'+["admin","preparador","vendedor","consulta"].map(function(x){return'<option'+(x===u.rol?" selected":"")+'>'+x+'</option>'}).join("")+'</select><select data-id="'+u.id+'" data-k="activo" aria-label="Acceso"'+d+'><option value="true"'+(u.activo?" selected":"")+'>Activo</option><option value="false"'+(u.activo?"":" selected")+'>Pendiente o bloqueado</option></select></div></div>'}).join("");
+    return'<div class="v'+(u.activo?"":" out")+'"><h3>'+esc(u.email)+(me?" (tú)":"")+'</h3><div class="vb"><select data-id="'+u.id+'" data-k="rol" aria-label="Rol"'+d+'>'+["admin","jefe","preparador","vendedor","consulta"].map(function(x){return'<option'+(x===u.rol?" selected":"")+'>'+x+'</option>'}).join("")+'</select><select data-id="'+u.id+'" data-k="activo" aria-label="Acceso"'+d+'><option value="true"'+(u.activo?" selected":"")+'>Activo</option><option value="false"'+(u.activo?"":" selected")+'>Pendiente o bloqueado</option></select></div></div>'}).join("");
   document.querySelectorAll("#ul select").forEach(function(s){s.onchange=async function(){var c={};c[s.dataset.k]=s.dataset.k==="activo"?s.value==="true":s.value;var x=await db.from("perfiles").update(c).eq("id",s.dataset.id).select();toast(x.error||!x.data.length?"No se pudo cambiar":"Cambio guardado")}});
 }
 async function historial(){
@@ -385,7 +385,7 @@ function atras(){var v=vista();return["inicio","usuarios","historial","plan","al
 function dias(f){return Math.round((new Date(f+"T00:00:00")-new Date(hoy()+"T00:00:00"))/864e5)}
 function hh(e){return String(e.hora||"").slice(0,5)}
 async function cargarEntregas(){var r=await db.from("entregas").select("*").order("fecha_entrega").order("hora");ent=r.data||[]}
-async function cargarNotifs(){if(perfil.rol!=="admin"&&perfil.rol!=="preparador"){notifs=[];return}var r=await db.from("notificaciones").select("*").eq("usuario_id",sesion.user.id).order("created_at",{ascending:false}).limit(50);notifs=r.data||[]}
+async function cargarNotifs(){if(perfil.rol!=="admin"&&perfil.rol!=="jefe"&&perfil.rol!=="preparador"){notifs=[];return}var r=await db.from("notificaciones").select("*").eq("usuario_id",sesion.user.id).order("created_at",{ascending:false}).limit(50);notifs=r.data||[]}
 function alertasPlazo(){return ent.filter(function(e){return e.estado!=="Entregado"&&dias(e.fecha_entrega)<=1})}
 function badge(){return notifs.filter(function(n){return!n.leida}).length+alertasPlazo().length}
 function refrescaVista(){pintaNav();var v=vista();if(v==="plan")listaPlan();else if(v==="alertas"||v==="portada")renderApp()}
@@ -449,8 +449,8 @@ async function cambiarEstado(id,v){
   if(r.error||!r.data.length)toast("No tienes permiso para cambiar esta entrega");
   await cargarEntregas();listaPlan();
 }
-function puedeEditar(e){return perfil.rol==="admin"||(perfil.rol==="vendedor"&&e.creado_por===sesion.user.id)}
-function puedeCrear(){return perfil.rol==="admin"||perfil.rol==="vendedor"}
+function puedeEditar(e){return perfil.rol==="admin"||perfil.rol==="jefe"||(perfil.rol==="vendedor"&&e.creado_por===sesion.user.id)}
+function puedeCrear(){return perfil.rol==="admin"||perfil.rol==="jefe"||perfil.rol==="vendedor"}
 function ayudaRol(){var m={vendedor:"Ves todas las entregas, pero solo puedes editar las que tú creaste.",preparador:"Puedes cambiar el estado, el grabado de patente y comentar los accesorios de cada entrega.",consulta:"Modo consulta: puedes ver las entregas, no editarlas."}[perfil.rol];return m?'<p class="hola">'+m+'</p>':''}
 async function cambiarGrabado(id,v){
   var r=await db.from("entregas").update({grabado_patente:v}).eq("id",id).select();
@@ -520,13 +520,30 @@ async function guardarEntrega(ev){
   if(x.error||!x.data.length){er.textContent="No se pudo guardar (revisa tu permiso o tu conexión).";return}
   await cargarEntregas();toast("Entrega guardada");editE=null;go("plan");
 }
+var verLeidas=false;
+function cardN(n){return'<div class="v'+(n.leida?"":" out")+'"><div>'+esc(n.mensaje)+'</div><div class="m">'+esc(n.autor||"")+' · '+new Date(n.created_at).toLocaleString("es-CL")+'</div>'+(n.leida?'':'<div style="margin-top:10px"><button class="btn g" style="min-height:40px;font-size:14px" data-nid="'+n.id+'">Marcar como leída</button></div>')+'</div>'}
 function alertasVista(){
-  var al=alertasPlazo();
-  return head("Alertas")+'<h2 class="sec">Plazos de entrega ('+al.length+')</h2><div class="cards">'+
-  (al.map(function(e){var d=dias(e.fecha_entrega);return'<div class="v out"><h3>'+esc(e.modelo)+' · '+esc(e.color)+'</h3><div class="m">'+(d<0?"Atrasada "+(-d)+" día(s)":d===0?"Entrega HOY":"Entrega MAÑANA")+' · '+fmt(e.fecha_entrega)+' '+hh(e)+' · '+esc(e.vendedor)+'</div><div class="m">'+e.estado+' · Grabado: '+e.grabado_patente+'</div></div>'}).join("")||'<div class="empty">Sin plazos próximos.</div>')+'</div>'+
-  ((perfil.rol==="admin"||perfil.rol==="preparador")?'<h2 class="sec">Cambios en entregas</h2><button class="btn g full" id="mk">Marcar todas como leídas</button><div class="cards">'+(notifs.map(function(n){return'<div class="v'+(n.leida?"":" out")+'"><div>'+esc(n.mensaje)+'</div><div class="m">'+esc(n.autor||"")+' · '+new Date(n.created_at).toLocaleString("es-CL")+'</div></div>'}).join("")||'<div class="empty">Sin avisos.</div>')+'</div>':'');
+  var al=alertasPlazo(),ver=perfil.rol==="admin"||perfil.rol==="jefe"||perfil.rol==="preparador";
+  var nu=notifs.filter(function(n){return!n.leida}),nl=notifs.filter(function(n){return n.leida});
+  var h=head("Alertas")+'<h2 class="sec">Plazos de entrega ('+al.length+')</h2><p class="hola">Se quitan solas cuando la entrega pasa a «Entregado».</p><div class="cards">'+
+  (al.map(function(e){var d=dias(e.fecha_entrega);return'<div class="v out"><h3>'+esc(e.modelo)+' · '+esc(e.color)+'</h3><div class="m">'+(d<0?"Atrasada "+(-d)+" día(s)":d===0?"Entrega HOY":"Entrega MAÑANA")+' · '+fmt(e.fecha_entrega)+' '+hh(e)+' · '+esc(e.vendedor)+'</div><div class="m">'+e.estado+' · Grabado: '+e.grabado_patente+'</div></div>'}).join("")||'<div class="empty">Sin plazos próximos.</div>')+'</div>';
+  if(ver){
+    h+='<h2 class="sec">Cambios en entregas ('+nu.length+' sin leer)</h2>';
+    if(nu.length)h+='<button class="btn g full" id="mk" style="margin-top:0;margin-bottom:14px">Marcar todas como leídas</button>';
+    h+='<div class="cards">'+(nu.map(cardN).join("")||'<div class="empty">No tienes avisos nuevos.</div>')+'</div>';
+    if(nl.length){
+      h+='<button class="btn g full" id="vl" style="margin-top:18px">'+(verLeidas?"Ocultar leídas":"Ver leídas ("+nl.length+")")+'</button>';
+      if(verLeidas)h+='<div class="cards" style="margin-top:14px">'+nl.map(cardN).join("")+'</div>';
+    }
+  }
+  return h;
 }
-function bindAlertas(){if($("#mk"))$("#mk").onclick=async function(){await db.from("notificaciones").update({leida:true}).eq("usuario_id",sesion.user.id).eq("leida",false);await cargarNotifs();renderApp()}}
+async function refrescaAlertas(){var y=window.scrollY;await cargarNotifs();renderApp();window.scrollTo(0,y)}
+function bindAlertas(){
+  if($("#mk"))$("#mk").onclick=async function(){await db.from("notificaciones").update({leida:true}).eq("usuario_id",sesion.user.id).eq("leida",false);refrescaAlertas()};
+  document.querySelectorAll("[data-nid]").forEach(function(b){b.onclick=async function(){await db.from("notificaciones").update({leida:true}).eq("id",b.dataset.nid).select();refrescaAlertas()}});
+  if($("#vl"))$("#vl").onclick=function(){verLeidas=!verLeidas;var y=window.scrollY;renderApp();window.scrollTo(0,y)};
+}
 async function olvide(){
   var em=$("#em").value.trim(),er=$("#err");er.style.color="";
   if(!em){er.textContent="Escribe tu correo arriba y vuelve a tocar «¿Olvidaste tu contraseña?».";return}
