@@ -553,7 +553,7 @@ async function sucursales(){
   '<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" list="dlc" placeholder="Ej: Santiago" autocomplete="off">'+dlCiudades()+'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Agregar sucursal</button></form>'+
   '<h2 class="sec">Sucursales ('+SUC.length+')</h2><div class="cards">'+
   (SUC.map(function(s){
-    var g=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&u.sucursal_id===s.id}).length};
+    var g=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&(rol==="jefe"||u.sucursal_id===s.id)}).length};
     return'<button type="button" class="v suc'+(s.activo?"":" out")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)"><h3>'+esc(s.nombre)+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</h3>'+(subSuc(s)?'<div class="m">📍 '+esc(subSuc(s))+'</div>':'')+
     '<div class="m">'+plural(g("jefe"),"jefe","jefes")+' · '+plural(g("vendedor"),"vendedor","vendedores")+' · '+plural(g("preparador"),"preparador","preparadores")+'</div>'+
     '<div class="m">'+plural(cv[s.id]||0,"auto en stock","autos en stock")+' · '+plural(ce[s.id]||0,"entrega activa","entregas activas")+'</div></button>'}).join("")||'<div class="empty">Aún no hay sucursales. Agrega la primera arriba.</div>')+
@@ -591,7 +591,7 @@ async function sucursalVista(){
     '<h2 class="sec">Pendientes ('+pe.length+')</h2><div class="cards">'+(pe.map(persona).join("")||'<div class="empty">No hay nadie pendiente.</div>')+'</div>'+
     '<h2 class="sec">Administradores ('+ad.length+')</h2><div class="cards">'+ad.map(persona).join("")+'</div>';
   }else{
-    var gr=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&u.sucursal_id===id})},pe2=PER.filter(pendiente);
+    var gr=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&(rol==="jefe"||u.sucursal_id===id)})},pe2=PER.filter(pendiente);
     h+='<form id="fSn" novalidate><label for="sn2">Nombre de la sucursal</label><input id="sn2" value="'+esc(s.nombre)+'" autocomplete="off"><label for="sc2">Ciudad</label><input id="sc2" list="dlc" value="'+esc(s.ciudad||"")+'" autocomplete="off">'+dlCiudades()+'<label for="sd2">Dirección</label><input id="sd2" value="'+esc(s.direccion||"")+'" autocomplete="off"><button class="btn full" type="submit">Guardar datos</button><div class="err" id="err" role="alert"></div>'+
     '<div class="vb"><button type="button" class="btn g" data-a="ts">'+(s.activo?"Desactivar sucursal":"Activar sucursal")+'</button><button type="button" class="btn d" data-a="es">Eliminar</button></div></form>'+
     (s.activo?'':'<p class="hola" style="margin-top:12px">Esta sucursal está desactivada: sus personas no pueden entrar.</p>')+
