@@ -140,7 +140,7 @@ body.r-consulta .act.pn,body.r-preparador .act.pn{display:none}
 .sucsel{display:flex;align-items:center;gap:10px;margin-bottom:12px}.sucsel label{margin:0;white-space:nowrap}.sucsel select{flex:1;max-width:380px}
 
 .bigbtn:not(.pb){flex-direction:row;align-items:center;gap:14px}.bigbtn .tx{display:flex;flex-direction:column;gap:2px}
-.bigbtn.np{width:100%}.big.np-w{grid-template-columns:1fr!important}.arw{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff}
+.bigbtn.np{width:100%}input[readonly]{background:var(--bg);color:var(--mu)}.big.np-w{grid-template-columns:1fr!important}.arw{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff}
 .arw svg{width:26px;height:26px;stroke-width:3}.arw.up{color:#16a34a}.arw.dn{color:#dc2626;border:1px solid var(--bd)}
 .chips .seg{margin-left:auto}
 .seg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
@@ -904,7 +904,8 @@ function bindPform(){
   var e=editE?ent.filter(function(x){return x.id===editE})[0]:null;
   if(editE&&!e){go("plan");return}
   if(e){var m={pvin:e.vin,pmod:e.modelo,pcol:e.color,pven:e.vendedor,pfi:e.fecha_inicial,pfe:e.fecha_entrega,phr:hh(e),pfa:e.fecha_alistamiento,pacc:e.accesorios,pcam:e.campanas,pgr:e.grabado_patente,ppr:e.preparador,pes:e.estado,psuc:e.sucursal_id};for(var k in m)if($("#"+k))setSel($("#"+k),m[k]||"")}
-  else{$("#pfi").value=hoy();if(perfil.rol==="vendedor"&&perfil.nombre)$("#pven").value=perfil.nombre}
+  else{$("#pfi").value=hoy();}
+  if(perfil.rol==="vendedor"){var pv=$("#pven");if(!e)pv.value=perfil.nombre||ident(perfil);pv.readOnly=true;pv.title="Se completa con tu nombre"}
   cargarPrep();if($("#psuc"))$("#psuc").onchange=cargarPrep;
   if(prefE){$("#pes").value=prefE;prefE=null}
   $("#pvin").oninput=vinPlan;$("#fp").onsubmit=guardarEntrega;
@@ -923,7 +924,7 @@ function vinPlan(){
   sg.innerHTML="";
   var v=data.filter(function(x){return x.vin===vin&&!x.fechaSalida})[0]||data.filter(function(x){return x.vin===vin})[0];
   if(!v){n.textContent="Este VIN no está en el inventario. Completa los datos a mano.";return}
-  if(!$("#pmod").value)$("#pmod").value=v.modelo;if(!$("#pcol").value)$("#pcol").value=v.color;if(!$("#pven").value&&v.vendedor)$("#pven").value=v.vendedor;if($("#psuc")&&v.sucursalId&&!editE){$("#psuc").value=v.sucursalId;cargarPrep()}
+  if(!$("#pmod").value)$("#pmod").value=v.modelo;if(!$("#pcol").value)$("#pcol").value=v.color;if(!$("#pven").value&&v.vendedor&&perfil.rol!=="vendedor")$("#pven").value=v.vendedor;if($("#psuc")&&v.sucursalId&&!editE){$("#psuc").value=v.sucursalId;cargarPrep()}
   n.textContent="En el inventario: "+v.modelo+" "+v.version+" · "+v.ubic+" · "+(v.estado||"Disponible");
 }
 async function guardarEntrega(ev){
