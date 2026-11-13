@@ -79,7 +79,7 @@ h2.sec{font-size:13px;margin:20px auto 8px;color:var(--mu);text-transform:upperc
 #nav button[aria-current=page]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;border-radius:0 0 3px 3px;background:var(--pr)}
 .bdg{position:absolute;top:6px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c62828;color:#fff;font-style:normal;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 body:not(.r-admin) .vb .btn.d{display:none}
-body.r-consulta .vb,body.r-consulta .bigbtn:not(.pb),body.r-vendedor .vb,body.r-vendedor .bigbtn:not(.pb){display:none}
+body.r-consulta .vb,body.r-consulta .bigbtn:not(.pb),body.r-vendedor .vb,body.r-vendedor .bigbtn:not(.pb):not(.np){display:none}
 body:not(.r-admin) .adm{display:none}
 body.r-consulta .pn,body.r-preparador .pn,body.r-consulta .pe{display:none}
 .hide{display:none}
@@ -171,7 +171,8 @@ body.r-consulta .act.pn,body.r-preparador .act.pn{display:none}
 #nav .ad svg{flex:none}
 #nav .ad span{flex:1;text-align:left}
 #nav .nsec{display:block;margin:14px 14px 4px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.55)}
-#nav .nbot{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+#nav{overflow-y:auto}
+#nav .nbot{position:sticky;bottom:-16px;background:var(--hd);padding-bottom:16px;display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
 #nav .nbot .seg{width:100%}
 #nav .seg button{flex:1;min-height:38px;padding:0 10px;justify-content:center;gap:6px;border-radius:9px;color:var(--mu);font-size:14px}
 #nav .seg button:hover{background:none}
@@ -806,7 +807,7 @@ function portada(){
   return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||ident(perfil))+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
-  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+'</div>':'')+
+  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
   '<h2 class="sec">Apariencia</h2>'+temaSeg()+
   '<button class="btn d full" style="margin-top:24px" onclick="salir()">Cerrar sesión</button></div>';
 }
@@ -816,7 +817,7 @@ function planVista(){
   (al.length?'<button class="v out" style="display:block;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--tx)" onclick="go(&quot;alertas&quot;)"><b>'+al.length+' entrega(s) con plazo para hoy, mañana o vencido</b><div class="m">Toca para ver el detalle</div></button>':'')+
   '<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button><button type="button" class="chip" id="psort"></button>'+vmBar("plan")+'</div>'+
   '<div class="tools"><select id="pe" aria-label="Estado">'+opts(PEST,"Todos los estados")+'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button></div>'+
-  '<div class="acts">'+act("Nueva entrega","editE=null;go(&quot;pform&quot;)","p pn","plus")+'</div>'+'<div id="pl" style="margin-top:12px"></div>';
+  '<div class="big np-w"><button class="bigbtn pn np" onclick="editE=null;go(&quot;pform&quot;)"><i class="arw up">'+svg("plus")+'</i><span class="tx"><b>Nueva entrega</b><span>Programar la entrega de un vehículo</span></span></button></div>'+'<div id="pl" style="margin-top:12px"></div>';
 }
 function bindPlan(){
   $("#pe").value=pf.ven;$("#pq").value=pf.q;
@@ -1009,7 +1010,7 @@ function pintaNav(){
   var a2={sucursales:"sucs",sucursal:"sucs",historial:"hist",cfginv:"cfgi",cfgplan:"cfgp"}[v]||"";
   var act=a2?"":v==="plan"||v==="pform"?"plan":v==="alertas"?"alertas":(["inicio","ingresar","salida","inventario","editar"].indexOf(v)>-1?"inv":"home");
   var it=[["home","","Inicio",IC.home],["inv","inv","Inventario",IC.car],["plan","plan","Planificador",IC.cal],["alertas","alertas","Alertas",IC.bell]];
-  var ex=[["sucs","sucursales","Sucursales","tienda"],["hist","historial","Historial de cambios","reloj"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"]];
+  var ex=[["sucs","sucursales","Sucursales","tienda"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
   n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("")+
   (ad?'<div class="nsec">Administración</div>'+ex.map(function(x){return'<button type="button" class="ad" onclick="go(&quot;'+x[1]+'&quot;)"'+(a2===x[0]?' aria-current="page"':'')+'>'+svg(x[3])+'<span>'+x[2]+'</span></button>'}).join(""):"")+
   '<div class="nbot">'+temaSeg()+'<div class="who"><b>'+esc(perfil.nombre||ident(perfil))+'</b><span>'+esc(perfil.rol)+'</span></div><button type="button" class="out" onclick="salir()">'+svg("salir")+'<span>Cerrar sesión</span></button></div>';
