@@ -129,6 +129,7 @@ details.pers .ed label{margin-top:12px}
 .crow input{flex:1 1 100%;min-width:0}.crow select{flex:1 1 90px;min-width:0}.crow .btn{min-height:44px;padding:0 14px}.crow .btn:disabled{opacity:.4}
 .crow.add{border-style:dashed}
 @media(min-width:600px){.crow input{flex:1 1 200px}}
+details.pers .vb{flex-wrap:wrap}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
 </head>
@@ -150,22 +151,43 @@ async function cargarTodo(){var p=await db.from("perfiles").select("*").eq("id",
 async function guardarDB(v,er){var r=await db.from("vehiculos").update(aDB(v)).eq("id",v.id).select();if(r.error||!r.data.length){er.textContent=msgErr(r.error);await cargar();return false}return true}
 async function insertarDB(v,er){var r=await db.from("vehiculos").insert(aDB(v)).select().single();if(r.error){er.textContent=msgErr(r.error);return null}return deDB(r.data)}
 async function iniciar(){$("#app").innerHTML='<div class="empty">Cargando...</div>';var s=await db.auth.getSession();sesion=s.data.session;if(sesion)await cargarTodo();render()}
-async function entrar(registro){
-  var em=$("#em").value.trim(),pw=$("#pw").value,er=$("#err");
-  if(!em||pw.length<6){er.textContent="Ingresa tu correo y una contraseña de al menos 6 caracteres.";return}
-  var r=registro?await db.auth.signUp({email:em,password:pw}):await db.auth.signInWithPassword({email:em,password:pw});
-  if(r.error){er.textContent=registro?"No se pudo crear la cuenta: "+r.error.message:"Correo o contraseña incorrectos.";return}
-  if(!r.data.session){er.textContent="Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.";return}
+async function salir(){if(canal){db.removeChannel(canal);canal=null}await db.auth.signOut();sesion=null;perfil=null;data=[];SUC=[];sucSel="";try{sessionStorage.removeItem("sucSel")}catch(e){}document.body.className="";go("");render()}
+var modoReg=false;
+function loginView(){return'<div class="hero"><img src="'+LOGO+'" alt="Ford Inventario"><h1>Inventario Ford</h1><p>Inventario y planificador de entregas</p></div><form id="fLog" novalidate><label for="em">RUT <small>(o correo)</small></label><input id="em" autocomplete="username" placeholder="12.345.678-5"><label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password"><p class="hola" style="margin:8px 0 0">La primera vez, tu contraseña son los últimos 4 dígitos de tu RUT, sin el dígito verificador.</p><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Entrar</button><button class="btn g full" type="button" id="reg">Crear cuenta</button><button type="button" class="back" id="olv" style="display:block;margin:14px auto 0">¿Olvidaste tu contraseña?</button></form>'}
+function regView(){return'<div class="hero"><img src="'+LOGO+'" alt="Ford Inventario"><h1>Inventario Ford</h1><p>Inventario y planificador de entregas</p></div><form id="fReg" novalidate><label for="rn">Nombre y apellido</label><input id="rn" autocomplete="name"><label for="rr">RUT</label><input id="rr" placeholder="12.345.678-5" autocomplete="off"><p class="hola" style="margin:8px 0 0">Tu contraseña inicial serán los últimos 4 dígitos de tu RUT, sin el dígito verificador. Te pediremos cambiarla.</p><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Crear cuenta</button><button class="btn g full" type="button" id="vlg">Ya tengo cuenta</button></form>'}
+function rutLimpio(s){return String(s||"").replace(/[^0-9kK]/g,"").toUpperCase()}
+function rutValido(s){var r=rutLimpio(s);if(r.length<7||r.length>9)return false;var b=r.slice(0,-1),d=r.slice(-1),t=0,m=2;if(!/^\d+$/.test(b))return false;for(var i=b.length-1;i>=0;i--){t+=b.charAt(i)*m;m=m===7?2:m+1}var x=11-t%11;return(x===11?"0":x===10?"K":String(x))===d}
+function rutFmt(s){var r=rutLimpio(s);return r.slice(0,-1).replace(/\B(?=(\d{3})+(?!\d))/g,".")+"-"+r.slice(-1)}
+function rutEmail(s){return rutLimpio(s).slice(0,-1)+"@rut.inventario.app"}
+function rutClave(s){return rutLimpio(s).slice(0,-1).slice(-4)+"-Ford"}
+function ident(u){return u.rut||u.email}
+async function entrar(){
+  var em=$("#em").value.trim(),pw=$("#pw").value,er=$("#err"),id=em;
+  if(!em||!pw){er.textContent="Ingresa tu RUT y tu contraseña.";return}
+  if(em.indexOf("@")<0){if(!rutValido(em)){er.textContent="El RUT no es válido. Escríbelo con su dígito verificador, por ejemplo 12.345.678-5.";return}id=rutEmail(em);if(/^\d{4}$/.test(pw))pw=pw+"-Ford"}
+  var r=await db.auth.signInWithPassword({email:id,password:pw});
+  if(r.error||!r.data.session){er.textContent="RUT o contraseña incorrectos.";return}
   sesion=r.data.session;await cargarTodo();render()
 }
-async function salir(){if(canal){db.removeChannel(canal);canal=null}await db.auth.signOut();sesion=null;perfil=null;data=[];SUC=[];sucSel="";try{sessionStorage.removeItem("sucSel")}catch(e){}document.body.className="";go("");render()}
-function loginView(){return'<div class="hero"><img src="'+LOGO+'" alt="Ford Inventario"><h1>Inventario Ford</h1><p>Inventario y planificador de entregas</p></div><form id="fLog" novalidate><label for="em">Correo</label><input id="em" type="email" autocomplete="username"><label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Entrar</button><button class="btn g full" type="button" id="reg">Crear cuenta</button><button type="button" class="back" id="olv" style="display:block;margin:14px auto 0">¿Olvidaste tu contraseña?</button></form>'}
+async function registrar(e){
+  e.preventDefault();var n=$("#rn").value.trim(),rt=$("#rr").value,er=$("#err");
+  if(!n){er.textContent="Escribe tu nombre y apellido.";return}
+  if(!rutValido(rt)){er.textContent="El RUT no es válido. Escríbelo con su dígito verificador, por ejemplo 12.345.678-5.";return}
+  var r=await db.auth.signUp({email:rutEmail(rt),password:rutClave(rt),options:{data:{nombre:n,rut:rutFmt(rt)}}});
+  if(r.error){er.textContent=/registered|exists/i.test(r.error.message||"")?"Ese RUT ya tiene cuenta. Vuelve e inicia sesión con los últimos 4 dígitos de tu RUT.":"No se pudo crear la cuenta: "+r.error.message;return}
+  var ses=r.data&&r.data.session;
+  if(!ses){var x=await db.auth.signInWithPassword({email:rutEmail(rt),password:rutClave(rt)});ses=x.data&&x.data.session}
+  if(!ses){er.textContent="Cuenta creada, pero no se pudo entrar sola. Vuelve e inicia sesión con tu RUT.";return}
+  sesion=ses;modoReg=false;await cargarTodo();render()
+}
 function render(){
   var a=$("#app");$("#nav").hidden=true;document.body.classList.remove("conav");
   if(recup){a.innerHTML=recupView();$("#fRec").onsubmit=guardarClave;return}
-  if(!sesion){a.innerHTML=loginView();$("#fLog").onsubmit=function(e){e.preventDefault();entrar(false)};$("#reg").onclick=function(){entrar(true)};$("#olv").onclick=olvide;return}
+  if(!sesion){if(modoReg){a.innerHTML=regView();$("#fReg").onsubmit=registrar;$("#vlg").onclick=function(){modoReg=false;render()}}else{a.innerHTML=loginView();$("#fLog").onsubmit=function(e){e.preventDefault();entrar()};$("#reg").onclick=function(){modoReg=true;render()};$("#olv").onclick=olvide}return}
+  if(perfil&&perfil.clave_cambiada===false){a.innerHTML=recupView(true);$("#fRec").onsubmit=guardarClave;return}
+  if(perfil&&!perfil.activo&&perfil.rol!=="admin"&&!perfil.sucursal_pedida){elegirAcceso();return}
   var pend=!perfil||!perfil.activo,sinS=!pend&&perfil.rol!=="admin"&&!SUC.length;
-  if(pend||sinS){a.innerHTML='<header><h1>Cuenta pendiente</h1></header><div class="panel">Tu cuenta ('+esc(sesion.user.email)+') '+(pend?'está esperando la aprobación de un administrador.':'todavía no tiene una sucursal activa asignada. Pídele al administrador que te asigne una.')+'</div><button class="btn g full" id="rt">Reintentar</button><button class="btn g full" onclick="salir()">Cerrar sesión</button>';$("#rt").onclick=async function(){await cargarTodo();render()};return}
+  if(pend||sinS){a.innerHTML='<header><h1>Cuenta pendiente</h1></header><div class="panel">Tu cuenta ('+esc(perfil?ident(perfil):sesion.user.email)+') '+(pend?'está esperando la aprobación de un administrador'+(perfil&&perfil.rol_pedido?' (solicitaste ser '+esc(perfil.rol_pedido)+').':'.'):'todavía no tiene una sucursal activa asignada. Pídele al administrador que te asigne una.')+'</div><button class="btn g full" id="rt">Reintentar</button>'+(pend&&perfil&&perfil.sucursal_pedida?'<button class="btn g full" id="cs">Cambiar mi solicitud</button>':'')+'<button class="btn g full" onclick="salir()">Cerrar sesión</button>';$("#rt").onclick=async function(){await cargarTodo();render()};if($("#cs"))$("#cs").onclick=function(){perfil.sucursal_pedida=null;render()};return}
   document.body.className="r-"+perfil.rol;
   var v=vista();
   if(["sucursales","sucursal","cfginv","cfgplan","historial"].indexOf(v)>-1&&perfil.rol!=="admin"){go("");return}
@@ -477,12 +499,12 @@ async function sucursales(){
 }
 /* --- Sucursal: detalle y personas --- */
 function persona(u){
-  var me=u.id===sesion.user.id,d=me?" disabled":"";
-  return'<details class="v pers'+(u.activo&&(u.rol==="admin"||u.sucursal_id)?"":" out")+'"><summary><b>'+esc(u.nombre||u.email)+(me?" (tú)":"")+'</b><span class="m">'+esc(u.email)+(u.nombre?"":" · sin nombre")+'</span></summary><div class="ed" data-uid="'+u.id+'">'+
+  var me=u.id===sesion.user.id,d=me?" disabled":"",pd=pendiente(u),rolV=pd&&u.rol_pedido?u.rol_pedido:u.rol,sucV=u.sucursal_id||(pd?u.sucursal_pedida:null);
+  return'<details class="v pers'+(u.activo&&(u.rol==="admin"||u.sucursal_id)?"":" out")+'"><summary><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</summary><div class="ed" data-uid="'+u.id+'">'+
   '<label>Nombre</label><input data-f="nombre" value="'+esc(u.nombre||"")+'" placeholder="Nombre y apellido" autocomplete="off">'+
-  '<label>Rol</label><select data-f="rol"'+d+'>'+ROLES.map(function(x){return'<option'+(x===u.rol?" selected":"")+'>'+x+'</option>'}).join("")+'</select>'+
-  '<label>Sucursal</label><select data-f="suc"'+d+'>'+optsSuc(u.sucursal_id,"Sin sucursal")+'</select>'+
-  '<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>'+(me?'':'<button type="button" class="btn d" data-a="qp">Quitar acceso</button>')+'</div></div></details>';
+  '<label>Rol</label><select data-f="rol"'+d+'>'+ROLES.map(function(x){return'<option'+(x===rolV?" selected":"")+'>'+x+'</option>'}).join("")+'</select>'+
+  '<label>Sucursal</label><select data-f="suc"'+d+'>'+optsSuc(sucV,"Sin sucursal")+'</select>'+
+  '<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>'+(me?'':'<button type="button" class="btn d" data-a="qp">Quitar acceso</button>')+(!me&&u.rut?'<button type="button" class="btn g" data-a="rc">Restablecer clave</button>':'')+'</div></div></details>';
 }
 async function sucursalVista(){
   var id=hparam(),a=$("#app"),none=id==="none";
@@ -508,7 +530,7 @@ async function sucursalVista(){
       var l=gr(p[0]);if(p[0]==="consulta"&&!l.length)return;
       h+='<h2 class="sec">'+p[1]+' ('+l.length+')</h2><div class="cards">'+(l.map(persona).join("")||'<div class="empty" style="padding:12px">Nadie todavía.</div>')+'</div>';
     });
-    h+='<h2 class="sec">Agregar persona</h2>'+(pe2.length?'<form id="fAdd" novalidate><label for="ap">Cuenta registrada</label><select id="ap">'+pe2.map(function(u){return'<option value="'+u.id+'">'+esc(u.nombre||u.email)+(u.nombre?" · "+esc(u.email):"")+'</option>'}).join("")+'</select><label for="an">Nombre <small>(opcional)</small></label><input id="an" autocomplete="off" placeholder="Nombre y apellido"><label for="ar">Rol en esta sucursal</label><select id="ar"><option>jefe</option><option selected>vendedor</option><option>preparador</option><option>consulta</option></select><div class="err" id="err2" role="alert"></div><button class="btn full" type="submit">Agregar a esta sucursal</button></form>':'<div class="panel">No hay cuentas pendientes. Pídele a la persona que toque «Crear cuenta» en la pantalla de inicio; aparecerá aquí.</div>');
+    h+='<h2 class="sec">Agregar persona</h2>'+(pe2.length?'<form id="fAdd" novalidate><label for="ap">Cuenta registrada</label><select id="ap">'+pe2.map(function(u){return'<option value="'+u.id+'">'+esc(u.nombre||ident(u))+(u.nombre?" · "+esc(ident(u)):"")+'</option>'}).join("")+'</select><label for="an">Nombre <small>(opcional)</small></label><input id="an" autocomplete="off" placeholder="Nombre y apellido"><label for="ar">Rol en esta sucursal</label><select id="ar"><option>jefe</option><option selected>vendedor</option><option>preparador</option><option>consulta</option></select><div class="err" id="err2" role="alert"></div><button class="btn full" type="submit">Agregar a esta sucursal</button></form>':'<div class="panel">No hay cuentas pendientes. Pídele a la persona que toque «Crear cuenta» en la pantalla de inicio; aparecerá aquí.</div>');
   }
   a.innerHTML=h;
   if(!none){
@@ -527,9 +549,15 @@ ACC.gp=async function(b){
   var ed=b.closest(".ed"),q=function(k){return ed.querySelector('[data-f="'+k+'"]')},uid=ed.dataset.uid,u=PER.filter(function(x){return x.id===uid})[0],rol=q("rol").value,suc=q("suc").value,nom=q("nombre").value.trim();
   if(rol!=="admin"&&!suc){toast("Elige una sucursal");return}
   if(rol==="admin"&&u&&u.rol!=="admin"&&!confirm("Un administrador ve y cambia todo. ¿Continuar?"))return;
-  var x=await db.from("perfiles").update({nombre:nom||null,rol:rol,sucursal_id:rol==="admin"?null:suc,activo:true}).eq("id",uid).select();
+  var x=await db.from("perfiles").update({nombre:nom||null,rol:rol,sucursal_id:rol==="admin"?null:suc,activo:true,sucursal_pedida:null,rol_pedido:null}).eq("id",uid).select();
   if(x.error||!x.data.length){toast("No se pudo guardar");return}
   toast("Cambios guardados");refresca();
+};
+ACC.rc=async function(b){
+  var uid=b.closest(".ed").dataset.uid;
+  if(!confirm("La clave volverá a ser los últimos 4 dígitos del RUT y la persona deberá cambiarla al entrar. ¿Continuar?"))return;
+  var x=await db.rpc("restablecer_clave",{uid:uid});
+  toast(x.error?"No se pudo restablecer":"Clave restablecida");
 };
 ACC.qp=async function(b){
   var ed=b.closest(".ed"),uid=ed.dataset.uid;
@@ -622,7 +650,7 @@ async function cargarPrep(){
 
 function portada(){
   var n=badge();
-  return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||perfil.email)+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
+  return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||ident(perfil))+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
   (perfil.rol==="admin"?'<h2 class="sec">Administración</h2><div class="row2"><button class="btn g full" onclick="go(&quot;sucursales&quot;)">Sucursales</button><button class="btn g full" onclick="go(&quot;historial&quot;)">Historial de cambios</button></div>':'')+
@@ -770,21 +798,30 @@ function bindAlertas(){
   document.querySelectorAll("[data-nid]").forEach(function(b){b.onclick=async function(){await db.from("notificaciones").update({leida:true}).eq("id",b.dataset.nid).select();refrescaAlertas()}});
   if($("#vl"))$("#vl").onclick=function(){verLeidas=!verLeidas;var y=window.scrollY;renderApp();window.scrollTo(0,y)};
 }
+async function elegirAcceso(){
+  var a=$("#app");a.innerHTML=head("Elige tu sucursal")+'<div class="empty">Cargando...</div>';
+  var r=await db.rpc("sucursales_publicas"),l=r.data||[];
+  a.innerHTML=head("Elige tu sucursal y rol")+(l.length?'<form id="fAcc" novalidate><label for="xn">Tu nombre</label><input id="xn" autocomplete="name" value="'+esc(perfil.nombre||"")+'"><label for="xs">Sucursal</label><select id="xs">'+l.map(function(x){return'<option value="'+x.id+'">'+esc(x.nombre)+'</option>'}).join("")+'</select><label for="xr">Tu rol en esa sucursal</label><select id="xr"><option value="vendedor">Vendedor</option><option value="preparador">Preparador</option><option value="jefe">Jefe</option><option value="consulta">Solo consulta</option></select><p class="hola" style="margin:10px 0 0">Un administrador revisará tu solicitud antes de darte acceso.</p><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Enviar solicitud</button></form>':'<div class="panel">Todavía no hay sucursales creadas. Avísale al administrador.</div>')+'<button class="btn g full" onclick="salir()">Cerrar sesión</button>';
+  if($("#fAcc"))$("#fAcc").onsubmit=async function(e){e.preventDefault();var er=$("#err"),x=await db.rpc("pedir_acceso",{sid:$("#xs").value,r:$("#xr").value,n:$("#xn").value});
+    if(x.error){er.textContent="No se pudo enviar la solicitud.";return}await cargarTodo();render()};
+}
 async function olvide(){
   var em=$("#em").value.trim(),er=$("#err");er.style.color="";
-  if(!em){er.textContent="Escribe tu correo arriba y vuelve a tocar «¿Olvidaste tu contraseña?».";return}
+  if(!em){er.textContent="Escribe tu RUT arriba y vuelve a tocar «¿Olvidaste tu contraseña?».";return}
+  if(em.indexOf("@")<0){er.textContent="Pídele a tu administrador que restablezca tu contraseña: volverá a ser los últimos 4 dígitos de tu RUT.";return}
   er.textContent="Enviando...";
   var r=await db.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});
   if(r.error){er.textContent="No se pudo enviar el correo: "+r.error.message;return}
   er.style.color="var(--ok)";er.textContent="Listo. Si el correo está registrado, te enviamos un enlace para crear una nueva contraseña. Revisa también spam."
 }
-function recupView(){return'<header><h1>Nueva contraseña</h1><img class="logo" src="'+LOGO+'" alt="Ford"></header><form id="fRec" novalidate><label for="np">Nueva contraseña</label><input id="np" type="password" autocomplete="new-password"><label for="np2">Repetir contraseña</label><input id="np2" type="password" autocomplete="new-password"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Guardar contraseña</button></form>'}
+function recupView(f){return'<header><h1>Nueva contraseña</h1><img class="logo" src="'+LOGO+'" alt="Ford"></header><form id="fRec" novalidate>'+(f?'<p class="hola">Por seguridad, cambia tu contraseña inicial. Usa al menos 6 caracteres.</p>':'')+'<label for="np">Nueva contraseña</label><input id="np" type="password" autocomplete="new-password"><label for="np2">Repetir contraseña</label><input id="np2" type="password" autocomplete="new-password"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Guardar contraseña</button></form>'}
 async function guardarClave(e){
   e.preventDefault();var a=$("#np").value,b=$("#np2").value,er=$("#err");
   if(a.length<6){er.textContent="La contraseña debe tener al menos 6 caracteres.";return}
   if(a!==b){er.textContent="Las contraseñas no coinciden.";return}
   var r=await db.auth.updateUser({password:a});
   if(r.error){er.textContent="No se pudo guardar: "+r.error.message;return}
+  if(perfil&&perfil.clave_cambiada===false){await db.rpc("clave_cambiada");perfil.clave_cambiada=true}
   recup=false;toast("Contraseña actualizada");history.replaceState(null,"",location.pathname);await cargarTodo();render();
 }
 db.auth.onAuthStateChange(function(ev,ses){if(ev==="PASSWORD_RECOVERY"){recup=true;sesion=ses;setTimeout(render,0)}});
