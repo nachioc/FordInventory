@@ -247,7 +247,7 @@ function render(){
   if(!sesion){if(modoReg){a.innerHTML=regView();$("#fReg").onsubmit=registrar;$("#vlg").onclick=function(){modoReg=false;render()}}else{a.innerHTML=loginView();$("#fLog").onsubmit=function(e){e.preventDefault();entrar()};$("#reg").onclick=function(){modoReg=true;render()};$("#olv").onclick=olvide}return}
   if(perfil&&perfil.clave_cambiada===false){a.innerHTML=recupView(true);$("#fRec").onsubmit=guardarClave;return}
   if(perfil&&!perfil.activo&&perfil.rol!=="admin"&&!perfil.sucursal_pedida){elegirAcceso();return}
-  var pend=!perfil||!perfil.activo,sinS=!pend&&perfil.rol!=="admin"&&!SUC.length;
+  var pend=!perfil||!perfil.activo,sinS=!pend&&!esAdm()&&!SUC.length;
   if(pend||sinS){a.innerHTML='<header><h1>Cuenta pendiente</h1></header><div class="panel">Tu cuenta ('+esc(perfil?ident(perfil):sesion.user.email)+') '+(pend?'está esperando la aprobación de un administrador'+(perfil&&perfil.rol_pedido?' (solicitaste ser '+esc(perfil.rol_pedido)+').':'.'):'todavía no tiene una sucursal activa asignada. Pídele al administrador que te asigne una.')+'</div><button class="btn g full" id="rt">Reintentar</button>'+(pend&&perfil&&perfil.sucursal_pedida?'<button class="btn g full" id="cs">Cambiar mi solicitud</button>':'')+'<button class="btn g full" onclick="salir()">Cerrar sesión</button>';$("#rt").onclick=async function(){await cargarTodo();render()};if($("#cs"))$("#cs").onclick=function(){perfil.sucursal_pedida=null;render()};return}
   document.body.className="r-"+perfil.rol+(esAdm()?" r-admin":"");
   var v=vista();
@@ -534,7 +534,7 @@ function cfgBtn(v,t){return esAdm()?act(t,"go(&quot;"+v+"&quot;)","","tune"):""}
 function refresca(){window.__y=window.scrollY;renderApp()}
 function rest(){if(window.__y!=null){window.scrollTo(0,window.__y);window.__y=null}}
 function plural(n,a,b){return n+" "+(n===1?a:b)}
-function pendiente(u){return u.rol!=="admin"&&(!u.activo||!u.sucursal_id)}
+function pendiente(u){return u.rol==="admin"||u.rol==="jefe"?!u.activo:(!u.activo||!u.sucursal_id)}
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-a]");if(b&&ACC[b.dataset.a])ACC[b.dataset.a](b)});
 document.addEventListener("change",function(e){var el=e.target;if(!el.dataset||!el.dataset.a2)return;if(el.dataset.a2==="ren")renCat(el);else if(el.dataset.a2==="col")colCat(el)});
 
@@ -570,10 +570,10 @@ async function sucursales(){
 function persona(u){
   if(u.rol==='admin'&&perfil.rol!=='admin')return'<details class="v pers"><summary><b>'+esc(u.nombre||ident(u))+'</b><span class="m">'+esc(ident(u))+' · administrador</span></summary><div class="ed"><p class="hola">Solo otro administrador puede modificar esta cuenta.</p></div></details>';
   var me=u.id===sesion.user.id,d=me?" disabled":"",pd=pendiente(u),rolV=pd&&u.rol_pedido?u.rol_pedido:u.rol,sucV=u.sucursal_id||(pd?u.sucursal_pedida:null);
-  return'<details class="v pers'+(u.activo&&(u.rol==="admin"||u.sucursal_id)?"":" out")+'"><summary><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</summary><div class="ed" data-uid="'+u.id+'">'+
+  return'<details class="v pers'+(u.activo&&(u.rol==="admin"||u.rol==="jefe"||u.sucursal_id)?"":" out")+'"><summary><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</summary><div class="ed" data-uid="'+u.id+'">'+
   '<label>Nombre</label><input data-f="nombre" value="'+esc(u.nombre||"")+'" placeholder="Nombre y apellido" autocomplete="off">'+
   ''+(u.email.indexOf("@rut.inventario.app")<0?'<label>RUT</label><input data-f="rut" value="'+esc(u.rut||"")+'" placeholder="12.345.678-5" autocomplete="off">':'')+'<label>Rol</label><select data-f="rol"'+d+'>'+ROLES.filter(function(x){return x!=='admin'||perfil.rol==='admin'}).map(function(x){return'<option'+(x===rolV?" selected":"")+'>'+x+'</option>'}).join("")+'</select>'+
-  '<label>Sucursal</label><select data-f="suc"'+d+'>'+optsSuc(sucV,"Sin sucursal")+'</select>'+
+  '<label>Sucursal</label><select data-f="suc"'+d+'>'+optsSuc(sucV,"Sin sucursal fija (todas)")+'</select><p class="m" style="margin:4px 0 0">Admin y jefe pueden trabajar en todas las sucursales; dejar vacío es lo normal para ellos.</p>'+
   '<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>'+(me?'':'<button type="button" class="btn d" data-a="qp">Quitar acceso</button>')+(!me&&u.rut?'<button type="button" class="btn g" data-a="rc">Restablecer clave</button>':'')+'</div></div></details>';
 }
 async function sucursalVista(){
@@ -617,9 +617,9 @@ async function sucursalVista(){
 }
 ACC.gp=async function(b){
   var ed=b.closest(".ed"),q=function(k){return ed.querySelector('[data-f="'+k+'"]')},uid=ed.dataset.uid,u=PER.filter(function(x){return x.id===uid})[0],rol=q("rol").value,suc=q("suc").value,nom=q("nombre").value.trim();
-  if(rol!=="admin"&&!suc){toast("Elige una sucursal");return}
+  if(rol!=="admin"&&rol!=="jefe"&&!suc){toast("Elige una sucursal");return}
   if(rol==="admin"&&u&&u.rol!=="admin"&&!confirm("Un administrador ve y cambia todo. ¿Continuar?"))return;
-  var c={nombre:nom||null,rol:rol,sucursal_id:rol==="admin"?null:suc,activo:true,sucursal_pedida:null,rol_pedido:null};
+  var c={nombre:nom||null,rol:rol,sucursal_id:rol==="admin"?null:(suc||null),activo:true,sucursal_pedida:null,rol_pedido:null};
   if(q("rut")){var rv=q("rut").value.trim();if(rv&&!rutValido(rv)){toast("El RUT no es válido");return}c.rut=rv?rutFmt(rv):null}
   var x=await db.from("perfiles").update(c).eq("id",uid).select();
   if(x.error||!x.data.length){toast(x.error&&x.error.code==="23505"?"Ese RUT ya pertenece a otra cuenta":"No se pudo guardar");return}
