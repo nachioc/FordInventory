@@ -118,7 +118,6 @@ body.conav{padding-left:232px;padding-bottom:24px}
 @media(prefers-reduced-motion:no-preference){#app.sw>*:not(header){animation:swp .2s ease-out}@keyframes swp{from{opacity:.35;transform:translateX(var(--dx))}}}
 @media(prefers-reduced-motion:no-preference){.toast{animation:t .2s}@keyframes t{from{opacity:0}}}
 
-.sucsel{margin-bottom:12px}.sucsel label{margin:0 0 4px}
 .v.suc{display:block;width:100%;text-align:left;font:inherit;color:var(--tx);cursor:pointer}
 .v.suc:hover{border-color:var(--pr)}
 details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
@@ -130,6 +129,15 @@ details.pers .ed label{margin-top:12px}
 .crow.add{border-style:dashed}
 @media(min-width:600px){.crow input{flex:1 1 200px}}
 details.pers .vb{flex-wrap:wrap}
+
+.acts{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+@media(min-width:600px){.acts{grid-template-columns:1fr 1fr}}
+.act{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 18px;border-radius:14px;border:1.5px solid var(--bd);background:var(--card);color:var(--pr);font:inherit;font-weight:700;text-align:left;cursor:pointer;box-shadow:0 1px 3px rgba(0,20,60,.06)}
+.act:hover{border-color:var(--pr)}
+.act svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.act.p{background:var(--pr);border-color:var(--pr);color:var(--on)}
+body.r-consulta .act.pn,body.r-preparador .act.pn{display:none}
+.sucsel{display:flex;align-items:center;gap:10px;margin-bottom:12px}.sucsel label{margin:0;white-space:nowrap}.sucsel select{flex:1;max-width:380px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
 </head>
@@ -238,7 +246,7 @@ function inicio(){
   '<div class="big"><button class="bigbtn" onclick="go(\'ingresar\')"><b>Ingresar</b><span>Registrar un vehículo nuevo en el inventario</span></button>'+
   '<button class="bigbtn s" onclick="go(\'salida\')"><b>Salida</b><span>Registrar la salida de un vehículo</span></button></div>'+
   '<div class="stats"><div class="stat"><b>'+s.length+'</b><small>En stock</small></div><div class="stat"><b>'+(data.length-s.length)+'</b><small>Con salida</small></div></div>'+
-  '<button class="btn g full" onclick="go(\'inventario\')">Ver inventario</button>'+cfgBtn("cfginv","Configurar modelos y estados");
+  '<div class="acts">'+act("Ver inventario","go(&quot;inventario&quot;)","p","lista")+cfgBtn("cfginv","Configurar modelos y estados")+'</div>';
 }
 function ingresar(){
   return head(editId?"Actualizar vehículo":"Ingresar vehículo")+'<form id="fIng" novalidate>'+(perfil.rol==="admin"?'<label for="isuc">Sucursal</label><select id="isuc">'+optsSuc(sucDef())+'</select>':'')+
@@ -304,7 +312,7 @@ function inventario(){
   '<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Con salida</button><button class="chip" data-e="todos">Todos</button></div>'+
   '<div class="tools"><select id="fm" aria-label="Modelo">'+opts(MODELOS,"Todos los modelos")+'</select><select id="fu" aria-label="Ubicación">'+opts(UBIC,"Todas las ubicaciones")+'</select>'+
   '<select class="wide" id="fv" aria-label="Estado del vehículo">'+opts(ESTADOS,"Todos los estados")+'</select><input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar"><button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>'+
-  '<div id="lst"></div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn g" id="exp" style="flex:1">Exportar CSV</button></div>'+
+  '<div id="lst"></div><div class="acts">'+act("Exportar CSV",null,"","bajar",'id="exp"')+'</div>'+
   '';
 }
 function bindInv(){
@@ -464,7 +472,9 @@ function bindSuc(){
   var s=$("#ssel");if(!s)return;s.value=sucSel;
   s.onchange=async function(){sucSel=s.value;try{sessionStorage.setItem("sucSel",sucSel)}catch(e){}await Promise.all([cargar(),cargarEntregas()]);renderApp()};
 }
-function cfgBtn(v,t){return perfil.rol==="admin"?'<button class="btn g full" onclick="go(&quot;'+v+'&quot;)">'+t+'</button>':''}
+var ICO={lista:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',tune:'<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2.2"/><circle cx="9" cy="12" r="2.2"/><circle cx="17" cy="18" r="2.2"/>',plus:'<path d="M12 5v14M5 12h14"/>',tienda:'<path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6"/><path d="M3 9h18"/>',reloj:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',bajar:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>'};
+function act(t,c,k,i,x){return'<button type="button" class="act '+(k||"")+'"'+(c?' onclick="'+c+'"':'')+(x?' '+x:'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICO[i]+'</svg><span>'+t+'</span></button>'}
+function cfgBtn(v,t){return perfil.rol==="admin"?act(t,"go(&quot;"+v+"&quot;)","","tune"):""}
 function refresca(){window.__y=window.scrollY;renderApp()}
 function rest(){if(window.__y!=null){window.scrollTo(0,window.__y);window.__y=null}}
 function plural(n,a,b){return n+" "+(n===1?a:b)}
@@ -602,7 +612,7 @@ function seccionCat(k){
   (ia.length?'<h2 class="sec">Desactivados</h2>'+ia.map(function(x){return'<div class="crow" data-k="'+k+'" data-id="'+x.id+'"><input value="'+esc(x.nombre)+'" disabled aria-label="Nombre"><button type="button" class="btn g" data-a="rea">Reactivar</button></div>'}).join(""):"");
 }
 function cfgInv(){return head("Configurar inventario")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita. Vale para todas las sucursales. Si algo ya se usa, «Quitar» solo lo desactiva para no perder historial.</p>'+seccionCat("modelo")+seccionCat("estado_inv")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>'}
-function cfgPlan(){return head("Configurar planificador")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita estados. Vale para todas las sucursales.</p>'+seccionCat("estado_ent")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p><h2 class="sec">Preparadores</h2><div class="panel">Los preparadores son las personas con rol «preparador» de cada sucursal. Para agregar, quitar o cambiar uno, entra a Sucursales.</div><button class="btn g full" onclick="go(&quot;sucursales&quot;)">Ir a Sucursales</button>'}
+function cfgPlan(){return head("Configurar planificador")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita estados. Vale para todas las sucursales.</p>'+seccionCat("estado_ent")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p><h2 class="sec">Preparadores</h2><div class="panel">Los preparadores son las personas con rol «preparador» de cada sucursal. Para agregar, quitar o cambiar uno, entra a Sucursales.</div><div class="acts">'+act("Ir a Sucursales","go(&quot;sucursales&quot;)","","tienda")+'</div>'}
 function catCtx(b){var r=b.closest("[data-k]"),k=r.dataset.k;return{k:k,id:r.dataset.id,c:CFG[k],f:CAT[k].filter(function(i){return i.id===r.dataset.id})[0]}}
 async function usos(c,nombre){var n=0;for(var i=0;i<c.usa.length;i++){var r=await db.from(c.usa[i]).select("id",{count:"exact",head:true}).eq(c.campo,nombre);n+=r.count||0}return n}
 async function recargaCat(){await Promise.all([cargarCat(),cargar(),cargarEntregas()]);refresca()}
@@ -656,7 +666,7 @@ function portada(){
   return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||ident(perfil))+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
-  (perfil.rol==="admin"?'<h2 class="sec">Administración</h2><div class="row2"><button class="btn g full" onclick="go(&quot;sucursales&quot;)">Sucursales</button><button class="btn g full" onclick="go(&quot;historial&quot;)">Historial de cambios</button></div>':'')+
+  (perfil.rol==="admin"?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
   '<button class="btn d full" style="margin-top:24px" onclick="salir()">Cerrar sesión</button>';
 }
 function planVista(){
@@ -665,7 +675,7 @@ function planVista(){
   (al.length?'<button class="v out" style="display:block;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--tx)" onclick="go(&quot;alertas&quot;)"><b>'+al.length+' entrega(s) con plazo para hoy, mañana o vencido</b><div class="m">Toca para ver el detalle</div></button>':'')+
   '<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button></div>'+
   '<div class="tools"><select id="pe" aria-label="Estado">'+opts(PEST,"Todos los estados")+'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button></div>'+
-  '<button class="btn full pn" onclick="editE=null;go(&quot;pform&quot;)">Nueva entrega</button>'+cfgBtn("cfgplan","Configurar estados")+'<div id="pl" style="margin-top:12px"></div>';
+  '<div class="acts">'+act("Nueva entrega","editE=null;go(&quot;pform&quot;)","p pn","plus")+cfgBtn("cfgplan","Configurar estados")+'</div>'+'<div id="pl" style="margin-top:12px"></div>';
 }
 function bindPlan(){
   $("#pe").value=pf.ven;$("#pq").value=pf.q;
