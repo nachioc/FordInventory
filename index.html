@@ -472,6 +472,9 @@ function pendiente(u){return u.rol!=="admin"&&(!u.activo||!u.sucursal_id)}
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-a]");if(b&&ACC[b.dataset.a])ACC[b.dataset.a](b)});
 document.addEventListener("change",function(e){var el=e.target;if(!el.dataset||!el.dataset.a2)return;if(el.dataset.a2==="ren")renCat(el);else if(el.dataset.a2==="col")colCat(el)});
 
+var CIUDADES=["Arica", "Iquique", "Alto Hospicio", "Antofagasta", "Calama", "Tocopilla", "Mejillones", "Copiapó", "Vallenar", "Caldera", "Chañaral", "La Serena", "Coquimbo", "Ovalle", "Illapel", "Los Vilos", "Vicuña", "Salamanca", "Valparaíso", "Viña del Mar", "Concón", "Quilpué", "Villa Alemana", "Quillota", "La Calera", "San Antonio", "Los Andes", "San Felipe", "Limache", "Olmué", "Casablanca", "Cartagena", "Santo Domingo", "Quintero", "Puchuncaví", "La Ligua", "Isla de Pascua", "Santiago", "Las Condes", "Providencia", "Ñuñoa", "La Florida", "Maipú", "Puente Alto", "San Bernardo", "Vitacura", "Lo Barnechea", "Huechuraba", "Recoleta", "Independencia", "Quilicura", "Renca", "Cerro Navia", "Pudahuel", "Estación Central", "Quinta Normal", "Lo Prado", "Cerrillos", "Pedro Aguirre Cerda", "San Miguel", "San Joaquín", "La Cisterna", "El Bosque", "La Granja", "La Pintana", "San Ramón", "Lo Espejo", "Macul", "Peñalolén", "La Reina", "Conchalí", "Colina", "Lampa", "Til Til", "Pirque", "San José de Maipo", "Padre Hurtado", "Peñaflor", "Talagante", "Melipilla", "Buin", "Paine", "Calera de Tango", "Rancagua", "Machalí", "San Fernando", "Rengo", "Graneros", "Santa Cruz", "Pichilemu", "San Vicente", "Talca", "Curicó", "Linares", "Cauquenes", "Constitución", "Parral", "Molina", "Chillán", "Chillán Viejo", "San Carlos", "Bulnes", "Concepción", "Talcahuano", "San Pedro de la Paz", "Chiguayante", "Hualpén", "Coronel", "Lota", "Penco", "Tomé", "Los Ángeles", "Lebu", "Cañete", "Arauco", "Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol", "Victoria", "Lautaro", "Nueva Imperial", "Valdivia", "La Unión", "Río Bueno", "Panguipulli", "Lanco", "Mariquina", "Osorno", "Puerto Montt", "Puerto Varas", "Frutillar", "Llanquihue", "Los Lagos", "Castro", "Ancud", "Quellón", "Coyhaique", "Puerto Aysén", "Chile Chico", "Punta Arenas", "Puerto Natales", "Porvenir"];
+function dlCiudades(){return'<datalist id="dlc">'+CIUDADES.map(function(c){return'<option value="'+c+'"></option>'}).join("")+'</datalist>'}
+function subSuc(x){return[x.ciudad,x.direccion].filter(Boolean).join(" · ")}
 /* --- Sucursales: lista --- */
 async function sucursales(){
   var a=$("#app");a.innerHTML=head("Sucursales")+'<div class="empty">Cargando...</div>';
@@ -481,17 +484,17 @@ async function sucursales(){
   var cv={},ce={};(r[1].data||[]).forEach(function(x){cv[x.sucursal_id]=(cv[x.sucursal_id]||0)+1});(r[2].data||[]).forEach(function(x){ce[x.sucursal_id]=(ce[x.sucursal_id]||0)+1});
   var np=PER.filter(pendiente).length,na=PER.filter(function(u){return u.rol==="admin"}).length;
   a.innerHTML=head("Sucursales")+
-  '<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><div class="vinrow"><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><button class="btn" type="submit">Agregar</button></div><div class="err" id="err" role="alert"></div></form>'+
+  '<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" list="dlc" placeholder="Ej: Santiago" autocomplete="off">'+dlCiudades()+'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Agregar sucursal</button></form>'+
   '<h2 class="sec">Sucursales ('+SUC.length+')</h2><div class="cards">'+
   (SUC.map(function(s){
     var g=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&u.sucursal_id===s.id}).length};
-    return'<button type="button" class="v suc'+(s.activo?"":" out")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)"><h3>'+esc(s.nombre)+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</h3>'+
+    return'<button type="button" class="v suc'+(s.activo?"":" out")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)"><h3>'+esc(s.nombre)+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</h3>'+(subSuc(s)?'<div class="m">📍 '+esc(subSuc(s))+'</div>':'')+
     '<div class="m">'+plural(g("jefe"),"jefe","jefes")+' · '+plural(g("vendedor"),"vendedor","vendedores")+' · '+plural(g("preparador"),"preparador","preparadores")+'</div>'+
     '<div class="m">'+plural(cv[s.id]||0,"auto en stock","autos en stock")+' · '+plural(ce[s.id]||0,"entrega activa","entregas activas")+'</div></button>'}).join("")||'<div class="empty">Aún no hay sucursales. Agrega la primera arriba.</div>')+
   '<button type="button" class="v suc'+(np?" out":"")+'" onclick="go(&quot;sucursal/none&quot;)"><h3>Sin sucursal y administradores</h3><div class="m">'+plural(np,"persona pendiente","personas pendientes")+' · '+plural(na,"administrador","administradores")+'</div></button></div>';
   $("#fSuc").onsubmit=async function(e){
     e.preventDefault();var n=$("#sn").value.trim(),er=$("#err");if(!n){er.textContent="Escribe el nombre de la sucursal.";return}
-    var x=await db.from("sucursales").insert({nombre:n}).select();
+    var x=await db.from("sucursales").insert({nombre:n,ciudad:$("#sc").value.trim()||null,direccion:$("#sd").value.trim()||null}).select();
     if(x.error){er.textContent=x.error.code==="23505"?"Ya existe una sucursal con ese nombre.":"No se pudo crear la sucursal.";return}
     toast("Sucursal creada");sucursales();
   };
@@ -522,7 +525,7 @@ async function sucursalVista(){
     '<h2 class="sec">Administradores ('+ad.length+')</h2><div class="cards">'+ad.map(persona).join("")+'</div>';
   }else{
     var gr=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&u.sucursal_id===id})},pe2=PER.filter(pendiente);
-    h+='<form id="fSn" novalidate><label for="sn2">Nombre de la sucursal</label><div class="vinrow"><input id="sn2" value="'+esc(s.nombre)+'" autocomplete="off"><button class="btn" type="submit">Guardar</button></div><div class="err" id="err" role="alert"></div>'+
+    h+='<form id="fSn" novalidate><label for="sn2">Nombre de la sucursal</label><input id="sn2" value="'+esc(s.nombre)+'" autocomplete="off"><label for="sc2">Ciudad</label><input id="sc2" list="dlc" value="'+esc(s.ciudad||"")+'" autocomplete="off">'+dlCiudades()+'<label for="sd2">Dirección</label><input id="sd2" value="'+esc(s.direccion||"")+'" autocomplete="off"><button class="btn full" type="submit">Guardar datos</button><div class="err" id="err" role="alert"></div>'+
     '<div class="vb"><button type="button" class="btn g" data-a="ts">'+(s.activo?"Desactivar sucursal":"Activar sucursal")+'</button><button type="button" class="btn d" data-a="es">Eliminar</button></div></form>'+
     (s.activo?'':'<p class="hola" style="margin-top:12px">Esta sucursal está desactivada: sus personas no pueden entrar.</p>')+
     '<div class="stats" style="margin-top:16px">'+["jefe","vendedor","preparador"].map(function(x){return'<div class="stat"><b>'+gr(x).length+'</b><small>'+({jefe:"Jefes",vendedor:"Vendedores",preparador:"Preparadores"})[x]+'</small></div>'}).join("")+'</div>';
@@ -535,9 +538,9 @@ async function sucursalVista(){
   a.innerHTML=h;
   if(!none){
     $("#fSn").onsubmit=async function(e){e.preventDefault();var n=$("#sn2").value.trim(),er=$("#err");if(!n){er.textContent="El nombre no puede quedar vacío.";return}
-      var x=await db.from("sucursales").update({nombre:n}).eq("id",id).select();
+      var x=await db.from("sucursales").update({nombre:n,ciudad:$("#sc2").value.trim()||null,direccion:$("#sd2").value.trim()||null}).eq("id",id).select();
       if(x.error||!x.data.length){er.textContent=x.error&&x.error.code==="23505"?"Ya existe una sucursal con ese nombre.":"No se pudo guardar.";return}
-      toast("Nombre guardado");refresca();};
+      toast("Datos guardados");refresca();};
     if($("#fAdd"))$("#fAdd").onsubmit=async function(e){e.preventDefault();var er=$("#err2"),c={sucursal_id:id,rol:$("#ar").value,activo:true},n=$("#an").value.trim();if(n)c.nombre=n;
       var x=await db.from("perfiles").update(c).eq("id",$("#ap").value).select();
       if(x.error||!x.data.length){er.textContent="No se pudo agregar.";return}
