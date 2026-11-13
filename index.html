@@ -78,7 +78,7 @@ h2.sec{font-size:13px;margin:20px auto 8px;color:var(--mu);text-transform:upperc
 #nav button[aria-current=page]{color:var(--pr)}
 #nav button[aria-current=page]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;border-radius:0 0 3px 3px;background:var(--pr)}
 .bdg{position:absolute;top:6px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c62828;color:#fff;font-style:normal;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
-body:not(.r-admin) .vb .btn.d{display:none}
+body:not(.r-admin) .vb .btn.d,body:not(.r-admin) .vb .ib.d{display:none}
 body.r-consulta .vb,body.r-consulta .bigbtn:not(.pb),body.r-vendedor .vb,body.r-vendedor .bigbtn:not(.pb):not(.np){display:none}
 body:not(.r-admin) .adm{display:none}
 body.r-consulta .pn,body.r-preparador .pn,body.r-consulta .pe{display:none}
@@ -155,6 +155,11 @@ body.r-consulta .act.pn,body.r-preparador .act.pn{display:none}
 .tbl tr:hover td{background:var(--bg)}
 .tbl tr.gone td{opacity:.65}.tbl tr.urg td{background:var(--warnbg)}
 .tbl .vin{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:nowrap}
+.ti td{padding:12px 10px}.ti .sub{display:block;color:var(--mu);font-size:12px;margin-top:2px}.ti .dtc{font-variant-numeric:tabular-nums}.ti .nd{color:var(--mu)}
+.ti tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--pr2) 35%,transparent)}.ti tbody tr:hover td{background:var(--pr2)}
+.ti td.ac,.ti th.ac{width:1%;background:var(--card)!important;box-shadow:-8px 0 8px -8px rgba(0,20,60,.18)}
+.ib{width:36px;height:36px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--pr);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.ib svg{width:18px;height:18px}.ib:hover{background:var(--pr2)}.ib.d{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,var(--bd))}.ib.d:hover{background:color-mix(in srgb,var(--bad) 12%,transparent)}
 .tbl .vb{display:flex;gap:6px;flex-wrap:nowrap;margin:0}
 .tbl .btn{min-height:34px;padding:0 10px;font-size:13px;white-space:nowrap}
 .tbl .pv{display:flex;gap:6px;margin:0}.tbl .pv select{min-height:34px;font-size:13px;padding:0 6px}
@@ -747,12 +752,14 @@ document.addEventListener("click",function(e){
 function bigsInv(){return'<div class="big"><button class="bigbtn" onclick="go(\'ingresar\')"><i class="arw up">'+svg("up")+'</i><span class="tx"><b>Ingresar</b><span>Registrar un vehículo nuevo</span></span></button>'+
   '<button class="bigbtn s" onclick="go(\'salida\')"><i class="arw dn">'+svg("dn")+'</i><span class="tx"><b>Salida</b><span>Registrar la salida de un vehículo</span></span></button></div>'}
 /* inventario en lista */
+ICO.edit='<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>';ICO.trash='<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>';ICO.undo='<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>';
+function ib(t,c,k,i){return'<button type="button" class="ib '+(k||"")+'" title="'+t+'" aria-label="'+t+'" onclick="'+c+'">'+svg(i)+'</button>'}
 function tablaInv(l){
   var adm=invTodas();
-  return'<div class="tw"><table class="tbl"><thead><tr><th>Modelo</th><th>Versión</th><th>Color</th><th>VIN</th><th>Ubicación</th><th>Estado</th><th>Entrada</th><th>Salida</th>'+(adm?'<th>Sucursal</th>':'')+'<th></th></tr></thead><tbody>'+
+  return'<div class="tw"><table class="tbl ti"><thead><tr><th>Vehículo</th><th>Color</th><th>VIN</th><th>Ubicación</th><th>Estado</th><th>Entrada</th><th>Salida</th>'+(adm?'<th>Sucursal</th>':'')+'<th class="ac"></th></tr></thead><tbody>'+
   l.map(function(v){var o=!!v.fechaSalida;
-    return'<tr class="'+(o?"gone":"")+'"><td><b>'+esc(v.modelo)+'</b></td><td>'+esc(v.version)+'</td><td>'+esc(v.color)+'</td><td class="vin">'+esc(v.vin)+'</td><td><span class="tag'+(o?" o":"")+'">'+(o?"Salió":esc(v.ubic))+'</span></td><td><span class="tag '+(EC[v.estado||"Disponible"]||"res")+'">'+esc(v.estado||"Disponible")+'</span></td><td>'+fmt(v.fechaEntrada)+'</td><td>'+(o?fmt(v.fechaSalida):"—")+'</td>'+(adm?'<td>'+esc(sucNombre(v.sucursalId))+'</td>':'')+
-    '<td><div class="vb">'+(o?'<button class="btn g" onclick="deshacer(\''+v.id+'\')">Deshacer salida</button>':'')+'<button class="btn g" onclick="actualizar(\''+v.id+'\')">Actualizar</button><button class="btn d" onclick="borrar(\''+v.id+'\')">Eliminar</button></div></td></tr>'}).join("")+'</tbody></table></div>';
+    return'<tr class="'+(o?"gone":"")+'"><td><b>'+esc(v.modelo)+'</b><small class="sub">'+esc(v.version)+'</small></td><td>'+esc(v.color)+'</td><td class="vin">'+esc(v.vin)+'</td><td><span class="tag'+(o?" o":"")+'">'+(o?"Salió":esc(v.ubic))+'</span></td><td><span class="tag '+(EC[v.estado||"Disponible"]||"res")+'">'+esc(v.estado||"Disponible")+'</span></td><td class="dtc">'+fmt(v.fechaEntrada)+'</td><td class="dtc">'+(o?fmt(v.fechaSalida):'<span class="nd">—</span>')+'</td>'+(adm?'<td>'+esc(sucNombre(v.sucursalId))+'</td>':'')+
+    '<td class="ac"><div class="vb">'+(o?ib("Deshacer salida","deshacer('"+v.id+"')","","undo"):'')+ib("Actualizar","actualizar('"+v.id+"')","","edit")+ib("Eliminar","borrar('"+v.id+"')","btn d","trash")+'</div></td></tr>'}).join("")+'</tbody></table></div>';
 }
 /* planificador en lista */
 function psortT(){pf.dir=pf.dir==="desc"?"asc":"desc";listaPlan()}
