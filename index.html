@@ -140,7 +140,7 @@ body.r-consulta .act.pn,body.r-preparador .act.pn{display:none}
 .sucsel{display:flex;align-items:center;gap:10px;margin-bottom:12px}.sucsel label{margin:0;white-space:nowrap}.sucsel select{flex:1;max-width:380px}
 
 .bigbtn:not(.pb){flex-direction:row;align-items:center;gap:14px}.bigbtn .tx{display:flex;flex-direction:column;gap:2px}
-.arw{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff}
+.bigbtn.np{width:100%}.big.np-w{grid-template-columns:1fr!important}.arw{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff}
 .arw svg{width:26px;height:26px;stroke-width:3}.arw.up{color:#16a34a}.arw.dn{color:#dc2626;border:1px solid var(--bd)}
 .chips .seg{margin-left:auto}
 .seg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
@@ -666,7 +666,7 @@ function seccionCat(k){
   (ia.length?'<h2 class="sec">Desactivados</h2>'+ia.map(function(x){return'<div class="crow" data-k="'+k+'" data-id="'+x.id+'"><input value="'+esc(x.nombre)+'" disabled aria-label="Nombre"><button type="button" class="btn g" data-a="rea">Reactivar</button></div>'}).join(""):"");
 }
 function cfgInv(){return head("Configurar inventario")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita. Vale para todas las sucursales. Si algo ya se usa, «Quitar» solo lo desactiva para no perder historial.</p>'+seccionCat("modelo")+seccionCat("estado_inv")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>'}
-function cfgPlan(){return head("Configurar planificador")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita estados. Vale para todas las sucursales.</p>'+seccionCat("estado_ent")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p><h2 class="sec">Preparadores</h2><div class="panel">Los preparadores son las personas con rol «preparador» de cada sucursal. Para agregar, quitar o cambiar uno, entra a Sucursales.</div><div class="acts">'+act("Ir a Sucursales","go(&quot;sucursales&quot;)","","tienda")+'</div>'}
+function cfgPlan(){return head("Configurar planificador")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita estados. Vale para todas las sucursales.</p>'+seccionCat("estado_ent")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>'}
 function catCtx(b){var r=b.closest("[data-k]"),k=r.dataset.k;return{k:k,id:r.dataset.id,c:CFG[k],f:CAT[k].filter(function(i){return i.id===r.dataset.id})[0]}}
 async function usos(c,nombre){var n=0;for(var i=0;i<c.usa.length;i++){var r=await db.from(c.usa[i]).select("id",{count:"exact",head:true}).eq(c.campo,nombre);n+=r.count||0}return n}
 async function recargaCat(){await Promise.all([cargarCat(),cargar(),cargarEntregas()]);refresca()}
@@ -1013,7 +1013,7 @@ function pintaNav(){
   var ex=[["sucs","sucursales","Sucursales","tienda"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
   n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("")+
   (ad?'<div class="nsec">Administración</div>'+ex.map(function(x){return'<button type="button" class="ad" onclick="go(&quot;'+x[1]+'&quot;)"'+(a2===x[0]?' aria-current="page"':'')+'>'+svg(x[3])+'<span>'+x[2]+'</span></button>'}).join(""):"")+
-  '<div class="nbot">'+temaSeg()+'<div class="who"><b>'+esc(perfil.nombre||ident(perfil))+'</b><span>'+esc(perfil.rol)+'</span></div><button type="button" class="out" onclick="salir()">'+svg("salir")+'<span>Cerrar sesión</span></button></div>';
+  '<div class="nbot">'+temaSeg()+'<button type="button" class="out" onclick="salir()">'+svg("salir")+'<span>Cerrar sesión</span></button></div>';
   n.hidden=false;document.body.classList.add("conav");
 }
 (function(){
