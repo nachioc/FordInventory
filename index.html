@@ -128,6 +128,10 @@ body.conav{padding-left:232px;padding-bottom:24px}
 .cbl{position:fixed;z-index:300;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 40px rgba(0,20,60,.28);max-height:264px;overflow-y:auto;padding:6px}
 .cbi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:15px}.cbi svg{width:16px;height:16px;flex:none;color:var(--mu)}
 .cbi:hover,.cbi.on{background:var(--pr2)}.cbi mark{background:none;color:var(--pr);font-weight:700}.cbn{padding:12px;color:var(--mu);font-size:14px}
+.ts td{padding:14px 12px}.ts th.c,.ts td.c{text-align:center}.ts tbody tr{cursor:pointer}.ts tbody tr:hover td{background:var(--pr2)}.ts td b{font-size:16px}
+.ts .cn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:30px;padding:0 10px;border-radius:999px;font-weight:700;font-size:14px;background:transparent;color:var(--mu)}
+.ts .cn.on{background:var(--pr2);color:var(--pr)}.ts .cn.ok{background:color-mix(in srgb,#1f9d55 18%,transparent);color:#1f9d55}.ts .cn.am{background:color-mix(in srgb,#d98a00 18%,transparent);color:#d98a00}
+.ts .ch{width:1%;text-align:right;color:var(--mu);font-size:24px;line-height:1;padding-right:16px}.ts tbody tr:hover .ch{color:var(--pr)}
 .cards>.pers{align-self:start}.vmrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
 details.pers summary::-webkit-details-marker{display:none}details.pers summary b{font-size:16px}
 details.pers[open] summary{border-bottom:1px solid var(--bd)}details.pers .ed{padding:6px 16px 16px}
@@ -585,8 +589,9 @@ function pintaSuc(){
   var el=$("#lsuc");if(!el)return;var cv=SCN.cv,ce=SCN.ce;
   if(!SUC.length){el.innerHTML='<div class="empty">Aún no hay sucursales. Agrega la primera arriba.</div>';return}
   if(VM.suc==="list"){
-    el.innerHTML='<div class="tw"><table class="tbl ti"><thead><tr><th>Sucursal</th><th>Ubicación</th><th>Jefes</th><th>Vendedores</th><th>Preparadores</th><th>Autos en stock</th><th>Entregas activas</th></tr></thead><tbody>'+SUC.map(function(s){
-      return'<tr class="'+(s.activo?"":"gone")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)" style="cursor:pointer"><td><b>'+esc(s.nombre)+'</b>'+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</td><td>'+(esc(subSuc(s))||'<span class="nd">—</span>')+'</td><td>'+cntSuc(s,"jefe")+'</td><td>'+cntSuc(s,"vendedor")+'</td><td>'+cntSuc(s,"preparador")+'</td><td>'+(cv[s.id]||0)+'</td><td>'+(ce[s.id]||0)+'</td></tr>'}).join("")+'</tbody></table></div>';
+    var pill=function(n,c){return'<span class="cn'+(n?" "+(c||"on"):"")+'">'+n+'</span>'};
+    el.innerHTML='<div class="tw"><table class="tbl ti ts"><thead><tr><th>Sucursal</th><th class="c">Jefes</th><th class="c">Vendedores</th><th class="c">Preparadores</th><th class="c">Autos en stock</th><th class="c">Entregas activas</th><th class="ch"></th></tr></thead><tbody>'+SUC.map(function(s){
+      return'<tr class="'+(s.activo?"":"gone")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)" tabindex="0" onkeydown="if(event.key===\'Enter\')go(&quot;sucursal/'+s.id+'&quot;)"><td><b>'+esc(s.nombre)+'</b>'+(s.activo?'':' <span class="tag o">Desactivada</span>')+'<small class="sub">'+(esc(subSuc(s))||"Sin ubicación")+'</small></td><td class="c">'+pill(cntSuc(s,"jefe"))+'</td><td class="c">'+pill(cntSuc(s,"vendedor"))+'</td><td class="c">'+pill(cntSuc(s,"preparador"))+'</td><td class="c">'+pill(cv[s.id]||0,"ok")+'</td><td class="c">'+pill(ce[s.id]||0,"am")+'</td><td class="ch">›</td></tr>'}).join("")+'</tbody></table></div>';
     return}
   el.innerHTML='<div class="cards">'+SUC.map(function(s){
     return'<button type="button" class="v suc'+(s.activo?"":" out")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)"><h3>'+esc(s.nombre)+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</h3>'+(subSuc(s)?'<div class="m">📍 '+esc(subSuc(s))+'</div>':'')+
