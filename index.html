@@ -125,6 +125,9 @@ body.conav{padding-left:232px;padding-bottom:24px}
 .mp{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:18px;width:100%;max-width:440px;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
 .mh{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--card);z-index:1}.mh b{font-size:17px}.mh .ib{font-size:22px;line-height:1}
 .mp .ed{padding:6px 16px 16px}.mp .ed label{margin-top:12px}.mp .vb{flex-wrap:wrap}body.mopen{overflow:hidden}
+.cbl{position:fixed;z-index:300;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 40px rgba(0,20,60,.28);max-height:264px;overflow-y:auto;padding:6px}
+.cbi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:15px}.cbi svg{width:16px;height:16px;flex:none;color:var(--mu)}
+.cbi:hover,.cbi.on{background:var(--pr2)}.cbi mark{background:none;color:var(--pr);font-weight:700}.cbn{padding:12px;color:var(--mu);font-size:14px}
 .cards>.pers{align-self:start}.vmrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
 details.pers summary::-webkit-details-marker{display:none}details.pers summary b{font-size:16px}
 details.pers[open] summary{border-bottom:1px solid var(--bd)}details.pers .ed{padding:6px 16px 16px}
@@ -544,7 +547,34 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
 document.addEventListener("change",function(e){var el=e.target;if(!el.dataset||!el.dataset.a2)return;if(el.dataset.a2==="ren")renCat(el);else if(el.dataset.a2==="col")colCat(el)});
 
 var CIUDADES=["Arica", "Iquique", "Alto Hospicio", "Antofagasta", "Calama", "Tocopilla", "Mejillones", "Copiapó", "Vallenar", "Caldera", "Chañaral", "La Serena", "Coquimbo", "Ovalle", "Illapel", "Los Vilos", "Vicuña", "Salamanca", "Valparaíso", "Viña del Mar", "Concón", "Quilpué", "Villa Alemana", "Quillota", "La Calera", "San Antonio", "Los Andes", "San Felipe", "Limache", "Olmué", "Casablanca", "Cartagena", "Santo Domingo", "Quintero", "Puchuncaví", "La Ligua", "Isla de Pascua", "Santiago", "Las Condes", "Providencia", "Ñuñoa", "La Florida", "Maipú", "Puente Alto", "San Bernardo", "Vitacura", "Lo Barnechea", "Huechuraba", "Recoleta", "Independencia", "Quilicura", "Renca", "Cerro Navia", "Pudahuel", "Estación Central", "Quinta Normal", "Lo Prado", "Cerrillos", "Pedro Aguirre Cerda", "San Miguel", "San Joaquín", "La Cisterna", "El Bosque", "La Granja", "La Pintana", "San Ramón", "Lo Espejo", "Macul", "Peñalolén", "La Reina", "Conchalí", "Colina", "Lampa", "Til Til", "Pirque", "San José de Maipo", "Padre Hurtado", "Peñaflor", "Talagante", "Melipilla", "Buin", "Paine", "Calera de Tango", "Rancagua", "Machalí", "San Fernando", "Rengo", "Graneros", "Santa Cruz", "Pichilemu", "San Vicente", "Talca", "Curicó", "Linares", "Cauquenes", "Constitución", "Parral", "Molina", "Chillán", "Chillán Viejo", "San Carlos", "Bulnes", "Concepción", "Talcahuano", "San Pedro de la Paz", "Chiguayante", "Hualpén", "Coronel", "Lota", "Penco", "Tomé", "Los Ángeles", "Lebu", "Cañete", "Arauco", "Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol", "Victoria", "Lautaro", "Nueva Imperial", "Valdivia", "La Unión", "Río Bueno", "Panguipulli", "Lanco", "Mariquina", "Osorno", "Puerto Montt", "Puerto Varas", "Frutillar", "Llanquihue", "Los Lagos", "Castro", "Ancud", "Quellón", "Coyhaique", "Puerto Aysén", "Chile Chico", "Punta Arenas", "Puerto Natales", "Porvenir"];
-function dlCiudades(){return'<datalist id="dlc">'+CIUDADES.map(function(c){return'<option value="'+c+'"></option>'}).join("")+'</datalist>'}
+function dlCiudades(){return""}
+/* selector de ciudades (combobox propio) */
+(function(){
+  var box=null,inp=null,items=[],ix=-1;
+  var nz=function(t){return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()};
+  function cierra(){if(box){box.remove();box=null}inp=null;items=[];ix=-1}
+  function pos(){if(!box||!inp)return;var r=inp.getBoundingClientRect(),h=Math.min(box.scrollHeight,264),abajo=window.innerHeight-r.bottom;
+    box.style.left=r.left+"px";box.style.width=r.width+"px";
+    if(abajo<h+16&&r.top>abajo){box.style.top="auto";box.style.bottom=(window.innerHeight-r.top+6)+"px"}else{box.style.bottom="auto";box.style.top=(r.bottom+6)+"px"}}
+  function pinta(){
+    var q=nz(inp.value.trim());
+    items=CIUDADES.filter(function(c){return !q||nz(c).indexOf(q)>-1}).sort(function(a,b){var x=nz(a).indexOf(q)===0?0:1,y=nz(b).indexOf(q)===0?0:1;return x-y});
+    if(!box){box=document.createElement("div");box.className="cbl";box.setAttribute("role","listbox");document.body.appendChild(box)}
+    if(!items.length){box.innerHTML='<div class="cbn">Sin coincidencias: se guardará lo que escribas</div>'}
+    else box.innerHTML=items.map(function(c,i){var n=nz(c).indexOf(q),t=q&&n>-1?esc(c.slice(0,n))+"<mark>"+esc(c.slice(n,n+q.length))+"</mark>"+esc(c.slice(n+q.length)):esc(c);
+      return'<div class="cbi" role="option" data-i="'+i+'">'+svg("pin")+'<span>'+t+'</span></div>'}).join("");
+    ix=-1;pos();
+  }
+  function marca(n){var l=box.querySelectorAll(".cbi");if(!l.length)return;ix=(n+l.length)%l.length;l.forEach(function(e,i){e.classList.toggle("on",i===ix)});l[ix].scrollIntoView({block:"nearest"})}
+  function elige(i){if(!inp||!items[i])return;inp.value=items[i];inp.dispatchEvent(new Event("input",{bubbles:true}));cierra()}
+  document.addEventListener("focusin",function(e){if(e.target.dataset&&e.target.dataset.cb){inp=e.target;pinta()}});
+  document.addEventListener("input",function(e){if(e.target.dataset&&e.target.dataset.cb){inp=e.target;pinta()}});document.addEventListener("click",function(e){if(!box&&e.target.dataset&&e.target.dataset.cb){inp=e.target;pinta()}});
+  document.addEventListener("keydown",function(e){if(!box||e.target!==inp)return;
+    if(e.key==="ArrowDown"){e.preventDefault();marca(ix+1)}else if(e.key==="ArrowUp"){e.preventDefault();marca(ix-1)}
+    else if(e.key==="Enter"&&ix>-1){e.preventDefault();elige(ix)}else if(e.key==="Escape"||e.key==="Tab")cierra()});
+  document.addEventListener("mousedown",function(e){var o=e.target.closest&&e.target.closest(".cbi");if(o){e.preventDefault();elige(+o.dataset.i)}else if(box&&e.target!==inp)cierra()});
+  window.addEventListener("resize",pos);window.addEventListener("scroll",function(e){if(box&&!(e.target.closest&&e.target.closest(".cbl")))pos()},true);
+})();
 function subSuc(x){return[x.ciudad,x.direccion].filter(Boolean).join(" · ")}
 /* --- Sucursales: lista --- */
 var SCN={cv:{},ce:{}};
@@ -569,7 +599,7 @@ async function sucursales(){
   var cv={},ce={};(r[1].data||[]).forEach(function(x){cv[x.sucursal_id]=(cv[x.sucursal_id]||0)+1});(r[2].data||[]).forEach(function(x){ce[x.sucursal_id]=(ce[x.sucursal_id]||0)+1});
   var np=PER.filter(pendiente).length,na=PER.filter(function(u){return u.rol==="admin"}).length;
   a.innerHTML=head("Sucursales")+
-  '<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" list="dlc" placeholder="Ej: Santiago" autocomplete="off">'+dlCiudades()+'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Agregar sucursal</button></form>'+
+  '<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" data-cb="1" placeholder="Ej: Santiago" autocomplete="off">'+dlCiudades()+'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Agregar sucursal</button></form>'+
   '<h2 class="sec">Sucursales ('+SUC.length+')</h2><div class="vmrow">'+vmBar("suc")+'</div><div id="lsuc"></div>';
   SCN={cv:cv,ce:ce};pintaSuc();
   $("#fSuc").onsubmit=async function(e){
@@ -621,7 +651,7 @@ async function sucursalVista(){
     '<h2 class="sec">Administradores ('+ad.length+')</h2><div class="cards">'+ad.map(persona).join("")+'</div>';
   }else{
     var gr=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&(rol==="jefe"||u.sucursal_id===id)})},pe2=PER.filter(pendiente);
-    h+='<form id="fSn" novalidate><label for="sn2">Nombre de la sucursal</label><input id="sn2" value="'+esc(s.nombre)+'" autocomplete="off"><label for="sc2">Ciudad</label><input id="sc2" list="dlc" value="'+esc(s.ciudad||"")+'" autocomplete="off">'+dlCiudades()+'<label for="sd2">Dirección</label><input id="sd2" value="'+esc(s.direccion||"")+'" autocomplete="off"><button class="btn full" type="submit">Guardar datos</button><div class="err" id="err" role="alert"></div>'+
+    h+='<form id="fSn" novalidate><label for="sn2">Nombre de la sucursal</label><input id="sn2" value="'+esc(s.nombre)+'" autocomplete="off"><label for="sc2">Ciudad</label><input id="sc2" data-cb="1" value="'+esc(s.ciudad||"")+'" autocomplete="off">'+dlCiudades()+'<label for="sd2">Dirección</label><input id="sd2" value="'+esc(s.direccion||"")+'" autocomplete="off"><button class="btn full" type="submit">Guardar datos</button><div class="err" id="err" role="alert"></div>'+
     '<div class="vb"><button type="button" class="btn g" data-a="ts">'+(s.activo?"Desactivar sucursal":"Activar sucursal")+'</button><button type="button" class="btn d" data-a="es">Eliminar</button></div></form>'+
     (s.activo?'':'<p class="hola" style="margin-top:12px">Esta sucursal está desactivada: sus personas no pueden entrar.</p>')+
     '<div class="stats" style="margin-top:16px">'+["jefe","vendedor","preparador"].map(function(x){return'<div class="stat"><b>'+gr(x).length+'</b><small>'+({jefe:"Jefes",vendedor:"Vendedores",preparador:"Preparadores"})[x]+'</small></div>'}).join("")+'</div>';
@@ -760,6 +790,7 @@ var ICO={lista:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',t
  sol:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
  luna:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/>',
  salir:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>'};
+ICO.pin='<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/>';
 ICO.sinsuc='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>';
 function svg(k){return SI+ICO[k]+'</svg>'}
 function pad2(n){return String(n).padStart(2,"0")}
