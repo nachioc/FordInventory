@@ -589,11 +589,10 @@ function personaEd(u){
   '<label>Sucursal</label><select data-f="suc"'+d+'>'+optsSuc(sucV,"Sin sucursal fija (todas)")+'</select><p class="m" style="margin:4px 0 0">Admin y jefe pueden trabajar en todas las sucursales; dejar vacío es lo normal para ellos.</p>'+
   '<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>'+(me?'':'<button type="button" class="btn d" data-a="qp">Quitar acceso</button>')+(!me&&u.rut?'<button type="button" class="btn g" data-a="rc">Restablecer clave</button>':'')+'</div></div>';
 }
-ICO.lapiz='<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>';
 function persona(u){
   var me=u.id===sesion.user.id,pd=pendiente(u),ro=u.rol==='admin'&&perfil.rol!=='admin';
   var out=u.activo&&(u.rol==="admin"||u.rol==="jefe"||u.sucursal_id)?"":" out";
-  return'<div class="v pers'+out+(ro?"":" edit")+'"'+(ro?'':' data-a="ep" data-uid="'+u.id+'" role="button" tabindex="0"')+'><div class="pi"><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+(ro?" · administrador":"")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</div>'+(ro?'':'<button type="button" class="ib" data-a="ep" data-uid="'+u.id+'" title="Editar" aria-label="Editar">'+svg("lapiz")+'</button>')+'</div>';
+  return'<div class="v pers'+out+(ro?"":" edit")+'"'+(ro?'':' data-a="ep" data-uid="'+u.id+'" role="button" tabindex="0"')+'><div class="pi"><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+(ro?" · administrador":"")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</div>'+(ro?'':'<button type="button" class="ib" data-a="ep" data-uid="'+u.id+'" title="Editar" aria-label="Editar">'+svg("edit")+'</button>')+'</div>';
 }
 function cierraModal(){var m=$("#modal");if(m)m.remove();document.body.classList.remove("mopen")}
 ACC.ep=function(b){
