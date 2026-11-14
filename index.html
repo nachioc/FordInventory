@@ -587,13 +587,13 @@ function persona(u){
 }
 async function sucursalVista(){
   var id=hparam(),a=$("#app"),none=id==="none";
-  a.innerHTML=head(none?"Sin sucursal":"Sucursal")+'<div class="empty">Cargando...</div>';
+  a.innerHTML=head(none?"Cuentas":"Sucursal")+'<div class="empty">Cargando...</div>';
   var r=await Promise.all([db.from("perfiles").select("*").order("created_at"),cargarSuc()]);
   if(vista()!=="sucursal")return;
   PER=r[0].data||[];
   var s=SUC.filter(function(x){return x.id===id})[0];
   if(!none&&!s){go("sucursales");return}
-  var h=head(none?"Sin sucursal":s.nombre);
+  var h=head(none?"Cuentas":s.nombre);
   if(none){
     var pe=PER.filter(pendiente),ad=PER.filter(function(u){return u.rol==="admin"});
     h+='<p class="hola">Estas cuentas ya se registraron pero no tienen sucursal. Abre una, elige sucursal y rol, y toca Guardar para darle acceso.</p>'+
@@ -740,7 +740,7 @@ var ICO={lista:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',t
  sol:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
  luna:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/>',
  salir:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>'};
-ICO.sinsuc='<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16.5 8.5h6"/>';
+ICO.sinsuc='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>';
 function svg(k){return SI+ICO[k]+'</svg>'}
 function pad2(n){return String(n).padStart(2,"0")}
 function fmtDT(iso){var d=new Date(iso);if(isNaN(d))return"";return pad2(d.getDate())+"/"+pad2(d.getMonth()+1)+"/"+d.getFullYear()+" "+pad2(d.getHours())+":"+pad2(d.getMinutes())}
@@ -824,7 +824,7 @@ function portada(){
   return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||ident(perfil))+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
-  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Sin sucursal y admins","go(&quot;sucursal/none&quot;)","","sinsuc")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
+  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Cuentas","go(&quot;sucursal/none&quot;)","","sinsuc")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
   '<h2 class="sec">Apariencia</h2>'+temaSeg()+'<p class="ver">v13-nov 14:10 · '+esc(perfil.rol)+' · '+SUC.length+' suc.</p>'+
   '<button class="btn d full" style="margin-top:24px" onclick="salir()">Cerrar sesión</button></div>';
 }
@@ -1028,7 +1028,7 @@ function pintaNav(){
   var a2={sucursales:"sucs",sucursal:hparam()==="none"?"nosuc":"sucs",historial:"hist",cfginv:"cfgi",cfgplan:"cfgp"}[v]||"";
   var act=a2?"":v==="plan"||v==="pform"?"plan":v==="alertas"?"alertas":(["inicio","ingresar","salida","inventario","editar"].indexOf(v)>-1?"inv":"home");
   var it=[["home","","Inicio",IC.home],["inv","inv","Inventario",IC.car],["plan","plan","Planificador",IC.cal],["alertas","alertas","Alertas",IC.bell]];
-  var ex=[["sucs","sucursales","Sucursales","tienda"],["nosuc","sucursal/none","Sin sucursal y admins","sinsuc"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
+  var ex=[["sucs","sucursales","Sucursales","tienda"],["nosuc","sucursal/none","Cuentas","sinsuc"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
   n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("")+
   (ad?'<div class="nsec">Administración</div>'+ex.map(function(x){return'<button type="button" class="ad" onclick="go(&quot;'+x[1]+'&quot;)"'+(a2===x[0]?' aria-current="page"':'')+'>'+svg(x[3])+'<span>'+x[2]+'</span></button>'}).join(""):"")+
   '<div class="nbot">'+temaSeg()+'<div class="ver">v13-nov 14:10 · '+esc(perfil.rol)+' · '+SUC.length+' suc.</div>'+'<button type="button" class="out" onclick="salir()">'+svg("salir")+'<span>Cerrar sesión</span></button></div>';
