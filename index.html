@@ -882,7 +882,7 @@ function portada(){
   return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||ident(perfil))+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
-  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Cuentas","go(&quot;sucursal/none&quot;)","","sinsuc")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
+  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Cuentas","go(&quot;sucursal/none&quot;)","","sinsuc")+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
   '<h2 class="sec">Apariencia</h2>'+temaSeg()+'<p class="ver">v13-nov 14:10 · '+esc(perfil.rol)+' · '+SUC.length+' suc.</p>'+
   '<button class="btn d full" style="margin-top:24px" onclick="salir()">Cerrar sesión</button></div>';
 }
@@ -1086,7 +1086,7 @@ function pintaNav(){
   var a2={sucursales:"sucs",sucursal:hparam()==="none"?"nosuc":"sucs",historial:"hist",cfginv:"cfgi",cfgplan:"cfgp"}[v]||"";
   var act=a2?"":v==="plan"||v==="pform"?"plan":v==="alertas"?"alertas":(["inicio","ingresar","salida","inventario","editar"].indexOf(v)>-1?"inv":"home");
   var it=[["home","","Inicio",IC.home],["inv","inv","Inventario",IC.car],["plan","plan","Planificador",IC.cal],["alertas","alertas","Alertas",IC.bell]];
-  var ex=[["sucs","sucursales","Sucursales","tienda"],["nosuc","sucursal/none","Cuentas","sinsuc"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
+  var ex=[["nosuc","sucursal/none","Cuentas","sinsuc"],["sucs","sucursales","Sucursales","tienda"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
   n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("")+
   (ad?'<div class="nsec">Administración</div>'+ex.map(function(x){return'<button type="button" class="ad" onclick="go(&quot;'+x[1]+'&quot;)"'+(a2===x[0]?' aria-current="page"':'')+'>'+svg(x[3])+'<span>'+x[2]+'</span></button>'}).join(""):"")+
   '<div class="nbot">'+temaSeg()+'<div class="ver">v13-nov 14:10 · '+esc(perfil.rol)+' · '+SUC.length+' suc.</div>'+'<button type="button" class="out" onclick="salir()">'+svg("salir")+'<span>Cerrar sesión</span></button></div>';
