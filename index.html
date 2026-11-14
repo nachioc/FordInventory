@@ -120,7 +120,12 @@ body.conav{padding-left:232px;padding-bottom:24px}
 
 .v.suc{display:block;width:100%;text-align:left;font:inherit;color:var(--tx);cursor:pointer}
 .v.suc:hover{border-color:var(--pr)}
-.cards>details.pers{align-self:start}.vmrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
+.pers.edit{cursor:pointer}.pers.edit:hover{border-color:var(--pr)}.v.pers{display:flex;align-items:center;gap:12px;padding:14px 16px}.pers .pi{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.pers .pi b{font-size:16px}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(5,15,40,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.mp{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:18px;width:100%;max-width:440px;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--card);z-index:1}.mh b{font-size:17px}.mh .ib{font-size:22px;line-height:1}
+.mp .ed{padding:6px 16px 16px}.mp .ed label{margin-top:12px}.mp .vb{flex-wrap:wrap}body.mopen{overflow:hidden}
+.cards>.pers{align-self:start}.vmrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
 details.pers summary::-webkit-details-marker{display:none}details.pers summary b{font-size:16px}
 details.pers[open] summary{border-bottom:1px solid var(--bd)}details.pers .ed{padding:6px 16px 16px}
 details.pers .ed label{margin-top:12px}
@@ -576,15 +581,31 @@ async function sucursales(){
   rest();
 }
 /* --- Sucursal: detalle y personas --- */
-function persona(u){
-  if(u.rol==='admin'&&perfil.rol!=='admin')return'<details class="v pers"><summary><b>'+esc(u.nombre||ident(u))+'</b><span class="m">'+esc(ident(u))+' · administrador</span></summary><div class="ed"><p class="hola">Solo otro administrador puede modificar esta cuenta.</p></div></details>';
+function personaEd(u){
   var me=u.id===sesion.user.id,d=me?" disabled":"",pd=pendiente(u),rolV=pd&&u.rol_pedido?u.rol_pedido:u.rol,sucV=u.sucursal_id||(pd?u.sucursal_pedida:null);
-  return'<details class="v pers'+(u.activo&&(u.rol==="admin"||u.rol==="jefe"||u.sucursal_id)?"":" out")+'"><summary><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</summary><div class="ed" data-uid="'+u.id+'">'+
+  return'<div class="ed" data-uid="'+u.id+'">'+
   '<label>Nombre</label><input data-f="nombre" value="'+esc(u.nombre||"")+'" placeholder="Nombre y apellido" autocomplete="off">'+
   ''+(u.email.indexOf("@rut.inventario.app")<0?'<label>RUT</label><input data-f="rut" value="'+esc(u.rut||"")+'" placeholder="12.345.678-5" autocomplete="off">':'')+'<label>Rol</label><select data-f="rol"'+d+'>'+ROLES.filter(function(x){return x!=='admin'||perfil.rol==='admin'}).map(function(x){return'<option'+(x===rolV?" selected":"")+'>'+x+'</option>'}).join("")+'</select>'+
   '<label>Sucursal</label><select data-f="suc"'+d+'>'+optsSuc(sucV,"Sin sucursal fija (todas)")+'</select><p class="m" style="margin:4px 0 0">Admin y jefe pueden trabajar en todas las sucursales; dejar vacío es lo normal para ellos.</p>'+
-  '<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>'+(me?'':'<button type="button" class="btn d" data-a="qp">Quitar acceso</button>')+(!me&&u.rut?'<button type="button" class="btn g" data-a="rc">Restablecer clave</button>':'')+'</div></div></details>';
+  '<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>'+(me?'':'<button type="button" class="btn d" data-a="qp">Quitar acceso</button>')+(!me&&u.rut?'<button type="button" class="btn g" data-a="rc">Restablecer clave</button>':'')+'</div></div>';
 }
+ICO.lapiz='<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>';
+function persona(u){
+  var me=u.id===sesion.user.id,pd=pendiente(u),ro=u.rol==='admin'&&perfil.rol!=='admin';
+  var out=u.activo&&(u.rol==="admin"||u.rol==="jefe"||u.sucursal_id)?"":" out";
+  return'<div class="v pers'+out+(ro?"":" edit")+'"'+(ro?'':' data-a="ep" data-uid="'+u.id+'" role="button" tabindex="0"')+'><div class="pi"><b>'+esc(u.nombre||ident(u))+(me?" (tú)":"")+'</b><span class="m">'+esc(ident(u))+(u.nombre?"":" · sin nombre")+(ro?" · administrador":"")+'</span>'+(pd&&u.sucursal_pedida?'<span class="m"><span class="tag res">Solicita: '+esc(sucNombre(u.sucursal_pedida))+' · '+esc(u.rol_pedido||"")+'</span></span>':'')+'</div>'+(ro?'':'<button type="button" class="ib" data-a="ep" data-uid="'+u.id+'" title="Editar" aria-label="Editar">'+svg("lapiz")+'</button>')+'</div>';
+}
+function cierraModal(){var m=$("#modal");if(m)m.remove();document.body.classList.remove("mopen")}
+ACC.ep=function(b){
+  var el=b.closest("[data-uid]"),u=PER.filter(function(x){return x.id===el.dataset.uid})[0];if(!u)return;
+  cierraModal();var m=document.createElement("div");m.id="modal";m.className="modal";m.setAttribute("role","dialog");m.setAttribute("aria-modal","true");
+  m.innerHTML='<div class="mp"><div class="mh"><b>Editar cuenta</b><button type="button" class="ib" data-a="xm" aria-label="Cerrar">&times;</button></div>'+personaEd(u)+'</div>';
+  document.body.appendChild(m);document.body.classList.add("mopen");
+  m.addEventListener("mousedown",function(e){if(e.target===m)cierraModal()});
+  var i=m.querySelector("input");if(i)i.focus();
+};
+ACC.xm=cierraModal;window.addEventListener("hashchange",cierraModal);
+document.addEventListener("keydown",function(e){if(e.key==="Escape")cierraModal();else if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("pers")&&e.target.dataset.a==="ep"){e.preventDefault();ACC.ep(e.target)}});
 async function sucursalVista(){
   var id=hparam(),a=$("#app"),none=id==="none";
   a.innerHTML=head(none?"Cuentas":"Sucursal")+'<div class="empty">Cargando...</div>';
@@ -632,7 +653,7 @@ ACC.gp=async function(b){
   if(q("rut")){var rv=q("rut").value.trim();if(rv&&!rutValido(rv)){toast("El RUT no es válido");return}c.rut=rv?rutFmt(rv):null}
   var x=await db.from("perfiles").update(c).eq("id",uid).select();
   if(x.error||!x.data.length){toast(x.error&&x.error.code==="23505"?"Ese RUT ya pertenece a otra cuenta":"No se pudo guardar");return}
-  toast("Cambios guardados");refresca();
+  toast("Cambios guardados");cierraModal();refresca();
 };
 ACC.rc=async function(b){
   var uid=b.closest(".ed").dataset.uid;
@@ -645,7 +666,7 @@ ACC.qp=async function(b){
   if(!confirm("¿Quitar el acceso a esta persona? Quedará pendiente, sin sucursal."))return;
   var x=await db.from("perfiles").update({activo:false,sucursal_id:null}).eq("id",uid).select();
   if(x.error||!x.data.length){toast("No se pudo quitar el acceso");return}
-  toast("Acceso quitado");refresca();
+  toast("Acceso quitado");cierraModal();refresca();
 };
 ACC.ts=async function(){
   var id=hparam(),s=SUC.filter(function(x){return x.id===id})[0];if(!s)return;
