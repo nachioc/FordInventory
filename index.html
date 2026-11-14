@@ -132,10 +132,12 @@ body.conav{padding-left:232px;padding-bottom:24px}
 details.pers summary::-webkit-details-marker{display:none}details.pers summary b{font-size:16px}
 details.pers[open] summary{border-bottom:1px solid var(--bd)}details.pers .ed{padding:6px 16px 16px}
 details.pers .ed label{margin-top:12px}
-.crow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px}
-.crow input{flex:1 1 100%;min-width:0}.crow select{flex:1 1 90px;min-width:0}.crow .btn{min-height:44px;padding:0 14px}.crow .btn:disabled{opacity:.4}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px 112px;gap:8px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px}
+.crow input{grid-column:1/-1;min-width:0}.crow select{grid-column:1/2;min-width:0}.crow .btn{min-height:44px;height:44px;padding:0;width:100%;display:flex;align-items:center;justify-content:center}.crow .btn:disabled{opacity:.4}
+.crow .tag{height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;white-space:nowrap;margin:0}
+.crow.nc>[data-a=up]{grid-column:2}.crow.nc>[data-a=dn]{grid-column:3}.crow>[data-a=add],.crow>[data-a=rea]{grid-column:-2/-1}.crow>[data-a=rm],.crow>.tag{grid-column:-2/-1}
 .crow.add{border-style:dashed}
-@media(min-width:600px){.crow input{flex:1 1 200px}}
+@media(min-width:600px){.crow.col{grid-template-columns:minmax(0,1fr) 160px 44px 44px 112px}.crow.col input{grid-column:1/2}.crow.col select{grid-column:2/3}.crow.nc{grid-template-columns:minmax(0,1fr) 44px 44px 112px}.crow input{grid-column:1/2}}
 details.pers .vb{flex-wrap:wrap}
 
 .acts{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
@@ -716,7 +718,7 @@ ACC.es=async function(){
 /* --- Listas editables: modelos y estados --- */
 function filaCat(k,x,i,n){
   var c=CFG[k],lock=x.protegido;
-  return'<div class="crow" data-k="'+k+'" data-id="'+x.id+'"><input data-a2="ren" value="'+esc(x.nombre)+'" aria-label="Nombre"'+(lock?" disabled":"")+'>'+
+  return'<div class="crow '+(c.color?"col":"nc")+'" data-k="'+k+'" data-id="'+x.id+'"><input data-a2="ren" value="'+esc(x.nombre)+'" aria-label="Nombre"'+(lock?" disabled":"")+'>'+
   (c.color?'<select data-a2="col" aria-label="Color">'+Object.keys(CNOM).map(function(o){return'<option value="'+o+'"'+(o===x.color?" selected":"")+'>'+CNOM[o]+'</option>'}).join("")+'</select>':'')+
   '<button type="button" class="btn g" data-a="up" aria-label="Subir"'+(i===0?" disabled":"")+'>▲</button><button type="button" class="btn g" data-a="dn" aria-label="Bajar"'+(i===n-1?" disabled":"")+'>▼</button>'+
   (lock?'<span class="tag">🔒 Protegido</span>':'<button type="button" class="btn d" data-a="rm">Quitar</button>')+'</div>';
@@ -724,10 +726,10 @@ function filaCat(k,x,i,n){
 function seccionCat(k){
   var c=CFG[k],L=CAT[k],ac=L.filter(function(x){return x.activo}),ia=L.filter(function(x){return!x.activo});
   if(!L.length)return'<h2 class="sec">'+c.tit+'</h2><div class="panel">Aún no se puede editar: falta ejecutar el SQL de sucursales en Supabase.</div>';
-  return'<h2 class="sec">'+c.tit+' ('+ac.length+')</h2><div class="crow add" data-k="'+k+'"><input id="n_'+k+'" placeholder="'+c.ej+'" aria-label="Agregar nuevo" autocomplete="off">'+
+  return'<h2 class="sec">'+c.tit+' ('+ac.length+')</h2><div class="crow add '+(c.color?"col":"nc")+'" data-k="'+k+'"><input id="n_'+k+'" placeholder="'+c.ej+'" aria-label="Agregar nuevo" autocomplete="off">'+
   (c.color?'<select id="c_'+k+'" aria-label="Color">'+Object.keys(CNOM).map(function(o){return'<option value="'+o+'">'+CNOM[o]+'</option>'}).join("")+'</select>':'')+'<button type="button" class="btn" data-a="add">Agregar</button></div>'+
   ac.map(function(x,i){return filaCat(k,x,i,ac.length)}).join("")+
-  (ia.length?'<h2 class="sec">Desactivados</h2>'+ia.map(function(x){return'<div class="crow" data-k="'+k+'" data-id="'+x.id+'"><input value="'+esc(x.nombre)+'" disabled aria-label="Nombre"><button type="button" class="btn g" data-a="rea">Reactivar</button></div>'}).join(""):"");
+  (ia.length?'<h2 class="sec">Desactivados</h2>'+ia.map(function(x){return'<div class="crow '+(c.color?"col":"nc")+'" data-k="'+k+'" data-id="'+x.id+'"><input value="'+esc(x.nombre)+'" disabled aria-label="Nombre"><button type="button" class="btn g" data-a="rea">Reactivar</button></div>'}).join(""):"");
 }
 function cfgInv(){return head("Configurar inventario")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita. Vale para todas las sucursales. Si algo ya se usa, «Quitar» solo lo desactiva para no perder historial.</p>'+seccionCat("modelo")+seccionCat("estado_inv")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>'}
 function cfgPlan(){return head("Configurar planificador")+'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita estados. Vale para todas las sucursales.</p>'+seccionCat("estado_ent")+'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>'}
