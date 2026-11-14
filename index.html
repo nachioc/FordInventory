@@ -120,7 +120,7 @@ body.conav{padding-left:232px;padding-bottom:24px}
 
 .v.suc{display:block;width:100%;text-align:left;font:inherit;color:var(--tx);cursor:pointer}
 .v.suc:hover{border-color:var(--pr)}
-details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
+.cards>details.pers{align-self:start}.vmrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}details.pers{padding:0}details.pers summary{display:flex;flex-direction:column;cursor:pointer;padding:14px 16px;list-style:none}
 details.pers summary::-webkit-details-marker{display:none}details.pers summary b{font-size:16px}
 details.pers[open] summary{border-bottom:1px solid var(--bd)}details.pers .ed{padding:6px 16px 16px}
 details.pers .ed label{margin-top:12px}
@@ -542,6 +542,20 @@ var CIUDADES=["Arica", "Iquique", "Alto Hospicio", "Antofagasta", "Calama", "Toc
 function dlCiudades(){return'<datalist id="dlc">'+CIUDADES.map(function(c){return'<option value="'+c+'"></option>'}).join("")+'</datalist>'}
 function subSuc(x){return[x.ciudad,x.direccion].filter(Boolean).join(" · ")}
 /* --- Sucursales: lista --- */
+var SCN={cv:{},ce:{}};
+function cntSuc(s,rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&(rol==="jefe"||u.sucursal_id===s.id)}).length}
+function pintaSuc(){
+  var el=$("#lsuc");if(!el)return;var cv=SCN.cv,ce=SCN.ce;
+  if(!SUC.length){el.innerHTML='<div class="empty">Aún no hay sucursales. Agrega la primera arriba.</div>';return}
+  if(VM.suc==="list"){
+    el.innerHTML='<div class="tw"><table class="tbl ti"><thead><tr><th>Sucursal</th><th>Ubicación</th><th>Jefes</th><th>Vendedores</th><th>Preparadores</th><th>Autos en stock</th><th>Entregas activas</th></tr></thead><tbody>'+SUC.map(function(s){
+      return'<tr class="'+(s.activo?"":"gone")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)" style="cursor:pointer"><td><b>'+esc(s.nombre)+'</b>'+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</td><td>'+(esc(subSuc(s))||'<span class="nd">—</span>')+'</td><td>'+cntSuc(s,"jefe")+'</td><td>'+cntSuc(s,"vendedor")+'</td><td>'+cntSuc(s,"preparador")+'</td><td>'+(cv[s.id]||0)+'</td><td>'+(ce[s.id]||0)+'</td></tr>'}).join("")+'</tbody></table></div>';
+    return}
+  el.innerHTML='<div class="cards">'+SUC.map(function(s){
+    return'<button type="button" class="v suc'+(s.activo?"":" out")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)"><h3>'+esc(s.nombre)+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</h3>'+(subSuc(s)?'<div class="m">📍 '+esc(subSuc(s))+'</div>':'')+
+    '<div class="m">'+plural(cntSuc(s,"jefe"),"jefe","jefes")+' · '+plural(cntSuc(s,"vendedor"),"vendedor","vendedores")+' · '+plural(cntSuc(s,"preparador"),"preparador","preparadores")+'</div>'+
+    '<div class="m">'+plural(cv[s.id]||0,"auto en stock","autos en stock")+' · '+plural(ce[s.id]||0,"entrega activa","entregas activas")+'</div></button>'}).join("")+'</div>';
+}
 async function sucursales(){
   var a=$("#app");a.innerHTML=head("Sucursales")+'<div class="empty">Cargando...</div>';
   var r=await Promise.all([db.from("perfiles").select("*"),db.from("vehiculos").select("sucursal_id").is("fecha_salida",null),db.from("entregas").select("sucursal_id").neq("estado","Entregado"),cargarSuc()]);
@@ -551,13 +565,8 @@ async function sucursales(){
   var np=PER.filter(pendiente).length,na=PER.filter(function(u){return u.rol==="admin"}).length;
   a.innerHTML=head("Sucursales")+
   '<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" list="dlc" placeholder="Ej: Santiago" autocomplete="off">'+dlCiudades()+'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Agregar sucursal</button></form>'+
-  '<h2 class="sec">Sucursales ('+SUC.length+')</h2><div class="cards">'+
-  (SUC.map(function(s){
-    var g=function(rol){return PER.filter(function(u){return u.activo&&u.rol===rol&&(rol==="jefe"||u.sucursal_id===s.id)}).length};
-    return'<button type="button" class="v suc'+(s.activo?"":" out")+'" onclick="go(&quot;sucursal/'+s.id+'&quot;)"><h3>'+esc(s.nombre)+(s.activo?'':' <span class="tag o">Desactivada</span>')+'</h3>'+(subSuc(s)?'<div class="m">📍 '+esc(subSuc(s))+'</div>':'')+
-    '<div class="m">'+plural(g("jefe"),"jefe","jefes")+' · '+plural(g("vendedor"),"vendedor","vendedores")+' · '+plural(g("preparador"),"preparador","preparadores")+'</div>'+
-    '<div class="m">'+plural(cv[s.id]||0,"auto en stock","autos en stock")+' · '+plural(ce[s.id]||0,"entrega activa","entregas activas")+'</div></button>'}).join("")||'<div class="empty">Aún no hay sucursales. Agrega la primera arriba.</div>')+
-  '<button type="button" class="v suc'+(np?" out":"")+'" onclick="go(&quot;sucursal/none&quot;)"><h3>Sin sucursal y administradores</h3><div class="m">'+plural(np,"persona pendiente","personas pendientes")+' · '+plural(na,"administrador","administradores")+'</div></button></div>';
+  '<h2 class="sec">Sucursales ('+SUC.length+')</h2><div class="vmrow">'+vmBar("suc")+'</div><div id="lsuc"></div>';
+  SCN={cv:cv,ce:ce};pintaSuc();
   $("#fSuc").onsubmit=async function(e){
     e.preventDefault();var n=$("#sn").value.trim(),er=$("#err");if(!n){er.textContent="Escribe el nombre de la sucursal.";return}
     var x=await db.from("sucursales").insert({nombre:n,ciudad:$("#sc").value.trim()||null,direccion:$("#sd").value.trim()||null}).select();
@@ -721,7 +730,7 @@ async function cargarPrep(){
 }
 
 /* ===== Vistas lista/tarjeta, tema, fechas DD/MM/AAAA ===== */
-var VM={inv:"cards",plan:"cards",hist:"cards"},HR=[],hdir="desc";
+var VM={inv:"cards",plan:"cards",hist:"cards",suc:"cards"},HR=[],hdir="desc";
 try{var _vm=JSON.parse(localStorage.getItem("vm")||"{}");for(var _k in _vm)if(VM[_k]!==undefined)VM[_k]=_vm[_k]==="list"?"list":"cards"}catch(e){}
 try{var _t=localStorage.getItem("tema");if(_t==="dark"||_t==="light")document.documentElement.setAttribute("data-theme",_t)}catch(e){}
 var ICO={lista:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',tune:'<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2.2"/><circle cx="9" cy="12" r="2.2"/><circle cx="17" cy="18" r="2.2"/>',plus:'<path d="M12 5v14M5 12h14"/>',tienda:'<path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M9 20v-6h6v6"/><path d="M3 9h18"/>',reloj:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',bajar:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
@@ -731,6 +740,7 @@ var ICO={lista:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',t
  sol:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
  luna:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/>',
  salir:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>'};
+ICO.sinsuc='<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16.5 8.5h6"/>';
 function svg(k){return SI+ICO[k]+'</svg>'}
 function pad2(n){return String(n).padStart(2,"0")}
 function fmtDT(iso){var d=new Date(iso);if(isNaN(d))return"";return pad2(d.getDate())+"/"+pad2(d.getMonth()+1)+"/"+d.getFullYear()+" "+pad2(d.getHours())+":"+pad2(d.getMinutes())}
@@ -746,7 +756,7 @@ document.addEventListener("click",function(e){
   if(b.dataset.th){setTema(b.dataset.th);return}
   var p=b.dataset.vm.split(":");setVM(p[0],p[1]);
   document.querySelectorAll('[data-vm^="'+p[0]+':"]').forEach(function(x){x.setAttribute("aria-pressed",x.dataset.vm===b.dataset.vm)});
-  if(p[0]==="inv")lista();else if(p[0]==="plan")listaPlan();else pintaHist();
+  if(p[0]==="inv")lista();else if(p[0]==="plan")listaPlan();else if(p[0]==="suc")pintaSuc();else pintaHist();
 });
 /* flechas de Ingresar / Salida */
 function bigsInv(){return'<div class="big"><button class="bigbtn" onclick="go(\'ingresar\')"><i class="arw up">'+svg("up")+'</i><span class="tx"><b>Ingresar</b><span>Registrar un vehículo nuevo</span></span></button>'+
@@ -814,7 +824,7 @@ function portada(){
   return head("Inicio")+'<p class="hola">Sesión: <b>'+esc(perfil.nombre||ident(perfil))+'</b> <span class="tag res">'+perfil.rol+'</span></p>'+sucBar()+
   '<div class="big"><button class="bigbtn pb" onclick="go(&quot;inv&quot;)"><i class="ic">'+IC.car+'</i><span class="tx"><b>Inventario Ford</b><span>Ingresos, salidas y stock</span></span></button>'+
   '<button class="bigbtn pb" onclick="go(&quot;plan&quot;)"><i class="ic">'+IC.cal+'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>'+(n?'<span class="tag res">'+n+'</span>':'')+'</button></div>'+
-  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
+  '<div class="mo">'+(ad?'<h2 class="sec">Administración</h2><div class="acts">'+act("Sucursales","go(&quot;sucursales&quot;)","","tienda")+act("Sin sucursal y admins","go(&quot;sucursal/none&quot;)","","sinsuc")+act("Configurar inventario","go(&quot;cfginv&quot;)","","tune")+act("Configurar planificador","go(&quot;cfgplan&quot;)","","tune")+act("Historial de cambios","go(&quot;historial&quot;)","","reloj")+'</div>':'')+
   '<h2 class="sec">Apariencia</h2>'+temaSeg()+'<p class="ver">v13-nov 14:10 · '+esc(perfil.rol)+' · '+SUC.length+' suc.</p>'+
   '<button class="btn d full" style="margin-top:24px" onclick="salir()">Cerrar sesión</button></div>';
 }
@@ -1015,10 +1025,10 @@ var SI='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="curr
 IC={home:SI+'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',car:SI+'<path d="M3 13l2-6h14l2 6v4H3z"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>',cal:SI+'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 16l2 2 4-4"/></svg>',bell:SI+'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>'};
 function pintaNav(){
   var v=vista(),n=$("#nav"),b=badge(),ad=esAdm();
-  var a2={sucursales:"sucs",sucursal:"sucs",historial:"hist",cfginv:"cfgi",cfgplan:"cfgp"}[v]||"";
+  var a2={sucursales:"sucs",sucursal:hparam()==="none"?"nosuc":"sucs",historial:"hist",cfginv:"cfgi",cfgplan:"cfgp"}[v]||"";
   var act=a2?"":v==="plan"||v==="pform"?"plan":v==="alertas"?"alertas":(["inicio","ingresar","salida","inventario","editar"].indexOf(v)>-1?"inv":"home");
   var it=[["home","","Inicio",IC.home],["inv","inv","Inventario",IC.car],["plan","plan","Planificador",IC.cal],["alertas","alertas","Alertas",IC.bell]];
-  var ex=[["sucs","sucursales","Sucursales","tienda"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
+  var ex=[["sucs","sucursales","Sucursales","tienda"],["nosuc","sucursal/none","Sin sucursal y admins","sinsuc"],["cfgi","cfginv","Configurar inventario","tune"],["cfgp","cfgplan","Configurar planificador","tune"],["hist","historial","Historial de cambios","reloj"]];
   n.innerHTML='<div class="brand"><img src="'+LOGO+'" alt=""><b>Inventario Ford</b></div>'+it.map(function(x){return'<button type="button" onclick="go(&quot;'+x[1]+'&quot;)"'+(act===x[0]?' aria-current="page"':'')+'>'+x[3]+'<span>'+x[2]+'</span>'+(x[0]==="alertas"&&b?'<i class="bdg">'+b+'</i>':'')+'</button>'}).join("")+
   (ad?'<div class="nsec">Administración</div>'+ex.map(function(x){return'<button type="button" class="ad" onclick="go(&quot;'+x[1]+'&quot;)"'+(a2===x[0]?' aria-current="page"':'')+'>'+svg(x[3])+'<span>'+x[2]+'</span></button>'}).join(""):"")+
   '<div class="nbot">'+temaSeg()+'<div class="ver">v13-nov 14:10 · '+esc(perfil.rol)+' · '+SUC.length+' suc.</div>'+'<button type="button" class="out" onclick="salir()">'+svg("salir")+'<span>Cerrar sesión</span></button></div>';
