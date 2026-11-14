@@ -469,6 +469,12 @@ async function autoVin(){
   ultimoVin=vin;
   var ex=data.filter(function(v){return v.vin===vin})[0];
   if(ex){rellenar(ex.modelo,ex.version,ex.color);msg.textContent="Este VIN ya existe en el inventario: se usaron sus datos.";return}
+  var pf8=vin.slice(0,8),par=data.filter(function(v){return v.vin&&v.vin.slice(0,8)===pf8&&v.modelo});
+  if(par.length){
+    var cuenta={};par.forEach(function(v){var k=v.modelo+"|"+(v.version||"");cuenta[k]=(cuenta[k]||0)+1});
+    var mejor=Object.keys(cuenta).sort(function(x,y){return cuenta[y]-cuenta[x]})[0].split("|");
+    rellenar(mejor[0],mejor[1],"");
+    msg.textContent="Datos tomados de "+(par.length===1?"un vehículo parecido ya registrado":par.length+" vehículos parecidos ya registrados")+" (mismo código de modelo). Revisa la versión y completa el color.";return}
   msg.textContent="Buscando datos del VIN...";
   try{
     var r=await fetch("https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/"+vin+"?format=json"),d=(await r.json()).Results[0],md=(d.Model||"").toLowerCase();
