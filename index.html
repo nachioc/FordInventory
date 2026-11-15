@@ -1410,7 +1410,15 @@
 				white-space: nowrap;
 			}
 			.ti td {
-				padding: 12px 10px;
+				padding: 12px 8px;
+			}
+			.ti th {
+				padding-left: 8px;
+				padding-right: 8px;
+			}
+			.ti .vin {
+				font-size: 12.5px;
+				letter-spacing: 0;
 			}
 			.ti .sub {
 				display: block;
@@ -1435,6 +1443,49 @@
 				width: 1%;
 				background: var(--card) !important;
 				box-shadow: -8px 0 8px -8px rgba(0, 20, 60, 0.18);
+			}
+			/* planificador e historial en lista: mismo estilo que el inventario */
+			.ti tbody tr.urg td {
+				background: var(--warnbg);
+			}
+			.ti tbody tr.urg:hover td {
+				background: color-mix(in srgb, var(--warn) 22%, var(--warnbg));
+			}
+			.ti tbody tr.urg td.ac {
+				background: var(--warnbg) !important;
+			}
+			.ti .dtc small {
+				display: block;
+				color: var(--mu);
+				font-size: 12px;
+				margin-top: 2px;
+			}
+			.ti .dtc small .tag {
+				padding: 1px 8px;
+				font-size: 11px;
+				margin-left: 4px;
+			}
+			.ti td .t2 {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 4px;
+			}
+			.ti td.ac .pv {
+				flex-direction: row;
+				flex-wrap: nowrap;
+				align-items: center;
+				margin: 0;
+				justify-content: flex-end;
+			}
+			.ti td.ac .pv select {
+				flex: none;
+				width: auto;
+				min-width: 0;
+				min-height: 36px;
+				border-radius: 10px;
+				padding: 0 8px;
+				font-size: 13px;
 			}
 			.ib {
 				width: 36px;
@@ -5007,47 +5058,85 @@
 				pf.dir = pf.dir === "desc" ? "asc" : "desc";
 				listaPlan();
 			}
+			// Acciones de una entrega en la tabla: estado + iconos (mismos permisos que en las tarjetas)
+			function accEt(e) {
+				var q = "'" + e.id + "'",
+					pr = perfil.rol === "preparador";
+				if (!(puedeEditar(e) || pr)) return "";
+				return (
+					'<div class="pv pe"><select class="pe" aria-label="Cambiar estado" onchange="cambiarEstado(' +
+					q +
+					',this.value)">' +
+					PEST.map(function (x) {
+						return "<option" + (x === e.estado ? " selected" : "") + ">" + x + "</option>";
+					}).join("") +
+					"</select>" +
+					(pr
+						? '<select class="pe" aria-label="Grabado de patente" onchange="cambiarGrabado(' +
+							q +
+							',this.value)">' +
+							["Falta", "OK"]
+								.map(function (x) {
+									return '<option value="' + x + '"' + (x === e.grabado_patente ? " selected" : "") + ">Grabado: " + x + "</option>";
+								})
+								.join("") +
+							"</select>"
+						: "") +
+					ib(pr ? "Comentar" : "Editar", "editE=" + q + ";go('pform')", "", "edit") +
+					ib("Eliminar", "borrarEntrega(" + q + ")", "d adm", "trash") +
+					"</div>"
+				);
+			}
+			// Cuándo es la entrega, en palabras: Hoy, Mañana, Atrasada...
+			function cuando(e) {
+				if (e.estado === "Entregado") return "";
+				var d = dias(e.fecha_entrega);
+				return d < 0 ? "Atrasada" : d === 0 ? "Hoy" : d === 1 ? "Mañana" : "";
+			}
 			// Tabla del planificador
 			function tablaPlan(f) {
 				var adm = esAdm() && !sucSel && SUC.length > 1;
 				return (
-					'<div class="tw"><table class="tbl"><thead><tr><th class="srt" onclick="psortT()" title="Cambiar orden">Fecha y hora ' +
+					'<div class="tw"><table class="tbl ti"><thead><tr><th class="srt" onclick="psortT()" title="Cambiar orden">Fecha y hora ' +
 					(pf.dir === "desc" ? "↓" : "↑") +
-					"</th><th>Vehículo</th><th>VIN</th><th>Estado</th><th>Grabado</th><th>Vendedor</th><th>Preparador</th>" +
-					(adm ? "<th>Sucursal</th>" : "") +
-					"<th></th></tr></thead><tbody>" +
+					"</th><th>" +
+					"Vehículo" +
+					"</th><th>VIN</th><th>Estado</th><th>Vendedor</th><th>Preparador</th>" +
+					'<th class="ac"></th></tr></thead><tbody>' +
 					f
 						.map(function (e) {
-							var urg = e.estado !== "Entregado" && dias(e.fecha_entrega) <= 1;
+							var urg = e.estado !== "Entregado" && dias(e.fecha_entrega) <= 1,
+								cu = cuando(e);
 							return (
 								'<tr class="' +
 								(urg ? "urg" : "") +
-								'"><td style="white-space:nowrap"><b>' +
+								(e.estado === "Entregado" ? " gone" : "") +
+								'"><td class="dtc" style="white-space:nowrap"><b>' +
 								fmt(e.fecha_entrega) +
-								"</b> " +
+								"</b><small>" +
 								hh(e) +
-								"</td><td><b>" +
+								(cu ? ' <span class="tag o">' + cu + "</span>" : "") +
+								"</small></td><td><b>" +
 								esc(e.modelo) +
-								"</b> · " +
+								'</b><small class="sub">' +
 								esc(e.color) +
-								'</td><td class="vin">' +
+								(adm ? " · " + esc(sucNombre(e.sucursal_id)) : "") +
+								'</small></td><td class="vin">' +
 								esc(e.vin) +
-								'</td><td><span class="tag ' +
+								'</td><td><div class="t2"><span class="tag ' +
 								(PC[e.estado] || "res") +
 								'">' +
 								esc(e.estado) +
-								'</span></td><td><span class="tag ' +
+								'</span><span class="tag ' +
 								(e.grabado_patente === "OK" ? "dis" : "o") +
-								'">' +
+								'">Grabado: ' +
 								esc(e.grabado_patente) +
-								"</span></td><td>" +
+								"</span></div></td><td>" +
 								esc(e.vendedor) +
 								"</td><td>" +
 								esc(e.preparador) +
-								"</td>" +
-								(adm ? "<td>" + esc(sucNombre(e.sucursal_id)) + "</td>" : "") +
-								"<td>" +
-								accE(e) +
+								'</td><td class="ac">' +
+								accEt(e) +
 								"</td></tr>"
 							);
 						})
@@ -5061,6 +5150,8 @@
 			// HISTORIAL DE CAMBIOS
 			// ======================================================================
 
+			// Color de cada tipo de movimiento en el historial
+			var HC = { ingreso: "dis", salida: "ven", "salida deshecha": "o", "eliminación": "o", "actualización": "res" };
 			function hsortT() {
 				hdir = hdir === "desc" ? "asc" : "desc";
 				pintaHist();
@@ -5091,22 +5182,27 @@
 				});
 				if (VM.hist === "list") {
 					$("#hl").innerHTML =
-						'<div class="tw"><table class="tbl"><thead><tr><th class="srt" onclick="hsortT()" title="Cambiar orden">Fecha y hora ' +
+						'<div class="tw"><table class="tbl ti"><thead><tr><th class="srt" onclick="hsortT()" title="Cambiar orden">Fecha y hora ' +
 						(hdir === "desc" ? "↓" : "↑") +
-						"</th><th>Acción</th><th>Modelo</th><th>Versión</th><th>VIN</th><th>Usuario</th></tr></thead><tbody>" +
+						"</th><th>Acción</th><th>Vehículo</th><th>VIN</th><th>Usuario</th></tr></thead><tbody>" +
 						l
 							.map(function (h) {
-								var d = h.detalle || {};
+								var d = h.detalle || {},
+									fh = fmtDT(h.fecha).split(" ");
 								return (
-									"<tr><td>" +
-									fmtDT(h.fecha) +
-									"</td><td>" +
+									'<tr><td class="dtc" style="white-space:nowrap"><b>' +
+									esc(fh[0]) +
+									"</b><small>" +
+									esc(fh.slice(1).join(" ")) +
+									'</small></td><td><span class="tag ' +
+									(HC[h.accion] || "res") +
+									'">' +
 									esc(h.accion) +
-									"</td><td><b>" +
+									"</span></td><td><b>" +
 									esc(d.modelo || "") +
-									"</b></td><td>" +
+									'</b><small class="sub">' +
 									esc(d.version || "") +
-									'</td><td class="vin">' +
+									'</small></td><td class="vin">' +
 									esc(d.vin || "") +
 									"</td><td>" +
 									esc(h.usuario_email || "") +
