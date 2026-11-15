@@ -12,62 +12,69 @@
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-title" content="Inventario" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-		<meta name="theme-color" content="#003478" />
+		<meta name="theme-color" content="#4a2e22" />
 		<link rel="manifest" href="manifest.json" />
 		<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 		<link rel="icon" type="image/png" href="icon-192.png" />
 		<title>Inventario de vehículos</title>
 		<style>
 			/* ===== VARIABLES DE COLOR Y TEMA (claro / oscuro) ===== */
+			/* Paleta cálida: crema, café y terracota. Todo el color de la app sale de estas variables. */
 			:root {
-				--bg: #f4f6fa;
-				--card: #fff;
-				--tx: #0d1b2e;
-				--mu: #556070;
-				--pr: #003478;
-				--pr2: #e5edf8;
-				--on: #fff;
-				--bd: #d5dce8;
-				--ok: #136c3a;
-				--okbg: #e3f4ea;
-				--warn: #8a5300;
-				--warnbg: #fdf0d8;
-				--bad: #b3261e;
-				--hd: #003478;
+				--bg: #f7f1e8; /* fondo: crema */
+				--card: #fffdf9; /* tarjetas y paneles */
+				--tx: #2b2019; /* texto: café espresso */
+				--mu: #6c5d52; /* texto secundario: taupe */
+				--pr: #a5441f; /* color principal: terracota */
+				--pr2: #f7e6d9; /* fondo suave del color principal */
+				--on: #fff; /* texto sobre el color principal */
+				--bd: #e6dacb; /* bordes */
+				--ok: #2c6b3c; /* verde: disponible, listo */
+				--okbg: #e4f1df;
+				--warn: #7b5200; /* ámbar: atención, plazos */
+				--warnbg: #fbefc9;
+				--bad: #b3202b; /* rojo: errores, eliminar */
+				--info: #2b5d85; /* azul suave: reservado, avisos */
+				--infobg: #e2edf5;
+				--hd: #4a2e22; /* encabezado y menú: chocolate */
 			}
 			@media (prefers-color-scheme: dark) {
 				:root:not([data-theme="light"]) {
-					--bg: #0a1220;
-					--card: #121c2f;
-					--tx: #e8eef8;
-					--mu: #9fb0c7;
-					--pr: #7db0ff;
-					--pr2: #1a2c4d;
-					--on: #06101f;
-					--bd: #26364f;
-					--ok: #5fd18f;
-					--okbg: #12301f;
-					--warn: #f2b660;
-					--warnbg: #38280f;
-					--bad: #ff9a92;
-					--hd: #00204d;
+					--bg: #17110d;
+					--card: #221a14;
+					--tx: #f4ece2;
+					--mu: #bba998;
+					--pr: #f2a46f;
+					--pr2: #3b2619;
+					--on: #2a1408;
+					--bd: #3b2e25;
+					--ok: #7fd69f;
+					--okbg: #1a3022;
+					--warn: #f3c26b;
+					--warnbg: #3b2b10;
+					--bad: #ff938a;
+					--info: #8fc2e8;
+					--infobg: #1b2f3f;
+					--hd: #1f1510;
 				}
 			}
 			:root[data-theme="dark"] {
-				--bg: #0a1220;
-				--card: #121c2f;
-				--tx: #e8eef8;
-				--mu: #9fb0c7;
-				--pr: #7db0ff;
-				--pr2: #1a2c4d;
-				--on: #06101f;
-				--bd: #26364f;
-				--ok: #5fd18f;
-				--okbg: #12301f;
-				--warn: #f2b660;
-				--warnbg: #38280f;
-				--bad: #ff9a92;
-				--hd: #00204d;
+				--bg: #17110d;
+				--card: #221a14;
+				--tx: #f4ece2;
+				--mu: #bba998;
+				--pr: #f2a46f;
+				--pr2: #3b2619;
+				--on: #2a1408;
+				--bd: #3b2e25;
+				--ok: #7fd69f;
+				--okbg: #1a3022;
+				--warn: #f3c26b;
+				--warnbg: #3b2b10;
+				--bad: #ff938a;
+				--info: #8fc2e8;
+				--infobg: #1b2f3f;
+				--hd: #1f1510;
 			}
 			* {
 				box-sizing: border-box;
@@ -115,7 +122,7 @@
 				color: #fff;
 				padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, calc((100% - var(--w)) / 2)) 10px;
 				margin-bottom: 16px;
-				box-shadow: 0 2px 10px rgba(0, 20, 60, 0.25);
+				box-shadow: 0 2px 10px rgba(70, 40, 20, 0.25);
 			}
 			header h1 {
 				flex: 1;
@@ -149,7 +156,7 @@
 				margin: 0 0 20px !important;
 				text-align: center;
 				color: #fff;
-				background: linear-gradient(160deg, #003478, #00184a);
+				background: linear-gradient(160deg, #7a432b, #3b241b);
 				padding: calc(32px + env(safe-area-inset-top, 0px)) 20px 32px;
 				border-radius: 0 0 28px 28px;
 			}
@@ -194,7 +201,7 @@
 				color: #fff;
 				background: var(--pr);
 				min-height: 84px;
-				box-shadow: 0 2px 6px rgba(0, 30, 80, 0.2);
+				box-shadow: 0 2px 6px rgba(70, 40, 20, 0.2);
 			}
 			.bigbtn.s {
 				background: var(--card);
@@ -216,7 +223,7 @@
 				background: var(--card);
 				color: var(--tx);
 				border: 1px solid var(--bd);
-				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.08);
+				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.08);
 				padding: 18px;
 			}
 			.bigbtn.pb .ic {
@@ -274,7 +281,7 @@
 				border: 1px solid var(--bd);
 				border-radius: 16px;
 				padding: 16px 16px 20px;
-				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.06);
+				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.06);
 			}
 			label {
 				display: block;
@@ -418,7 +425,7 @@
 				border-radius: 14px;
 				padding: 14px 16px;
 				margin-bottom: 12px;
-				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.06);
+				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.06);
 			}
 			.v.out {
 				border-left-color: var(--warn);
@@ -469,8 +476,8 @@
 				color: var(--ok);
 			}
 			.tag.res {
-				background: var(--pr2);
-				color: var(--pr);
+				background: var(--infobg);
+				color: var(--info);
 			}
 			.tag.o {
 				background: var(--warnbg);
@@ -582,7 +589,7 @@
 				background: var(--card);
 				border-top: 1px solid var(--bd);
 				padding-bottom: env(safe-area-inset-bottom, 0px);
-				box-shadow: 0 -2px 10px rgba(0, 20, 60, 0.08);
+				box-shadow: 0 -2px 10px rgba(70, 40, 20, 0.08);
 			}
 			#nav[hidden] {
 				display: none;
@@ -892,7 +899,7 @@
 				position: fixed;
 				inset: 0;
 				z-index: 200;
-				background: rgba(5, 15, 40, 0.55);
+				background: rgba(35, 20, 10, 0.55);
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -946,7 +953,7 @@
 				color: var(--tx);
 				border: 1px solid var(--bd);
 				border-radius: 14px;
-				box-shadow: 0 14px 40px rgba(0, 20, 60, 0.28);
+				box-shadow: 0 14px 40px rgba(70, 40, 20, 0.28);
 				max-height: 264px;
 				overflow-y: auto;
 				padding: 6px;
@@ -1015,12 +1022,12 @@
 				color: var(--pr);
 			}
 			.ts .cn.ok {
-				background: color-mix(in srgb, #1f9d55 18%, transparent);
-				color: #1f9d55;
+				background: color-mix(in srgb, var(--ok) 18%, transparent);
+				color: var(--ok);
 			}
 			.ts .cn.am {
-				background: color-mix(in srgb, #d98a00 18%, transparent);
-				color: #d98a00;
+				background: color-mix(in srgb, var(--warn) 18%, transparent);
+				color: var(--warn);
 			}
 			.ts .ch {
 				width: 1%;
@@ -1170,7 +1177,7 @@
 				font-weight: 700;
 				text-align: left;
 				cursor: pointer;
-				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.06);
+				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.06);
 			}
 			.act:hover {
 				border-color: var(--pr);
@@ -1442,7 +1449,7 @@
 			.ti th.ac {
 				width: 1%;
 				background: var(--card) !important;
-				box-shadow: -8px 0 8px -8px rgba(0, 20, 60, 0.18);
+				box-shadow: -8px 0 8px -8px rgba(70, 40, 20, 0.18);
 			}
 			/* planificador e historial en lista: mismo estilo que el inventario */
 			.ti tbody tr.urg td {
@@ -1582,7 +1589,7 @@
 				color: var(--tx);
 				border: 1px solid var(--bd);
 				border-radius: 18px;
-				box-shadow: 0 18px 48px rgba(0, 20, 60, 0.32);
+				box-shadow: 0 18px 48px rgba(70, 40, 20, 0.32);
 				padding: 12px;
 				font-size: 15px;
 				user-select: none;
@@ -1830,7 +1837,7 @@
 				position: sticky;
 				right: 0;
 				background: var(--card);
-				box-shadow: -6px 0 8px -6px rgba(0, 20, 60, 0.15);
+				box-shadow: -6px 0 8px -6px rgba(70, 40, 20, 0.15);
 			}
 			.tbl th:last-child {
 				background: var(--pr2);
@@ -1844,6 +1851,15 @@
 			.tbl .pv {
 				flex-direction: column;
 				align-items: stretch;
+			}
+			/* selector Tarjetas / Lista de las personas, alineado a la derecha */
+			.vmrow {
+				display: flex;
+				justify-content: flex-end;
+				margin: 14px 0 -6px;
+			}
+			.ti tr.prow.edit {
+				cursor: pointer;
 			}
 			/* la última columna solo queda fija si es la de acciones */
 			.ti td:last-child:not(.ac),
@@ -4246,6 +4262,109 @@
 					"</div>"
 				);
 			}
+			// Lista de personas en tabla (misma información que las tarjetas)
+			function tablaPer(l) {
+				return (
+					'<div class="tw"><table class="tbl ti st"><thead><tr><th>Persona</th><th>RUT</th><th>Rol</th><th>Sucursal</th><th>Estado</th><th class="ac"></th></tr></thead><tbody>' +
+					l
+						.map(function (u) {
+							var me = u.id === sesion.user.id,
+								pd = pendiente(u),
+								ro = u.rol === "admin" && perfil.rol !== "admin",
+								suc = u.sucursal_id
+									? sucNombre(u.sucursal_id)
+									: pd && u.sucursal_pedida
+										? "Solicita: " + sucNombre(u.sucursal_pedida)
+										: u.rol === "admin" || u.rol === "jefe"
+											? "Todas"
+											: "—";
+							return (
+								'<tr class="prow' +
+								(ro ? "" : " edit") +
+								'"' +
+								(ro ? "" : ' data-a="ep" data-uid="' + u.id + '" role="button" tabindex="0"') +
+								'><td data-l="Persona"><b>' +
+								esc(u.nombre || ident(u)) +
+								(me ? " (tú)" : "") +
+								"</b>" +
+								(u.nombre ? "" : '<small class="sub">sin nombre</small>') +
+								'</td><td class="vin" data-l="RUT">' +
+								esc(ident(u)) +
+								'</td><td data-l="Rol">' +
+								esc((pd && u.rol_pedido ? u.rol_pedido : u.rol) + (ro ? " · administrador" : "")) +
+								'</td><td data-l="Sucursal">' +
+								esc(suc) +
+								'</td><td data-l="Estado"><span class="tag ' +
+								(pd ? "o" : "dis") +
+								'">' +
+								(pd ? "Pendiente" : "Activa") +
+								'</span></td><td class="ac">' +
+								(ro
+									? ""
+									: '<button type="button" class="ib" data-a="ep" data-uid="' +
+										u.id +
+										'" title="Editar" aria-label="Editar">' +
+										svg("edit") +
+										"</button>") +
+								"</td></tr>"
+							);
+						})
+						.join("") +
+					"</tbody></table></div>"
+				);
+			}
+			// Una lista de personas, en tarjetas o en tabla según la vista elegida
+			function listaPer(l, vacio) {
+				if (!l.length) return vacio;
+				return VM.per === "list" ? tablaPer(l) : '<div class="cards">' + l.map(persona).join("") + "</div>";
+			}
+			// Secciones de personas de la página de Cuentas (none) o de una sucursal
+			function personasHtml(none, id) {
+				if (none) {
+					var pe = PER.filter(pendiente),
+						ad = PER.filter(function (u) {
+							return u.rol === "admin";
+						});
+					return (
+						'<h2 class="sec">Pendientes (' +
+						pe.length +
+						")</h2>" +
+						listaPer(pe, '<div class="empty">No hay nadie pendiente.</div>') +
+						'<h2 class="sec">Administradores (' +
+						ad.length +
+						")</h2>" +
+						listaPer(ad, '<div class="empty">No hay administradores.</div>')
+					);
+				}
+				var gr = function (rol) {
+						return PER.filter(function (u) {
+							return u.activo && u.rol === rol && (rol === "jefe" || u.sucursal_id === id);
+						});
+					},
+					h = "";
+				[
+					["jefe", "Jefes"],
+					["vendedor", "Vendedores"],
+					["preparador", "Preparadores"],
+					["consulta", "Consulta"],
+				].forEach(function (p) {
+					var l = gr(p[0]);
+					if (p[0] === "consulta" && !l.length) return;
+					h +=
+						'<h2 class="sec">' +
+						p[1] +
+						" (" +
+						l.length +
+						")</h2>" +
+						listaPer(l, '<div class="empty" style="padding:12px">Nadie todavía.</div>');
+				});
+				return h;
+			}
+			// Vuelve a dibujar solo las secciones de personas (al cambiar entre tarjetas y lista)
+			function pintaPersonas() {
+				var el = $("#personas");
+				if (el) el.innerHTML = personasHtml(hparam() === "none", hparam());
+			}
 			// Cierra la ventana emergente de edición
 			function cierraModal() {
 				var m = $("#modal");
@@ -4283,7 +4402,7 @@
 				else if (
 					(e.key === "Enter" || e.key === " ") &&
 					e.target.classList &&
-					e.target.classList.contains("pers") &&
+					(e.target.classList.contains("pers") || e.target.classList.contains("prow")) &&
 					e.target.dataset.a === "ep"
 				) {
 					e.preventDefault();
@@ -4308,21 +4427,12 @@
 				}
 				var h = head(none ? "Cuentas" : s.nombre);
 				if (none) {
-					var pe = PER.filter(pendiente),
-						ad = PER.filter(function (u) {
-							return u.rol === "admin";
-						});
 					h +=
 						'<p class="hola">Estas cuentas ya se registraron pero no tienen sucursal. Abre una, elige sucursal y rol, y toca Guardar para darle acceso.</p>' +
-						'<h2 class="sec">Pendientes (' +
-						pe.length +
-						')</h2><div class="cards">' +
-						(pe.map(persona).join("") || '<div class="empty">No hay nadie pendiente.</div>') +
-						"</div>" +
-						'<h2 class="sec">Administradores (' +
-						ad.length +
-						')</h2><div class="cards">' +
-						ad.map(persona).join("") +
+						'<div class="vmrow">' +
+						vmBar("per") +
+						'</div><div id="personas">' +
+						personasHtml(true, id) +
 						"</div>";
 				} else {
 					var gr = function (rol) {
@@ -4360,23 +4470,7 @@
 							})
 							.join("") +
 						"</div>";
-					[
-						["jefe", "Jefes"],
-						["vendedor", "Vendedores"],
-						["preparador", "Preparadores"],
-						["consulta", "Consulta"],
-					].forEach(function (p) {
-						var l = gr(p[0]);
-						if (p[0] === "consulta" && !l.length) return;
-						h +=
-							'<h2 class="sec">' +
-							p[1] +
-							" (" +
-							l.length +
-							')</h2><div class="cards">' +
-							(l.map(persona).join("") || '<div class="empty" style="padding:12px">Nadie todavía.</div>') +
-							"</div>";
-					});
+					h += '<div class="vmrow">' + vmBar("per") + '</div><div id="personas">' + personasHtml(false, id) + "</div>";
 					h +=
 						'<h2 class="sec">Agregar persona</h2>' +
 						(pe2.length
@@ -4957,7 +5051,7 @@
 			}
 
 			/* ===== Vistas lista/tarjeta, tema, fechas DD/MM/AAAA ===== */
-			var VM = { inv: "cards", plan: "cards", hist: "cards", suc: "cards" },
+			var VM = { inv: "cards", plan: "cards", hist: "cards", suc: "cards", per: "cards" },
 				HR = [],
 				hdir = "desc";
 			try {
@@ -5027,7 +5121,7 @@
 					localStorage.setItem("tema", t);
 				} catch (e) {}
 				var m = document.querySelector("meta[name=theme-color]");
-				if (m) m.content = t === "dark" ? "#00204d" : "#003478";
+				if (m) m.content = t === "dark" ? "#1f1510" : "#4a2e22";
 				document.querySelectorAll("[data-th]").forEach(function (b) {
 					b.setAttribute("aria-pressed", b.dataset.th === t);
 				});
@@ -5085,6 +5179,7 @@
 				if (p[0] === "inv") lista();
 				else if (p[0] === "plan") listaPlan();
 				else if (p[0] === "suc") pintaSuc();
+				else if (p[0] === "per") pintaPersonas();
 				else pintaHist();
 			});
 			/* flechas de Ingresar / Salida */
