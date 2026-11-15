@@ -1433,7 +1433,7 @@
 				color: var(--mu);
 			}
 			.ti tbody tr:nth-child(even) td {
-				background: color-mix(in srgb, var(--pr2) 35%, transparent);
+				background: color-mix(in srgb, var(--pr2) 35%, var(--card));
 			}
 			.ti tbody tr:hover td {
 				background: var(--pr2);
@@ -1844,6 +1844,126 @@
 			.tbl .pv {
 				flex-direction: column;
 				align-items: stretch;
+			}
+			/* la última columna solo queda fija si es la de acciones */
+			.ti td:last-child:not(.ac),
+			.ti th:last-child:not(.ac) {
+				position: static;
+				box-shadow: none;
+			}
+			/* Celular: planificador e historial dejan de ser tabla y cada fila pasa a ser una tarjeta con "Etiqueta  valor" */
+			@media (max-width: 760px) {
+				.tbl.st,
+				.tbl.st tbody {
+					display: block;
+					width: 100%;
+				}
+				.tbl.st thead {
+					display: none;
+				}
+				.tbl.st tr {
+					display: block;
+					padding: 12px 14px;
+					border-bottom: 1px solid var(--bd);
+				}
+				.tbl.st tr:last-child {
+					border-bottom: 0;
+				}
+				.tbl.st tbody tr:nth-child(even) {
+					background: color-mix(in srgb, var(--pr2) 35%, var(--card));
+				}
+				.tbl.st tbody tr.urg {
+					background: var(--warnbg);
+				}
+				.tbl.st td {
+					display: grid;
+					grid-template-columns: 96px 1fr;
+					gap: 8px;
+					align-items: center;
+					padding: 4px 0;
+					white-space: normal;
+					position: static;
+					box-shadow: none;
+					border: 0;
+					background: transparent !important;
+				}
+				.tbl.st td::before {
+					content: attr(data-l);
+					color: var(--mu);
+					font-size: 13px;
+				}
+				.tbl.st td > .tag {
+					justify-self: start;
+				}
+				.tbl.st td.ac {
+					display: block;
+					width: auto;
+					padding-top: 10px;
+				}
+				.tbl.st td.ac::before {
+					content: none;
+				}
+				.tbl.st td.ac .pv select {
+					flex: 1;
+					min-width: 0;
+				}
+			}
+			/* El planificador tiene más columnas: se apila hasta pantallas medianas */
+			@media (max-width: 1260px) {
+				.tbl.stw,
+				.tbl.stw tbody {
+					display: block;
+					width: 100%;
+				}
+				.tbl.stw thead {
+					display: none;
+				}
+				.tbl.stw tr {
+					display: block;
+					padding: 12px 14px;
+					border-bottom: 1px solid var(--bd);
+				}
+				.tbl.stw tr:last-child {
+					border-bottom: 0;
+				}
+				.tbl.stw tbody tr:nth-child(even) {
+					background: color-mix(in srgb, var(--pr2) 35%, var(--card));
+				}
+				.tbl.stw tbody tr.urg {
+					background: var(--warnbg);
+				}
+				.tbl.stw td {
+					display: grid;
+					grid-template-columns: 96px 1fr;
+					gap: 8px;
+					align-items: center;
+					padding: 4px 0;
+					white-space: normal;
+					position: static;
+					box-shadow: none;
+					border: 0;
+					background: transparent !important;
+				}
+				.tbl.stw td::before {
+					content: attr(data-l);
+					color: var(--mu);
+					font-size: 13px;
+				}
+				.tbl.stw td > .tag {
+					justify-self: start;
+				}
+				.tbl.stw td.ac {
+					display: block;
+					width: auto;
+					padding-top: 10px;
+				}
+				.tbl.stw td.ac::before {
+					content: none;
+				}
+				.tbl.stw td.ac .pv select {
+					flex: 1;
+					min-width: 0;
+				}
 			}
 		</style>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
@@ -5097,7 +5217,7 @@
 			function tablaPlan(f) {
 				var adm = esAdm() && !sucSel && SUC.length > 1;
 				return (
-					'<div class="tw"><table class="tbl ti"><thead><tr><th class="srt" onclick="psortT()" title="Cambiar orden">Fecha y hora ' +
+					'<div class="tw"><table class="tbl ti stw"><thead><tr><th class="srt" onclick="psortT()" title="Cambiar orden">Fecha y hora ' +
 					(pf.dir === "desc" ? "↓" : "↑") +
 					"</th><th>" +
 					"Vehículo" +
@@ -5111,19 +5231,19 @@
 								'<tr class="' +
 								(urg ? "urg" : "") +
 								(e.estado === "Entregado" ? " gone" : "") +
-								'"><td class="dtc" style="white-space:nowrap"><b>' +
+								'"><td class="dtc" data-l="Fecha" style="white-space:nowrap"><div><b>' +
 								fmt(e.fecha_entrega) +
 								"</b><small>" +
 								hh(e) +
 								(cu ? ' <span class="tag o">' + cu + "</span>" : "") +
-								"</small></td><td><b>" +
+								'</small></div></td><td data-l="Vehículo"><div><b>' +
 								esc(e.modelo) +
 								'</b><small class="sub">' +
 								esc(e.color) +
 								(adm ? " · " + esc(sucNombre(e.sucursal_id)) : "") +
-								'</small></td><td class="vin">' +
+								'</small></div></td><td class="vin" data-l="VIN">' +
 								esc(e.vin) +
-								'</td><td><div class="t2"><span class="tag ' +
+								'</td><td data-l="Estado"><div class="t2"><span class="tag ' +
 								(PC[e.estado] || "res") +
 								'">' +
 								esc(e.estado) +
@@ -5131,9 +5251,9 @@
 								(e.grabado_patente === "OK" ? "dis" : "o") +
 								'">Grabado: ' +
 								esc(e.grabado_patente) +
-								"</span></div></td><td>" +
+								'</span></div></td><td data-l="Vendedor">' +
 								esc(e.vendedor) +
-								"</td><td>" +
+								'</td><td data-l="Preparador">' +
 								esc(e.preparador) +
 								'</td><td class="ac">' +
 								accEt(e) +
@@ -5182,7 +5302,7 @@
 				});
 				if (VM.hist === "list") {
 					$("#hl").innerHTML =
-						'<div class="tw"><table class="tbl ti"><thead><tr><th class="srt" onclick="hsortT()" title="Cambiar orden">Fecha y hora ' +
+						'<div class="tw"><table class="tbl ti st"><thead><tr><th class="srt" onclick="hsortT()" title="Cambiar orden">Fecha y hora ' +
 						(hdir === "desc" ? "↓" : "↑") +
 						"</th><th>Acción</th><th>Vehículo</th><th>VIN</th><th>Usuario</th></tr></thead><tbody>" +
 						l
@@ -5190,21 +5310,21 @@
 								var d = h.detalle || {},
 									fh = fmtDT(h.fecha).split(" ");
 								return (
-									'<tr><td class="dtc" style="white-space:nowrap"><b>' +
+									'<tr><td class="dtc" data-l="Fecha" style="white-space:nowrap"><div><b>' +
 									esc(fh[0]) +
 									"</b><small>" +
 									esc(fh.slice(1).join(" ")) +
-									'</small></td><td><span class="tag ' +
+									'</small></div></td><td data-l="Acción"><span class="tag ' +
 									(HC[h.accion] || "res") +
 									'">' +
 									esc(h.accion) +
-									"</span></td><td><b>" +
+									'</span></td><td data-l="Vehículo"><div><b>' +
 									esc(d.modelo || "") +
 									'</b><small class="sub">' +
 									esc(d.version || "") +
-									'</small></td><td class="vin">' +
+									'</small></div></td><td class="vin" data-l="VIN">' +
 									esc(d.vin || "") +
-									"</td><td>" +
+									'</td><td data-l="Usuario">' +
 									esc(h.usuario_email || "") +
 									"</td></tr>"
 								);
