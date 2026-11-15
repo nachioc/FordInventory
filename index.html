@@ -2011,14 +2011,14 @@
 						.join("")
 				);
 			}
-			function toast(t) {
+			function toast(t, ms) {
 				var e = document.createElement("div");
 				e.className = "toast";
 				e.textContent = t;
 				document.body.appendChild(e);
 				setTimeout(function () {
 					e.remove();
-				}, 2200);
+				}, ms || 2200);
 			}
 			function stock() {
 				return data.filter(function (v) {
@@ -2952,7 +2952,13 @@
 					}
 					toast("Avisos activados en este dispositivo");
 				} catch (e) {
-					toast("No se pudieron activar los avisos");
+					// Dice la causa real para poder corregirla
+					toast(
+						e && e.message === "sw"
+							? "No se pudieron activar: la app no tiene el archivo sw.js en el sitio (súbelo a GitHub junto a index.html)"
+							: "No se pudieron activar los avisos: " + ((e && (e.name + " " + e.message)) || "error desconocido"),
+						9000,
+					);
 				}
 				pintaPush();
 			}
