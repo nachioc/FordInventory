@@ -5960,7 +5960,10 @@
 					? await db.from("entregas").update(r).eq("id", editE).select()
 					: await db.from("entregas").insert(r).select();
 				if (x.error || !x.data.length) {
-					er.textContent = "No se pudo guardar (revisa tu permiso o tu conexión).";
+					er.textContent =
+						x.error && x.error.code === "23505"
+							? "Ya hay una entrega activa para ese VIN. Búscala en el Planificador y edítala."
+							: "No se pudo guardar (revisa tu permiso o tu conexión).";
 					return;
 				}
 				await cargarEntregas();
