@@ -2990,15 +2990,13 @@
 					return;
 				}
 				var sub = Notification.permission === "granted" ? await pushSub() : null;
-				el.innerHTML = sub
-					? caja(
-							"✅ " +
-								(cel ? "Este celular" : "Este computador") +
-								(vend ? " recibirá un aviso cuando una de tus entregas esté lista" : " recibirá un aviso cuando se cree o cambie una entrega") +
-								(cel ? ", aunque la app esté cerrada." : "."),
-							'<div class="pushb"><button type="button" class="btn g" data-a="pushprueba">Probar aviso</button><button type="button" class="btn g" data-a="pushoff">Desactivar</button></div>',
-						)
-					: caja(
+				// Con los avisos ya activados la tarjeta se oculta (para desactivarlos: ajustes del navegador)
+				if (sub) {
+					el.innerHTML = "";
+					return;
+				}
+				el.innerHTML =
+					caja(
 							"Activa los avisos para enterarte al tiro de las entregas que " + (vend ? "están listas" : "hay que preparar") + (cel ? ", sin abrir la app." : "."),
 							'<div class="pushb"><button type="button" class="btn" data-a="pushon">Activar avisos</button></div>',
 						);
