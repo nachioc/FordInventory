@@ -1853,7 +1853,7 @@
 			.vmrow {
 				display: flex;
 				justify-content: flex-end;
-				margin: 14px 0 -6px;
+				margin: 10px 0 12px;
 			}
 			.ti tr.prow.edit {
 				cursor: pointer;
@@ -2120,10 +2120,10 @@
 				line-height: 1;
 			}
 			.cd.n1 {
-				background: var(--pr2);
+				background: color-mix(in srgb, var(--pr) 20%, var(--card));
 			}
 			.cd.n2 {
-				background: color-mix(in srgb, var(--pr) 45%, var(--card));
+				background: color-mix(in srgb, var(--pr) 50%, var(--card));
 			}
 			.cd.n3 {
 				background: var(--pr);
@@ -2152,10 +2152,10 @@
 				border-radius: 4px;
 				margin-right: 5px;
 				vertical-align: -2px;
-				background: var(--pr2);
+				background: color-mix(in srgb, var(--pr) 20%, var(--card));
 			}
 			.cal .ley .l2::before {
-				background: color-mix(in srgb, var(--pr) 45%, var(--card));
+				background: color-mix(in srgb, var(--pr) 50%, var(--card));
 			}
 			.cal .ley .l3::before {
 				background: var(--pr);
@@ -2198,6 +2198,220 @@
 			}
 			.panel .btn + .btn {
 				margin-top: 8px;
+			}
+			/* ===== PLANIFICADOR: diseño más fino ===== */
+			.ban {
+				box-sizing: border-box;
+				width: 100%;
+				max-width: 100%;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				text-align: left;
+				cursor: pointer;
+				font: inherit;
+				color: var(--tx);
+				padding: 10px 14px;
+				margin-bottom: 12px;
+			}
+			.ban .ic {
+				display: grid;
+				place-items: center;
+				width: 36px;
+				height: 36px;
+				border-radius: 10px;
+				background: var(--warnbg);
+				color: var(--warn);
+				flex: none;
+			}
+			.ban .ic svg {
+				width: 20px;
+				height: 20px;
+			}
+			.ban small {
+				display: block;
+				color: var(--mu);
+				font-size: 13px;
+			}
+			.ph1 {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+				gap: 12px;
+			}
+			.ph1 .pt {
+				min-width: 0;
+			}
+			.ph1 h3 {
+				margin: 0 0 3px;
+			}
+			.pdt {
+				flex: none;
+				min-width: 60px;
+				text-align: center;
+				border-radius: 12px;
+				padding: 6px 8px 7px;
+				background: var(--pr2);
+				color: var(--pr);
+				line-height: 1.1;
+			}
+			.pdt b {
+				display: block;
+				font-size: 24px;
+				font-weight: 800;
+			}
+			.pdt span {
+				display: block;
+				font-size: 11px;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+			.pdt small {
+				display: block;
+				margin-top: 4px;
+				padding-top: 4px;
+				border-top: 1px solid currentColor;
+				font-size: 12.5px;
+				font-weight: 700;
+			}
+			.pdt.al {
+				background: var(--badbg);
+				color: var(--bad);
+			}
+			.pdt.wa {
+				background: var(--warnbg);
+				color: var(--warn);
+			}
+			.pdt.ok {
+				background: var(--okbg);
+				color: var(--ok);
+			}
+			#pl h2.sec,
+			.caldet h2.sec {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin: 16px 0 0;
+			}
+			#pl h2.sec em,
+			.caldet h2.sec em {
+				font-style: normal;
+				font-size: 12px;
+				min-width: 22px;
+				padding: 1px 7px;
+				border-radius: 99px;
+				text-align: center;
+				background: var(--pr2);
+				color: var(--pr);
+			}
+			#pl h2.sec.g0 em {
+				background: var(--badbg);
+				color: var(--bad);
+			}
+			#pl h2.sec.g1 em,
+			#pl h2.sec.g2 em {
+				background: var(--warnbg);
+				color: var(--warn);
+			}
+			#pl h2.sec.g4 em {
+				background: var(--okbg);
+				color: var(--ok);
+			}
+			.pp span {
+				display: block;
+				white-space: nowrap;
+			}
+			.pp i {
+				font-style: normal;
+				color: var(--mu);
+				font-size: 12px;
+				margin-right: 6px;
+			}
+			.ti th.ac {
+				background: var(--pr2) !important;
+			}
+			.ti tbody tr:nth-child(even) td.ac {
+				background: color-mix(in srgb, var(--pr2) 35%, var(--card)) !important;
+			}
+			.ti tbody tr:hover td.ac {
+				background: var(--pr2) !important;
+			}
+			.ti tbody tr.urg td.ac,
+			.ti tbody tr.urg:hover td.ac {
+				background: var(--warnbg) !important;
+			}
+			.calwrap {
+				grid-column: 1/-1;
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				gap: 16px;
+				align-items: start;
+			}
+			.calwrap .cal {
+				margin-bottom: 0;
+			}
+			.caldet {
+				display: grid;
+				gap: 12px;
+				align-content: start;
+			}
+			.caldet .v {
+				margin-bottom: 0;
+			}
+			.caldet .empty {
+				margin: 0;
+			}
+			@media (min-width: 900px) {
+				.tools .np-w {
+					margin: 0;
+				}
+				.tools .np-w .bigbtn.np {
+					width: auto;
+					min-height: 48px;
+					padding: 0 20px 0 12px;
+					gap: 10px;
+				}
+				.tools .np-w .bigbtn.np .tx span {
+					display: none;
+				}
+				.tools .np-w .bigbtn.np .tx b {
+					font-size: 16px;
+					white-space: nowrap;
+				}
+				.tools .np-w .bigbtn.np .arw {
+					width: 30px;
+					height: 30px;
+				}
+				.ptb-tools {
+					grid-template-columns: minmax(170px, 230px) minmax(200px, 1fr) auto auto;
+					align-items: stretch;
+				}
+				.calwrap {
+					grid-template-columns: minmax(380px, 540px) minmax(0, 1fr);
+				}
+				.calwrap .cal {
+					position: sticky;
+					top: 76px;
+				}
+				.caldet {
+					grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+				}
+				.caldet h2.sec,
+				.caldet .empty {
+					grid-column: 1/-1;
+				}
+				.cd {
+					min-height: 48px;
+				}
+				.cal .ley {
+					font-size: 13px;
+				}
+			}
+			@media (max-width: 899px) {
+				.tools .np-w {
+					grid-column: 1/-1;
+				}
 			}
 		</style>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
@@ -5653,9 +5867,7 @@
 				return (
 					'<div class="tw"><table class="tbl ti stw"><thead><tr><th class="srt" onclick="psortT()" title="Cambiar orden">Fecha y hora ' +
 					(pf.dir === "desc" ? "↓" : "↑") +
-					"</th><th>" +
-					"Vehículo" +
-					"</th><th>VIN</th><th>Estado</th><th>Vendedor</th><th>Preparador</th>" +
+					"</th><th>Vehículo</th><th>Estado</th><th>Personas</th>" +
 					'<th class="ac"></th></tr></thead><tbody>' +
 					f
 						.map(function (e) {
@@ -5675,9 +5887,9 @@
 								'</b><small class="sub">' +
 								esc(e.color) +
 								(adm ? " · " + esc(sucNombre(e.sucursal_id)) : "") +
-								'</small></div></td><td class="vin" data-l="VIN">' +
+								'</small><small class="sub vin">' +
 								esc(e.vin) +
-								'</td><td data-l="Estado"><div class="t2"><span class="tag ' +
+								'</small></div></td><td data-l="Estado"><div class="t2"><span class="tag ' +
 								(PC[e.estado] || "res") +
 								'">' +
 								esc(e.estado) +
@@ -5685,11 +5897,11 @@
 								(e.grabado_patente === "OK" ? "dis" : "o") +
 								'">Grabado: ' +
 								esc(e.grabado_patente) +
-								'</span></div></td><td data-l="Vendedor">' +
-								esc(e.vendedor) +
-								'</td><td data-l="Preparador">' +
-								esc(e.preparador) +
-								'</td><td class="ac">' +
+								'</span></div></td><td data-l="Personas"><div class="pp"><span><i>Vendedor</i>' +
+								esc(e.vendedor || "—") +
+								"</span><span><i>Preparador</i>" +
+								esc(e.preparador || "—") +
+								'</span></div></td><td class="ac">' +
 								accEt(e) +
 								"</td></tr>"
 							);
@@ -6202,19 +6414,22 @@
 					sucBar() +
 					ayudaRol() +
 					(al.length
-						? '<button class="v out" style="display:block;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--tx)" onclick="go(&quot;alertas&quot;)"><b>' +
+						? '<button class="v out ban" onclick="go(&quot;alertas&quot;)"><i class="ic">' +
+							IC.bell +
+							'</i><span><b>' +
 							al.length +
-							' entrega(s) con plazo para hoy, mañana o vencido</b><div class="m">Toca para ver el detalle</div></button>'
+							(al.length === 1 ? " entrega con plazo" : " entregas con plazo") +
+							' para hoy, mañana o vencido</b><small>Toca para ver el detalle</small></span></button>'
 						: "") +
 					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button><button type="button" class="chip" id="psort"></button>' +
 					vmBar("plan") +
 					"</div>" +
-					'<div class="tools"><select id="pe" aria-label="Estado">' +
+					'<div class="tools ptb-tools"><select id="pe" aria-label="Estado">' +
 					opts(PEST, "Todos los estados") +
-					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button></div>' +
+					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
 					'<div class="big np-w"><button class="bigbtn pn np" onclick="editE=null;go(&quot;pform&quot;)"><i class="arw up">' +
 					svg("plus") +
-					'</i><span class="tx"><b>Nueva entrega</b><span>Programar la entrega de un vehículo</span></span></button></div>' +
+					'</i><span class="tx"><b>Nueva entrega</b><span>Programar la entrega de un vehículo</span></span></button></div></div>' +
 					'<div id="pl" style="margin-top:12px"></div>' +
 					'<div class="acts">' +
 					act("Exportar CSV", null, "", "bajar", 'id="pexp"') +
@@ -6310,7 +6525,7 @@
 						return g[k];
 					})
 					.map(function (k) {
-						return '<h2 class="sec">' + k + " (" + g[k].length + ")</h2>" + g[k].map(cardE).join("");
+						return '<h2 class="sec g' + ord.indexOf(k) + '">' + k + " <em>" + g[k].length + "</em></h2>" + g[k].map(cardE).join("");
 					})
 					.join("");
 			}
@@ -6358,21 +6573,32 @@
 			}
 			function cardE(e) {
 				var urg = e.estado !== "Entregado" && dias(e.fecha_entrega) <= 1,
-					q = "&quot;" + e.id + "&quot;",
 					pr = perfil.rol === "preparador",
-					ed = puedeEditar(e),
-					tuya = perfil.rol === "vendedor" && e.creado_por === sesion.user.id;
+					tuya = perfil.rol === "vendedor" && e.creado_por === sesion.user.id,
+					d = dias(e.fecha_entrega),
+					k = e.estado === "Entregado" ? "ok" : d < 0 ? "al" : d <= 1 ? "wa" : "",
+					f = String(e.fecha_entrega).split("-");
 				return (
-					'<div class="v' +
+					'<div class="v pe' +
 					(urg ? " out" : "") +
-					'"><h3>' +
+					'"><div class="ph1"><div class="pt"><h3>' +
 					esc(e.modelo) +
 					" · " +
 					esc(e.color) +
 					'</h3><div class="vin">' +
 					esc(e.vin) +
-					"</div>" +
-					'<div style="margin:8px 0 2px"><span class="tag ' +
+					'</div></div><div class="pdt ' +
+					k +
+					'" title="Entrega: ' +
+					fmt(e.fecha_entrega) +
+					'"><b>' +
+					parseInt(f[2], 10) +
+					"</b><span>" +
+					MES3[parseInt(f[1], 10) - 1] +
+					"</span><small>" +
+					hh(e) +
+					"</small></div></div>" +
+					'<div style="margin:10px 0 4px"><span class="tag ' +
 					(PC[e.estado] || "res") +
 					'">' +
 					e.estado +
@@ -6386,7 +6612,7 @@
 					(tuya ? '<span class="tag res">Tuya</span>' : "") +
 					"</div>" +
 					filas([
-						["Entrega", fmt(e.fecha_entrega) + " " + hh(e) + (e.fecha_entrega !== e.fecha_inicial ? " (inicial " + fmt(e.fecha_inicial) + ")" : "")],
+						["Fecha inicial", e.fecha_entrega !== e.fecha_inicial ? fmt(e.fecha_inicial) : ""],
 						["Alistamiento", fmt(e.fecha_alistamiento)],
 						["Vendedor", esc(e.vendedor)],
 						["Preparador", esc(e.preparador)],
@@ -7125,6 +7351,7 @@
 				pfLast = [],
 				calMes = "",
 				calDia = "",
+				MES3 = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
 				MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 			async function cargarAjustes() {
 				try {
@@ -7547,16 +7774,18 @@
 				}
 				var lista = calDia && calDia.slice(0, 7) === calMes ? por[calDia] || [] : null;
 				return (
-					'<div class="cal"><div class="calh"><button type="button" class="btn g" data-a="calmes" data-s="-1" aria-label="Mes anterior">‹</button><b>' +
+					'<div class="calwrap"><div class="cal"><div class="calh"><button type="button" class="btn g" data-a="calmes" data-s="-1" aria-label="Mes anterior">‹</button><b>' +
 					MESES[m] +
 					" " +
 					y +
 					'</b><button type="button" class="btn g" data-a="calmes" data-s="1" aria-label="Mes siguiente">›</button></div><div class="calg">' +
 					c +
 					'</div><div class="ley"><span>1 entrega</span><span class="l2">2 a 3</span><span class="l3">4 o más</span><button type="button" class="btn g" data-a="calmes" data-s="0" style="min-height:32px;padding:0 12px;margin-left:auto">Hoy</button></div></div>' +
+					'<div class="caldet">' +
 					(lista
-						? '<h2 class="sec">' + fmt(calDia) + " (" + lista.length + ")</h2>" + (lista.map(cardE).join("") || '<div class="empty">No hay entregas este día.</div>')
-						: '<p class="hola">Toca un día para ver sus entregas.</p>')
+						? '<h2 class="sec">' + fmt(calDia) + " <em>" + lista.length + "</em></h2>" + (lista.map(cardE).join("") || '<div class="empty">No hay entregas este día.</div>')
+						: '<div class="empty">Toca un día del calendario para ver sus entregas.</div>') +
+					"</div></div>"
 				);
 			}
 			ACC.calmes = function (b) {
