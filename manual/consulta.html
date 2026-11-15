@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual del Solo consulta · Inventario Ford</title>
+<meta name="description" content="Manual de uso de Inventario Ford para el perfil Solo consulta.">
+<meta name="theme-color" content="#003478">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="manual.css" rel="stylesheet">
+</head>
+<body data-bs-spy="scroll" data-bs-target="#toc" data-bs-offset="90" tabindex="0">
+<nav class="navbar navbar-expand-lg fixed-top mnav">
+ <div class="container-xl">
+  <a class="navbar-brand fw-bold" href="index.html">Manual · Inventario Ford</a>
+  <div class="d-flex align-items-center gap-2 ms-auto">
+   <div class="dropdown"><button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">Perfil: Solo consulta</button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="admin.html">Administrador</a></li><li><a class="dropdown-item" href="jefe.html">Jefe</a></li><li><a class="dropdown-item" href="preparador.html">Preparador</a></li><li><a class="dropdown-item" href="vendedor.html">Vendedor</a></li><li><a class="dropdown-item active" href="consulta.html">Solo consulta</a></li><li><hr class="dropdown-divider"></li><li><a class="dropdown-item" href="index.html">Todos los manuales</a></li></ul></div>
+   <button class="btn btn-sm btn-outline-light" id="tema" type="button" aria-label="Cambiar entre modo claro y oscuro">Tema</button>
+   <a class="btn btn-sm btn-warning d-none d-sm-inline" href="../index.html" target="_blank" rel="noopener">Abrir la app</a>
+  </div>
+ </div>
+</nav>
+<header class="mhero"><div class="container-xl"><span class="badge rounded-pill text-bg-light mb-2">Perfil Solo consulta</span><h1>Manual del Solo consulta</h1><p class="lead mb-0">Cómo mirar el inventario y las entregas de tu sucursal.</p></div></header>
+<div class="container-xl py-4">
+ <div class="row g-4">
+  <aside class="col-lg-3 d-print-none"><div class="sticky-lg-top toc-w"><input id="buscar" class="form-control form-control-sm mb-2" type="search" placeholder="Buscar en este manual" aria-label="Buscar en este manual"><div id="toc" class="list-group small"><a class="list-group-item list-group-item-action" href="#resumen">Qué puedes hacer</a><a class="list-group-item list-group-item-action" href="#acceso">Entrar a la app</a><a class="list-group-item list-group-item-action" href="#instalar">Instalarla como app</a><a class="list-group-item list-group-item-action" href="#apariencia">Modo claro, oscuro y vistas</a><a class="list-group-item list-group-item-action" href="#inventario">Ver el inventario</a><a class="list-group-item list-group-item-action" href="#planificador">Ver el planificador de entregas</a><a class="list-group-item list-group-item-action" href="#exportar">Exportar a Excel o CSV</a><a class="list-group-item list-group-item-action" href="#faq">Preguntas frecuentes</a></div></div></aside>
+  <main class="col-lg-9" id="doc"><section id="resumen" class="msec"><h2>Qué puedes hacer</h2>
+<p>El perfil de <b>solo consulta</b> sirve para mirar sin riesgo de cambiar nada.</p>
+<ul><li>Ver el <b>inventario</b> de tu sucursal.</li><li>Ver las <b>entregas</b> y el calendario del planificador.</li><li><b>Exportar</b> lo que ves a Excel o CSV.</li></ul>
+<p>No puedes ingresar, editar, cambiar estados ni recibir avisos.</p></section><section id="acceso" class="msec"><h2>Entrar a la app</h2>
+<p>Abre <a href="https://nachioc.github.io/FordInventory/" target="_blank" rel="noopener">https://nachioc.github.io/FordInventory/</a> en tu celular o computador.</p>
+<ol class="pasos"><li>Escribe tu <b>RUT</b> y tu <b>contraseña</b>, y toca <b>Entrar</b>.</li><li>Si es tu primera vez, toca <b>Crear cuenta</b>, escribe tu nombre, RUT y una contraseña. Luego elige tu <b>sucursal</b> y tu <b>rol</b> y espera la aprobación de un administrador: verás «Cuenta pendiente» hasta entonces (toca <b>Reintentar</b>).</li><li>Si te dieron una clave temporal, la app te pedirá crear una nueva antes de seguir.</li><li>Si no recuerdas tu clave, toca <b>Olvidé mi clave</b> o pídele al administrador que la restablezca.</li></ol>
+<p class="small text-secondary mb-0">El RUT debe ser válido (la app revisa el dígito verificador).</p></section><section id="instalar" class="msec"><h2>Instalarla como app</h2>
+<p>No necesitas tienda de aplicaciones: se instala desde el navegador y queda con su ícono, como cualquier app.</p>
+<div class="row g-3">
+ <div class="col-md-4"><div class="card h-100"><div class="card-body"><h4 class="h6">Android (Chrome)</h4><p class="mb-0">Menú ⋮ → <b>Instalar app</b> (o «Agregar a la pantalla principal»).</p></div></div></div>
+ <div class="col-md-4"><div class="card h-100"><div class="card-body"><h4 class="h6">iPhone (Safari)</h4><p class="mb-0">Botón Compartir → <b>Agregar a inicio</b>. Es obligatorio para recibir avisos en iPhone.</p></div></div></div>
+ <div class="col-md-4"><div class="card h-100"><div class="card-body"><h4 class="h6">Computador</h4><p class="mb-0">Chrome, Edge o Brave: ícono de instalar al final de la barra de direcciones.</p></div></div></div>
+</div></section><section id="apariencia" class="msec"><h2>Modo claro, oscuro y vistas</h2>
+<p>En <b>Inicio</b>, al final, elige <b>Claro</b> u <b>Oscuro</b>. Se recuerda en ese dispositivo.</p>
+<p>Las listas se pueden ver como <b>tarjetas</b>, <b>lista</b> (tabla) y, en el planificador, <b>calendario</b>. Se cambia con los tres botoncitos arriba de la lista y la app recuerda tu elección.</p>
+<p>En el celular, además de los botones del menú inferior, puedes <b>deslizar el dedo a los lados</b> para pasar entre Inicio, Inventario, Planificador y Alertas.</p></section><section id="inventario" class="msec"><h2>Ver el inventario</h2>
+<p>Entra por <b>Inventario</b>. Arriba ves cuántos autos hay en stock y cuántos hay en cada inventario (Salón, Vitrina, Patio, Subterráneo, Equipador).</p>
+<ol class="pasos"><li>Elige <b>En stock</b>, <b>Con salida</b> o <b>Todos</b>.</li><li>Filtra por modelo, ubicación, estado o <b>antigüedad</b>, o busca por VIN, versión, color o vendedor.</li><li>Toca <b>Limpiar filtros</b> para volver a ver todo.</li></ol>
+<p><b>Antigüedad:</b> los autos que llevan mucho tiempo sin salir muestran un chip <span class="badge text-bg-warning">amarillo</span> o <span class="badge text-bg-danger">rojo</span> con los días. Los umbrales los define el administrador o el jefe (por defecto 60 y 90 días).</p>
+<figure class="fig"><img src="img/inventario-tarjetas.webp" alt="Inventario en tarjetas: chips de antigüedad y días en inventario." loading="lazy" width="390" height="800"><figcaption>Inventario en tarjetas: chips de antigüedad y días en inventario.</figcaption></figure>
+<figure class="fig"><img src="img/inventario-lista.webp" alt="El mismo inventario en modo lista." loading="lazy" width="390" height="800"><figcaption>El mismo inventario en modo lista.</figcaption></figure></section><section id="planificador" class="msec"><h2>Ver el planificador de entregas</h2>
+<p>Entra por <b>Planificador</b>. Las entregas se agrupan en <b>Atrasadas, Hoy, Mañana y Próximos días</b>. Las que vencen hoy, mañana o ya vencieron se marcan y suman al número de <b>Alertas</b>.</p>
+<ol class="pasos"><li>Filtra por <b>Activas</b>, <b>Entregadas</b> o <b>Todas</b>, por estado, o busca por VIN, modelo o vendedor.</li><li>Cambia entre <b>tarjetas</b>, <b>lista</b> y <b>calendario</b> con los tres botones de arriba.</li></ol>
+<figure class="fig"><img src="img/planificador.webp" alt="Planificador en tarjetas." loading="lazy" width="390" height="800"><figcaption>Planificador en tarjetas.</figcaption></figure>
+<h3 class="h5 mt-4">Calendario</h3>
+<p>El modo calendario muestra el mes completo. Cada día con entregas lleva el número de entregas y se pinta más fuerte mientras más carga tenga (1, 2 a 3, 4 o más). Toca un día para ver sus entregas debajo; usa ‹ › para cambiar de mes y <b>Hoy</b> para volver.</p>
+<figure class="fig"><img src="img/calendario.webp" alt="Calendario del planificador con el día de hoy seleccionado." loading="lazy" width="390" height="800"><figcaption>Calendario del planificador con el día de hoy seleccionado.</figcaption></figure></section><section id="exportar" class="msec"><h2>Exportar a Excel o CSV</h2>
+<p>Al final del <b>Inventario</b> y del <b>Planificador</b> hay dos botones: <b>Exportar CSV</b> y <b>Exportar Excel</b>.</p>
+<ul><li>Se exporta <b>lo que estás viendo</b>: respeta los filtros, la búsqueda y la sucursal elegida.</li>
+<li>El inventario incluye la columna <b>Días en inventario</b>.</li>
+<li>El Excel (.xlsx) necesita internet la primera vez; si no hay, la app te baja un CSV, que Excel también abre con tildes bien.</li></ul></section><section id="faq" class="msec"><h2>Preguntas frecuentes</h2><div class="accordion" id="faqconsulta"><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqconsulta0">Quiero poder editar.</button></h3><div id="faqconsulta0" class="accordion-collapse collapse" data-bs-parent="#faqconsulta"><div class="accordion-body">Pídele a un administrador que cambie tu rol desde Cuentas.</div></div></div><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqconsulta1">No veo autos de otra sucursal.</button></h3><div id="faqconsulta1" class="accordion-collapse collapse" data-bs-parent="#faqconsulta"><div class="accordion-body">Tu perfil ve solo la sucursal que tienes asignada.</div></div></div></div></section>
+   <div class="text-center text-secondary small mt-5 mb-3">Inventario Ford · Manual del Solo consulta · <a href="index.html">Todos los manuales</a> · <a href="#" onclick="window.print();return false">Imprimir</a></div>
+  </main>
+ </div>
+</div>
+<button id="arriba" class="btn btn-primary rounded-circle d-print-none" type="button" aria-label="Volver arriba" hidden>↑</button>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="manual.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+/* Estilos de los manuales de Inventario Ford (se suman a Bootstrap 5) */
+:root{--ford:#003478;--ford2:#0f5995;--acento:#ffc247}
+[data-bs-theme=light]{--bs-primary:#003478;--bs-primary-rgb:0,52,120;--bs-link-color:#003478;--bs-link-hover-color:#0f5995;--mbg:#f4f6fa}
+[data-bs-theme=dark]{--bs-primary:#4da3ff;--bs-primary-rgb:77,163,255;--bs-link-color:#4da3ff;--bs-link-hover-color:#8cc4ff;--mbg:#060f23;--bs-body-bg:#060f23;--bs-body-color:#eef4ff;--bs-secondary-color:#a9c0e6;--bs-border-color:#1f3f78;--bs-card-bg:#0e2044}
+body{background:var(--mbg);padding-top:56px}
+.btn-primary{--bs-btn-bg:var(--bs-primary);--bs-btn-border-color:var(--bs-primary);--bs-btn-hover-bg:var(--ford2);--bs-btn-hover-border-color:var(--ford2)}
+[data-bs-theme=dark] .btn-primary{--bs-btn-color:#031026;--bs-btn-hover-color:#031026}
+.mnav{background:var(--ford)!important;color:#fff}
+[data-bs-theme=dark] .mnav{background:#0b3a8c!important}
+.mnav .navbar-brand{color:#fff}
+.mhero{background:linear-gradient(135deg,#003478,#0f5995);color:#fff;padding:36px 0 32px}
+[data-bs-theme=dark] .mhero{background:linear-gradient(135deg,#0b3a8c,#123a7a)}
+.mhero h1{font-weight:800;font-size:clamp(1.7rem,4vw,2.4rem)}
+.toc-w{top:72px}
+.msec{padding:6px 0 26px;scroll-margin-top:76px;border-bottom:1px solid var(--bs-border-color);margin-bottom:20px}
+.msec:last-of-type{border-bottom:0}
+.msec h2{font-size:1.5rem;font-weight:700;color:var(--bs-primary);margin-bottom:14px}
+.msec h2 .anc{opacity:0;margin-left:8px;text-decoration:none;font-weight:400}
+.msec h2:hover .anc{opacity:.6}
+.pasos{counter-reset:p;list-style:none;padding:0;margin:0 0 14px}
+.pasos li{counter-increment:p;position:relative;padding:8px 0 8px 46px;min-height:40px}
+.pasos li::before{content:counter(p);position:absolute;left:0;top:6px;width:32px;height:32px;border-radius:50%;background:var(--bs-primary);color:#fff;font-weight:700;display:grid;place-items:center}
+[data-bs-theme=dark] .pasos li::before{color:#031026}
+.fig{margin:16px 0;text-align:center}
+.fig img{max-width:min(100%,320px);height:auto;border-radius:16px;border:1px solid var(--bs-border-color);box-shadow:0 8px 28px rgba(0,20,60,.18)}
+.fig figcaption{font-size:.85rem;color:var(--bs-secondary-color);margin-top:8px}
+.rolcard{transition:transform .15s,box-shadow .15s;border-color:var(--bs-border-color)}
+.rolcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,30,90,.18)}
+#arriba{position:fixed;right:18px;bottom:18px;width:46px;height:46px;z-index:50}
+.list-group-item.active{background:var(--bs-primary);border-color:var(--bs-primary)}
+mark.hit{background:#ffe08a;color:#222;padding:0 2px;border-radius:3px}
+@media (max-width:991px){#toc{flex-direction:row;overflow-x:auto;white-space:nowrap;border-radius:10px}#toc .list-group-item{border-radius:0}}
+@media print{.mnav,.mhero,#arriba,aside{display:none!important}body{padding-top:0;background:#fff}.msec{break-inside:avoid-page}.fig img{max-width:200px;box-shadow:none}.accordion-collapse{display:block!important}}

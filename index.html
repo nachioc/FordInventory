@@ -12,69 +12,66 @@
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-title" content="Inventario" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-		<meta name="theme-color" content="#4a2e22" />
+		<meta name="theme-color" content="#003478" />
 		<link rel="manifest" href="manifest.json" />
 		<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 		<link rel="icon" type="image/png" href="icon-192.png" />
 		<title>Inventario de vehículos</title>
 		<style>
 			/* ===== VARIABLES DE COLOR Y TEMA (claro / oscuro) ===== */
-			/* Paleta cálida: crema, café y terracota. Todo el color de la app sale de estas variables. */
+			/* Paleta Ford: azul corporativo en claro y azules más vivos en oscuro. Todo el color sale de estas variables. */
 			:root {
-				--bg: #f7f1e8; /* fondo: crema */
-				--card: #fffdf9; /* tarjetas y paneles */
-				--tx: #2b2019; /* texto: café espresso */
-				--mu: #6c5d52; /* texto secundario: taupe */
-				--pr: #a5441f; /* color principal: terracota */
-				--pr2: #f7e6d9; /* fondo suave del color principal */
+				--bg: #f4f6fa; /* fondo */
+				--card: #fff; /* tarjetas y paneles */
+				--tx: #0d1b2e; /* texto */
+				--mu: #556070; /* texto secundario */
+				--pr: #003478; /* azul Ford: color principal */
+				--pr2: #e5edf8; /* fondo suave del color principal */
 				--on: #fff; /* texto sobre el color principal */
-				--bd: #e6dacb; /* bordes */
-				--ok: #2c6b3c; /* verde: disponible, listo */
-				--okbg: #e4f1df;
-				--warn: #7b5200; /* ámbar: atención, plazos */
-				--warnbg: #fbefc9;
-				--bad: #b3202b; /* rojo: errores, eliminar */
-				--info: #2b5d85; /* azul suave: reservado, avisos */
-				--infobg: #e2edf5;
-				--hd: #4a2e22; /* encabezado y menú: chocolate */
+				--bd: #d5dce8; /* bordes */
+				--ok: #136c3a; /* verde: disponible, listo */
+				--okbg: #e3f4ea;
+				--warn: #8a5300; /* ámbar: atención, plazos */
+				--warnbg: #fdf0d8;
+				--badbg: #fde4e2;
+				--bad: #b3261e; /* rojo: errores, eliminar */
+				--hd: #003478; /* encabezado y menú */
 			}
 			@media (prefers-color-scheme: dark) {
 				:root:not([data-theme="light"]) {
-					--bg: #17110d;
-					--card: #221a14;
-					--tx: #f4ece2;
-					--mu: #bba998;
-					--pr: #f2a46f;
-					--pr2: #3b2619;
-					--on: #2a1408;
-					--bd: #3b2e25;
-					--ok: #7fd69f;
-					--okbg: #1a3022;
-					--warn: #f3c26b;
-					--warnbg: #3b2b10;
-					--bad: #ff938a;
-					--info: #8fc2e8;
-					--infobg: #1b2f3f;
-					--hd: #1f1510;
+					--bg: #060f23; /* azul noche profundo */
+					--card: #0e2044;
+					--tx: #eef4ff;
+					--mu: #a9c0e6;
+					--pr: #4da3ff; /* azul vivo */
+					--pr2: #123a7a;
+					--on: #031026;
+					--bd: #1f3f78;
+					--ok: #3ddc84;
+					--okbg: #0c3a24;
+					--warn: #ffc247;
+					--warnbg: #402d05;
+					--badbg: #4a1613;
+					--bad: #ff7b72;
+					--hd: #0b3a8c; /* encabezado y menú: azul real vivo */
 				}
 			}
 			:root[data-theme="dark"] {
-				--bg: #17110d;
-				--card: #221a14;
-				--tx: #f4ece2;
-				--mu: #bba998;
-				--pr: #f2a46f;
-				--pr2: #3b2619;
-				--on: #2a1408;
-				--bd: #3b2e25;
-				--ok: #7fd69f;
-				--okbg: #1a3022;
-				--warn: #f3c26b;
-				--warnbg: #3b2b10;
-				--bad: #ff938a;
-				--info: #8fc2e8;
-				--infobg: #1b2f3f;
-				--hd: #1f1510;
+				--bg: #060f23; /* azul noche profundo */
+				--card: #0e2044;
+				--tx: #eef4ff;
+				--mu: #a9c0e6;
+				--pr: #4da3ff; /* azul vivo */
+				--pr2: #123a7a;
+				--on: #031026;
+				--bd: #1f3f78;
+				--ok: #3ddc84;
+				--okbg: #0c3a24;
+				--warn: #ffc247;
+				--warnbg: #402d05;
+				--badbg: #4a1613;
+				--bad: #ff7b72;
+				--hd: #0b3a8c; /* encabezado y menú: azul real vivo */
 			}
 			* {
 				box-sizing: border-box;
@@ -122,7 +119,7 @@
 				color: #fff;
 				padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, calc((100% - var(--w)) / 2)) 10px;
 				margin-bottom: 16px;
-				box-shadow: 0 2px 10px rgba(70, 40, 20, 0.25);
+				box-shadow: 0 2px 10px rgba(0, 20, 60, 0.25);
 			}
 			header h1 {
 				flex: 1;
@@ -156,7 +153,7 @@
 				margin: 0 0 20px !important;
 				text-align: center;
 				color: #fff;
-				background: linear-gradient(160deg, #7a432b, #3b241b);
+				background: linear-gradient(160deg, #003478, #00184a);
 				padding: calc(32px + env(safe-area-inset-top, 0px)) 20px 32px;
 				border-radius: 0 0 28px 28px;
 			}
@@ -201,7 +198,7 @@
 				color: #fff;
 				background: var(--pr);
 				min-height: 84px;
-				box-shadow: 0 2px 6px rgba(70, 40, 20, 0.2);
+				box-shadow: 0 2px 6px rgba(0, 20, 60, 0.2);
 			}
 			.bigbtn.s {
 				background: var(--card);
@@ -223,7 +220,7 @@
 				background: var(--card);
 				color: var(--tx);
 				border: 1px solid var(--bd);
-				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.08);
+				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.08);
 				padding: 18px;
 			}
 			.bigbtn.pb .ic {
@@ -281,7 +278,7 @@
 				border: 1px solid var(--bd);
 				border-radius: 16px;
 				padding: 16px 16px 20px;
-				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.06);
+				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.06);
 			}
 			label {
 				display: block;
@@ -425,7 +422,7 @@
 				border-radius: 14px;
 				padding: 14px 16px;
 				margin-bottom: 12px;
-				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.06);
+				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.06);
 			}
 			.v.out {
 				border-left-color: var(--warn);
@@ -476,8 +473,8 @@
 				color: var(--ok);
 			}
 			.tag.res {
-				background: var(--infobg);
-				color: var(--info);
+				background: var(--pr2);
+				color: var(--pr);
 			}
 			.tag.o {
 				background: var(--warnbg);
@@ -589,7 +586,7 @@
 				background: var(--card);
 				border-top: 1px solid var(--bd);
 				padding-bottom: env(safe-area-inset-bottom, 0px);
-				box-shadow: 0 -2px 10px rgba(70, 40, 20, 0.08);
+				box-shadow: 0 -2px 10px rgba(0, 20, 60, 0.08);
 			}
 			#nav[hidden] {
 				display: none;
@@ -899,7 +896,7 @@
 				position: fixed;
 				inset: 0;
 				z-index: 200;
-				background: rgba(35, 20, 10, 0.55);
+				background: rgba(5, 15, 40, 0.55);
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -953,7 +950,7 @@
 				color: var(--tx);
 				border: 1px solid var(--bd);
 				border-radius: 14px;
-				box-shadow: 0 14px 40px rgba(70, 40, 20, 0.28);
+				box-shadow: 0 14px 40px rgba(0, 20, 60, 0.28);
 				max-height: 264px;
 				overflow-y: auto;
 				padding: 6px;
@@ -1177,7 +1174,7 @@
 				font-weight: 700;
 				text-align: left;
 				cursor: pointer;
-				box-shadow: 0 1px 3px rgba(70, 40, 20, 0.06);
+				box-shadow: 0 1px 3px rgba(0, 20, 60, 0.06);
 			}
 			.act:hover {
 				border-color: var(--pr);
@@ -1449,7 +1446,7 @@
 			.ti th.ac {
 				width: 1%;
 				background: var(--card) !important;
-				box-shadow: -8px 0 8px -8px rgba(70, 40, 20, 0.18);
+				box-shadow: -8px 0 8px -8px rgba(0, 20, 60, 0.18);
 			}
 			/* planificador e historial en lista: mismo estilo que el inventario */
 			.ti tbody tr.urg td {
@@ -1589,7 +1586,7 @@
 				color: var(--tx);
 				border: 1px solid var(--bd);
 				border-radius: 18px;
-				box-shadow: 0 18px 48px rgba(70, 40, 20, 0.32);
+				box-shadow: 0 18px 48px rgba(0, 20, 60, 0.32);
 				padding: 12px;
 				font-size: 15px;
 				user-select: none;
@@ -1837,7 +1834,7 @@
 				position: sticky;
 				right: 0;
 				background: var(--card);
-				box-shadow: -6px 0 8px -6px rgba(70, 40, 20, 0.15);
+				box-shadow: -6px 0 8px -6px rgba(0, 20, 60, 0.15);
 			}
 			.tbl th:last-child {
 				background: var(--pr2);
@@ -1981,6 +1978,227 @@
 					min-width: 0;
 				}
 			}
+			/* ===== MEJORAS: antigüedad, panel, calendario, avisos ===== */
+			.tag.am {
+				background: var(--warnbg);
+				color: var(--warn);
+			}
+			.tag.rj {
+				background: var(--badbg);
+				color: var(--bad);
+			}
+			.vb {
+				flex-wrap: wrap;
+			}
+			.bars {
+				background: var(--card);
+				border: 1px solid var(--bd);
+				border-radius: 14px;
+				padding: 12px 14px;
+				margin-bottom: 14px;
+			}
+			.bars h3 {
+				margin: 0 0 8px;
+				font-size: 15px;
+			}
+			.br {
+				display: grid;
+				grid-template-columns: minmax(84px, 36%) 1fr 34px;
+				gap: 8px;
+				align-items: center;
+				margin: 7px 0;
+				font-size: 14px;
+			}
+			.br .tr {
+				background: var(--pr2);
+				border-radius: 99px;
+				height: 10px;
+				overflow: hidden;
+			}
+			.br .tr i {
+				display: block;
+				height: 100%;
+				min-width: 3px;
+				border-radius: 99px;
+				background: var(--pr);
+			}
+			.br b {
+				text-align: right;
+			}
+			.br span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.stat.al b {
+				color: var(--bad);
+			}
+			.stat.wa b {
+				color: var(--warn);
+			}
+			.stat.ok b {
+				color: var(--ok);
+			}
+			.top5 {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 10px;
+				padding: 9px 0;
+				border-top: 1px solid var(--bd);
+				font-size: 14px;
+			}
+			.top5:first-of-type {
+				border-top: 0;
+			}
+			.top5 small {
+				display: block;
+				color: var(--mu);
+			}
+			.cal {
+				background: var(--card);
+				border: 1px solid var(--bd);
+				border-radius: 14px;
+				padding: 12px;
+				margin-bottom: 14px;
+			}
+			.calh {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+				margin-bottom: 10px;
+			}
+			.calh b {
+				font-size: 17px;
+				text-transform: capitalize;
+			}
+			.calh .btn {
+				min-height: 40px;
+				padding: 0 14px;
+			}
+			.calg {
+				display: grid;
+				grid-template-columns: repeat(7, 1fr);
+				gap: 4px;
+			}
+			.calg .wd {
+				text-align: center;
+				font-size: 12px;
+				font-weight: 700;
+				color: var(--mu);
+				padding: 2px 0 4px;
+			}
+			.cd {
+				position: relative;
+				aspect-ratio: 1/1;
+				min-height: 40px;
+				border: 1.5px solid transparent;
+				border-radius: 10px;
+				background: var(--bg);
+				color: var(--tx);
+				font: inherit;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 1px;
+				cursor: pointer;
+				padding: 0;
+			}
+			.cd.ex {
+				background: none;
+				cursor: default;
+			}
+			.cd b {
+				font-size: 14px;
+			}
+			.cd i {
+				font-style: normal;
+				font-size: 11px;
+				font-weight: 800;
+				line-height: 1;
+			}
+			.cd.n1 {
+				background: var(--pr2);
+			}
+			.cd.n2 {
+				background: color-mix(in srgb, var(--pr) 45%, var(--card));
+			}
+			.cd.n3 {
+				background: var(--pr);
+				color: var(--on);
+			}
+			.cd.hoy {
+				border-color: var(--warn);
+			}
+			.cd.sel {
+				outline: 3px solid var(--pr);
+				outline-offset: 1px;
+			}
+			.cal .ley {
+				display: flex;
+				gap: 12px;
+				flex-wrap: wrap;
+				margin-top: 10px;
+				font-size: 12.5px;
+				color: var(--mu);
+			}
+			.cal .ley span::before {
+				content: "";
+				display: inline-block;
+				width: 12px;
+				height: 12px;
+				border-radius: 4px;
+				margin-right: 5px;
+				vertical-align: -2px;
+				background: var(--pr2);
+			}
+			.cal .ley .l2::before {
+				background: color-mix(in srgb, var(--pr) 45%, var(--card));
+			}
+			.cal .ley .l3::before {
+				background: var(--pr);
+			}
+			.chk {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-weight: 600;
+				margin: 12px 0 0;
+				cursor: pointer;
+			}
+			.chk input {
+				width: 22px;
+				min-height: 22px;
+				height: 22px;
+				margin: 0;
+				accent-color: var(--pr);
+			}
+			.dias {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+			.dias button {
+				min-width: 46px;
+				min-height: 40px;
+				border-radius: 10px;
+				border: 1.5px solid var(--bd);
+				background: var(--bg);
+				color: var(--tx);
+				font: inherit;
+				font-weight: 700;
+				cursor: pointer;
+			}
+			.dias button[aria-pressed="true"] {
+				background: var(--pr);
+				border-color: var(--pr);
+				color: var(--on);
+			}
+			.panel .btn + .btn {
+				margin-top: 8px;
+			}
 		</style>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
 	</head>
@@ -2075,6 +2293,7 @@
 				if (perfil && perfil.activo) {
 					await cargarCat();
 					await cargarSuc();
+					await cargarAjustes();
 					await cargar();
 					await cargarEntregas();
 					await cargarNotifs();
@@ -2325,11 +2544,23 @@
 				}
 				document.body.className = "r-" + perfil.rol + (esAdm() ? " r-admin" : "");
 				var v = vista();
-				if (["sucursales", "sucursal", "cfginv", "cfgplan", "historial"].indexOf(v) > -1 && !esAdm()) {
+				if (["sucursales", "sucursal", "cfginv", "cfgplan", "historial", "panel"].indexOf(v) > -1 && !esAdm()) {
+					go("");
+					return;
+				}
+				if (v === "tareas" && perfil.rol !== "preparador") {
 					go("");
 					return;
 				}
 				renderApp();
+				if (v === "panel")
+					Promise.all([cargar(), cargarEntregas()]).then(function () {
+						if (vista() === "panel") renderApp();
+					});
+				if (v === "tareas")
+					cargarEntregas().then(function () {
+						if (vista() === "tareas") pintaTareas();
+					});
 				if (v === "plan")
 					cargarEntregas().then(function () {
 						if (vista() === "plan") listaPlan();
@@ -2409,6 +2640,8 @@
 					"plan",
 					"pform",
 					"alertas",
+					"panel",
+					"tareas",
 				].indexOf(h) > -1
 					? h
 					: "portada";
@@ -2472,6 +2705,11 @@
 				} else if (v === "alertas") {
 					a.innerHTML = alertasVista();
 					bindAlertas();
+				} else if (v === "panel") {
+					a.innerHTML = panelVista();
+				} else if (v === "tareas") {
+					a.innerHTML = tareasVista();
+					pintaTareas();
 				} else if (v === "sucursales") {
 					sucursales();
 				} else if (v === "sucursal") {
@@ -2736,9 +2974,14 @@
 					"</select>" +
 					'<select class="wide" id="fv" aria-label="Estado del vehículo">' +
 					opts(ESTADOS, "Todos los estados") +
-					'</select><input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar"><button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>' +
+					'</select><select class="wide" id="fa" aria-label="Antigüedad en el inventario"><option value="">Toda la antigüedad</option><option value="am">Desde ' +
+					AJ.antiguedad.amarillo +
+					' días (amarillo)</option><option value="rj">Desde ' +
+					AJ.antiguedad.rojo +
+					' días (rojo)</option></select><input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar"><button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>' +
 					'<div id="lst"></div><div class="acts">' +
 					act("Exportar CSV", null, "", "bajar", 'id="exp"') +
+					act("Exportar Excel", null, "", "bajar", 'id="expx"') +
 					"</div>" +
 					""
 				);
@@ -2756,7 +2999,8 @@
 					lista();
 				};
 				$("#lim").onclick = function () {
-					filtro = { q: "", ubic: "", modelo: "", est: "stock", ven: "" };
+					filtro = { q: "", ubic: "", modelo: "", est: "stock", ven: "", ant: "" };
+					$("#fa").value = "";
 					$("#fm").value = "";
 					$("#fu").value = "";
 					$("#fv").value = "";
@@ -2766,6 +3010,11 @@
 				$("#fv").value = filtro.ven;
 				$("#fv").onchange = function () {
 					filtro.ven = this.value;
+					lista();
+				};
+				$("#fa").value = filtro.ant || "";
+				$("#fa").onchange = function () {
+					filtro.ant = this.value;
 					lista();
 				};
 				$("#q").oninput = function () {
@@ -2778,13 +3027,15 @@
 						lista();
 					};
 				});
-				$("#exp").onclick = csv;
+				$("#exp").onclick = function () {
+					exportarInv("csv");
+				};
+				$("#expx").onclick = function () {
+					exportarInv("xlsx");
+				};
 			}
-			// Dibuja el inventario filtrado (tarjetas o tabla)
-			function lista() {
-				document.querySelectorAll(".chip").forEach(function (b) {
-					b.setAttribute("aria-pressed", b.dataset.e === filtro.est);
-				});
+			// Vehículos que pasan los filtros de la pantalla (si se filtra por antigüedad, los más antiguos primero)
+			function invFiltrado() {
 				var q = filtro.q.toLowerCase();
 				var l = data.filter(function (v) {
 					if (filtro.est === "stock" && v.fechaSalida) return false;
@@ -2792,8 +3043,24 @@
 					if (filtro.modelo && v.modelo !== filtro.modelo) return false;
 					if (filtro.ubic && v.ubic !== filtro.ubic) return false;
 					if (filtro.ven && (v.estado || "Disponible") !== filtro.ven) return false;
+					if (filtro.ant) {
+						var d = antig(v);
+						if (d == null || d < (filtro.ant === "rj" ? AJ.antiguedad.rojo : AJ.antiguedad.amarillo)) return false;
+					}
 					return !q || [v.vin, v.version, v.color, v.vendedor, v.obs].join(" ").toLowerCase().indexOf(q) > -1;
 				});
+				if (filtro.ant)
+					l.sort(function (a, b) {
+						return antig(b) - antig(a);
+					});
+				return l;
+			}
+			// Dibuja el inventario filtrado (tarjetas o tabla)
+			function lista() {
+				document.querySelectorAll(".chip").forEach(function (b) {
+					b.setAttribute("aria-pressed", b.dataset.e === filtro.est);
+				});
+				var l = invFiltrado();
 				if (!l.length) {
 					$("#lst").innerHTML =
 						'<div class="empty">No hay vehículos con estos filtros. Usa Ingresar para registrar el primero.</div>';
@@ -2827,16 +3094,19 @@
 							'">' +
 							(v.estado || "Disponible") +
 							"</span>" +
+							tagAnt(v) +
 							tagSucI(v.sucursalId) +
 							"</div>" +
 							filas([
 								["Entrada", fmt(v.fechaEntrada)],
+								["En inventario", o ? "" : plural(antig(v), "día", "días")],
 								["Salida", o ? fmt(v.fechaSalida) : ""],
 								["Vendedor", esc(v.vendedor)],
 								["Observación", esc(v.obs)],
 							]) +
 							'<div class="vb">' +
 							(o ? '<button class="btn g" onclick="deshacer(\'' + v.id + "')\">Deshacer salida</button>" : "") +
+							(puedeTrasl(v) ? '<button class="btn g" onclick="trasladar(\'' + v.id + "')\">Trasladar</button>" : "") +
 							'<button class="btn g" onclick="actualizar(\'' +
 							v.id +
 							"')\">Actualizar</button>" +
@@ -3021,14 +3291,20 @@
 				});
 				lista();
 			}
-			// Exporta el inventario a CSV
-			function csv() {
-				var c = [
+			// Exporta a CSV o Excel lo que se ve en pantalla (filtros incluidos)
+			function exportarInv(tipo) {
+				var l = invFiltrado();
+				if (!l.length) {
+					toast("No hay vehículos para exportar con estos filtros");
+					return;
+				}
+				var cab = [
 					"Modelo",
 					"Versión",
 					"Color",
 					"VIN",
 					"Fecha entrada",
+					"Días en inventario",
 					"Inventario",
 					"Estado",
 					"Vendedor",
@@ -3036,26 +3312,73 @@
 					"Fecha salida",
 					"Sucursal",
 				];
-				var r = data.map(function (v) {
+				var f = l.map(function (v) {
 					return [
 						v.modelo,
 						v.version,
 						v.color,
 						v.vin,
 						fmt(v.fechaEntrada),
+						antig(v),
 						v.ubic,
 						v.estado || "Disponible",
 						v.vendedor,
 						v.obs,
 						fmt(v.fechaSalida),
 						sucNombre(v.sucursalId),
-					]
-						.map(function (x) {
-							return '"' + String(x || "").replace(/"/g, '""') + '"';
-						})
-						.join(";");
+					];
 				});
-				bajar("\ufeff" + [c.join(";")].concat(r).join("\n"), "inventario-ford.csv", "text/csv");
+				exportaTabla(tipo, "inventario-ford", "Inventario", cab, f);
+			}
+			function csv() {
+				exportarInv("csv");
+			}
+			// Descarga una tabla como CSV (punto y coma, con tildes bien en Excel) o como Excel real (.xlsx)
+			function exportaTabla(tipo, base, hoja, cab, filas) {
+				var nom = base + "-" + hoy();
+				function comoCsv() {
+					var r = filas.map(function (f) {
+						return f
+							.map(function (x) {
+								return '"' + String(x == null ? "" : x).replace(/"/g, '""') + '"';
+							})
+							.join(";");
+					});
+					bajar("\ufeff" + [cab.join(";")].concat(r).join("\n"), nom + ".csv", "text/csv");
+					toast(filas.length + " filas exportadas");
+				}
+				if (tipo !== "xlsx") return comoCsv();
+				cargarXlsx()
+					.then(function () {
+						var ws = XLSX.utils.aoa_to_sheet([cab].concat(filas));
+						ws["!cols"] = cab.map(function (c, i) {
+							var w = String(c).length;
+							filas.forEach(function (f) {
+								w = Math.max(w, String(f[i] == null ? "" : f[i]).length);
+							});
+							return { wch: Math.min(w + 2, 42) };
+						});
+						var wb = XLSX.utils.book_new();
+						XLSX.utils.book_append_sheet(wb, ws, hoja);
+						XLSX.writeFile(wb, nom + ".xlsx");
+						toast(filas.length + " filas exportadas a Excel");
+					})
+					.catch(function () {
+						toast("El Excel necesita internet. Te bajé el CSV, que Excel también abre.", 3500);
+						comoCsv();
+					});
+			}
+			function cargarXlsx() {
+				return new Promise(function (ok, no) {
+					if (window.XLSX) return ok();
+					var sc = document.createElement("script");
+					sc.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+					sc.onload = ok;
+					sc.onerror = function () {
+						no(new Error("sin conexión"));
+					};
+					document.head.appendChild(sc);
+				});
 			}
 			function backup() {
 				bajar(JSON.stringify(data), "inventario-ford-respaldo.json", "application/json");
@@ -3378,7 +3701,7 @@
 
 			function atras() {
 				var v = vista();
-				return ["inicio", "sucursales", "historial", "plan", "alertas"].indexOf(v) > -1
+				return ["inicio", "sucursales", "historial", "plan", "alertas", "panel", "tareas"].indexOf(v) > -1
 					? ""
 					: v === "pform"
 						? "plan"
@@ -3437,7 +3760,8 @@
 				pintaNav();
 				var v = vista();
 				if (v === "plan") listaPlan();
-				else if (v === "alertas" || v === "portada") renderApp();
+				else if (v === "tareas") pintaTareas();
+				else if (v === "alertas" || v === "portada" || v === "panel") renderApp();
 			}
 			function suscribir() {
 				if (canal || !sesion) return;
@@ -4864,6 +5188,7 @@
 					seccionCat("modelo") +
 					seccionCat("estado_inv") +
 					'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>' +
+					seccionAntig() +
 					seccionCV() +
 					seccionProbarVin()
 				);
@@ -4873,7 +5198,8 @@
 					head("Configurar planificador") +
 					'<p class="hola">Agrega, renombra, ordena con ▲▼ o quita estados. Vale para todas las sucursales.</p>' +
 					seccionCat("estado_ent") +
-					'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>'
+					'<p class="hola" style="margin-top:14px">🔒 Los estados protegidos los usa la app en sus filtros y avisos: no se renombran ni se quitan, pero sí puedes cambiar su color.</p>' +
+					seccionResumen()
 				);
 			}
 			function catCtx(b) {
@@ -5056,7 +5382,8 @@
 				hdir = "desc";
 			try {
 				var _vm = JSON.parse(localStorage.getItem("vm") || "{}");
-				for (var _k in _vm) if (VM[_k] !== undefined) VM[_k] = _vm[_k] === "list" ? "list" : "cards";
+				for (var _k in _vm)
+					if (VM[_k] !== undefined) VM[_k] = _vm[_k] === "list" ? "list" : _vm[_k] === "cal" && _k === "plan" ? "cal" : "cards";
 			} catch (e) {}
 			try {
 				var _t = localStorage.getItem("tema");
@@ -5081,6 +5408,8 @@
 			};
 			ICO.pin =
 				'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/>';
+			ICO.swap = '<path d="M7 7h13l-3-3M17 17H4l3 3"/>';
+			ICO.panel = '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>';
 			ICO.sinsuc = '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>';
 
 			// ======================================================================
@@ -5121,7 +5450,7 @@
 					localStorage.setItem("tema", t);
 				} catch (e) {}
 				var m = document.querySelector("meta[name=theme-color]");
-				if (m) m.content = t === "dark" ? "#1f1510" : "#4a2e22";
+				if (m) m.content = t === "dark" ? "#0b3a8c" : "#003478";
 				document.querySelectorAll("[data-th]").forEach(function (b) {
 					b.setAttribute("aria-pressed", b.dataset.th === t);
 				});
@@ -5161,7 +5490,15 @@
 					(VM[k] === "list") +
 					'" aria-label="Ver en lista" title="Lista">' +
 					svg("list") +
-					"</button></div>"
+					"</button>" +
+					(k === "plan"
+						? '<button type="button" data-vm="plan:cal" aria-pressed="' +
+							(VM.plan === "cal") +
+							'" aria-label="Ver en calendario" title="Calendario">' +
+							svg("cal") +
+							"</button>"
+						: "") +
+					"</div>"
 				);
 			}
 			document.addEventListener("click", function (e) {
@@ -5246,14 +5583,16 @@
 								(EC[v.estado || "Disponible"] || "res") +
 								'">' +
 								esc(v.estado || "Disponible") +
-								'</span></td><td class="dtc">' +
+								'</span></td><td class="dtc"><div>' +
 								fmt(v.fechaEntrada) +
-								'</td><td class="dtc">' +
+								(o ? "" : " " + tagAnt(v)) +
+								'</div></td><td class="dtc">' +
 								(o ? fmt(v.fechaSalida) : '<span class="nd">—</span>') +
 								"</td>" +
 								(adm ? "<td>" + esc(sucNombre(v.sucursalId)) + "</td>" : "") +
 								'<td class="ac"><div class="vb">' +
 								(o ? ib("Deshacer salida", "deshacer('" + v.id + "')", "", "undo") : "") +
+								(puedeTrasl(v) ? ib("Trasladar a otra sucursal", "trasladar('" + v.id + "')", "", "swap") : "") +
 								ib("Actualizar", "actualizar('" + v.id + "')", "", "edit") +
 								ib("Eliminar", "borrar('" + v.id + "')", "btn d", "trash") +
 								"</div></td></tr>"
@@ -5366,7 +5705,12 @@
 			// ======================================================================
 
 			// Color de cada tipo de movimiento en el historial
-			var HC = { ingreso: "dis", salida: "ven", "salida deshecha": "o", "eliminación": "o", "actualización": "res" };
+			var HC = { ingreso: "dis", salida: "ven", "salida deshecha": "o", "eliminación": "o", "actualización": "res", traslado: "am" };
+			// Texto extra de un movimiento del historial (de qué sucursal a cuál se trasladó)
+			function hExtra(h) {
+				var d = h.detalle || {};
+				return h.accion === "traslado" && d.origen ? esc(d.origen) + " → " + esc(d.destino || "") + (d.nota ? " · " + esc(d.nota) : "") : "";
+			}
 			function hsortT() {
 				hdir = hdir === "desc" ? "asc" : "desc";
 				pintaHist();
@@ -5413,7 +5757,9 @@
 									(HC[h.accion] || "res") +
 									'">' +
 									esc(h.accion) +
-									'</span></td><td data-l="Vehículo"><div><b>' +
+									"</span>" +
+									(hExtra(h) ? '<small class="sub">' + hExtra(h) + "</small>" : "") +
+									'</td><td data-l="Vehículo"><div><b>' +
 									esc(d.modelo || "") +
 									'</b><small class="sub">' +
 									esc(d.version || "") +
@@ -5439,7 +5785,9 @@
 								esc(d.version || "") +
 								'</h3><div class="vin">' +
 								esc(d.vin || "") +
-								'</div><div class="m">' +
+								"</div>" +
+								(hExtra(h) ? '<div class="m">' + hExtra(h) + "</div>" : "") +
+								'<div class="m">' +
 								esc(h.usuario_email || "") +
 								" · " +
 								fmtDT(h.fecha) +
@@ -5813,7 +6161,20 @@
 					IC.cal +
 					'</i><span class="tx"><b>Planificador Ford</b><span>Entregas y alistamiento</span></span>' +
 					(n ? '<span class="tag res">' + n + "</span>" : "") +
-					"</button></div>" +
+					"</button>" +
+					(ad
+						? '<button class="bigbtn pb" onclick="go(&quot;panel&quot;)"><i class="ic">' +
+							IC.chart +
+							'</i><span class="tx"><b>Panel de resumen</b><span>Cifras del stock y las entregas</span></span></button>'
+						: "") +
+					(perfil.rol === "preparador"
+						? '<button class="bigbtn pb" onclick="go(&quot;tareas&quot;)"><i class="ic">' +
+							IC.check +
+							'</i><span class="tx"><b>Mis tareas</b><span>Lo que tienes que preparar</span></span>' +
+							(tareasUrgentes() ? '<span class="tag o">' + tareasUrgentes() + "</span>" : "") +
+							"</button>"
+						: "") +
+					"</div>" +
 					'<div class="mo">' +
 					(ad
 						? '<h2 class="sec">Administración</h2><div class="acts">' +
@@ -5826,7 +6187,7 @@
 						: "") +
 					'<h2 class="sec">Apariencia</h2>' +
 					temaSeg() +
-					'<p class="ver">v13-nov 14:10 · ' +
+					'<p class="ver">v15-nov · ' +
 					esc(perfil.rol) +
 					" · " +
 					SUC.length +
@@ -5854,10 +6215,20 @@
 					'<div class="big np-w"><button class="bigbtn pn np" onclick="editE=null;go(&quot;pform&quot;)"><i class="arw up">' +
 					svg("plus") +
 					'</i><span class="tx"><b>Nueva entrega</b><span>Programar la entrega de un vehículo</span></span></button></div>' +
-					'<div id="pl" style="margin-top:12px"></div>'
+					'<div id="pl" style="margin-top:12px"></div>' +
+					'<div class="acts">' +
+					act("Exportar CSV", null, "", "bajar", 'id="pexp"') +
+					act("Exportar Excel", null, "", "bajar", 'id="pexpx"') +
+					"</div>"
 				);
 			}
 			function bindPlan() {
+				$("#pexp").onclick = function () {
+					exportarPlan("csv");
+				};
+				$("#pexpx").onclick = function () {
+					exportarPlan("xlsx");
+				};
 				$("#pe").value = pf.ven;
 				$("#pq").value = pf.q;
 				$("#pe").onchange = function () {
@@ -5882,6 +6253,7 @@
 				});
 			}
 			function listaPlan() {
+				if (vista() === "tareas") return pintaTareas();
 				if (!$("#pl")) return;
 				document.querySelectorAll("[data-p]").forEach(function (b) {
 					b.setAttribute("aria-pressed", b.dataset.p === pf.est);
@@ -5905,6 +6277,11 @@
 				if ($("#psort")) {
 					$("#psort").textContent = "Fecha " + (dir > 0 ? "↑ la más próxima primero" : "↓ la más lejana primero");
 					$("#psort").onclick = psortT;
+				}
+				pfLast = f;
+				if (VM.plan === "cal") {
+					$("#pl").innerHTML = calHtml(f);
+					return;
 				}
 				if (!f.length) {
 					$("#pl").innerHTML = '<div class="empty">No hay entregas con estos filtros.</div>';
@@ -6593,6 +6970,8 @@
 						'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 16l2 2 4-4"/></svg>',
 					bell: SI + '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>',
 				};
+			IC.chart = SI + '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>';
+			IC.check = SI + '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h9"/></svg>';
 
 			// ======================================================================
 			// MENÚ LATERAL (escritorio)
@@ -6618,15 +6997,19 @@
 						? "plan"
 						: v === "alertas"
 							? "alertas"
-							: ["inicio", "ingresar", "salida", "inventario", "editar"].indexOf(v) > -1
+							: v === "panel"
+								? "panel"
+								: v === "tareas"
+									? "tareas"
+									: ["inicio", "ingresar", "salida", "inventario", "editar"].indexOf(v) > -1
 								? "inv"
 								: "home";
-				var it = [
-					["home", "", "Inicio", IC.home],
-					["inv", "inv", "Inventario", IC.car],
-					["plan", "plan", "Planificador", IC.cal],
-					["alertas", "alertas", "Alertas", IC.bell],
-				];
+				var it = [["home", "", "Inicio", IC.home]];
+				if (ad) it.push(["panel", "panel", "Panel", IC.chart]);
+				it.push(["inv", "inv", "Inventario", IC.car], ["plan", "plan", "Planificador", IC.cal]);
+				if (perfil.rol === "preparador") it.push(["tareas", "tareas", "Mis tareas", IC.check]);
+				it.push(["alertas", "alertas", "Alertas", IC.bell]);
+				var nt = perfil.rol === "preparador" ? tareasUrgentes() : 0;
 				var ex = [
 					["nosuc", "sucursal/none", "Cuentas", "sinsuc"],
 					["sucs", "sucursales", "Sucursales", "tienda"],
@@ -6651,6 +7034,7 @@
 								x[2] +
 								"</span>" +
 								(x[0] === "alertas" && b ? '<i class="bdg">' + b + "</i>" : "") +
+								(x[0] === "tareas" && nt ? '<i class="bdg">' + nt + "</i>" : "") +
 								"</button>"
 							);
 						})
@@ -6675,7 +7059,7 @@
 						: "") +
 					'<div class="nbot">' +
 					temaSeg() +
-					'<div class="ver">v13-nov 14:10 · ' +
+					'<div class="ver">v15-nov · ' +
 					esc(perfil.rol) +
 					" · " +
 					SUC.length +
@@ -6728,6 +7112,544 @@
 					{ passive: true },
 				);
 			})();
+
+			// ======================================================================
+			// MEJORAS: ajustes, antigüedad del stock, traslados, panel, Mis tareas, calendario y resumen diario
+			// ======================================================================
+
+			// Ajustes que configuran el admin y el jefe (se guardan en la tabla "ajustes")
+			var AJ = {
+					antiguedad: { amarillo: 60, rojo: 90 },
+					resumen: { activo: false, hora: "08:00", dias: [1, 2, 3, 4, 5, 6], roles: { preparador: true, vendedor: true, jefe: true } },
+				},
+				pfLast = [],
+				calMes = "",
+				calDia = "",
+				MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+			async function cargarAjustes() {
+				try {
+					var r = await db.from("ajustes").select("*");
+					(r.data || []).forEach(function (a) {
+						if (a.clave === "antiguedad" && a.valor) AJ.antiguedad = Object.assign({}, AJ.antiguedad, a.valor);
+						else if (a.clave === "resumen_diario" && a.valor) AJ.resumen = Object.assign({}, AJ.resumen, a.valor);
+					});
+				} catch (e) {}
+			}
+			async function guardaAjuste(clave, valor) {
+				var r = await db.from("ajustes").upsert({ clave: clave, valor: valor, actualizado: new Date().toISOString() }).select();
+				return !(r.error || !r.data || !r.data.length);
+			}
+
+			/* ----- Antigüedad del stock ----- */
+			// Días que lleva un vehículo en el inventario (null si ya salió)
+			function antig(v) {
+				return v.fechaSalida || !v.fechaEntrada ? null : Math.max(0, -dias(v.fechaEntrada));
+			}
+			// Chip amarillo o rojo cuando supera los días configurados
+			function tagAnt(v) {
+				var d = antig(v);
+				if (d == null || d < AJ.antiguedad.amarillo) return "";
+				return '<span class="tag ' + (d >= AJ.antiguedad.rojo ? "rj" : "am") + '" title="Días en el inventario">' + d + " días</span>";
+			}
+			function seccionAntig() {
+				return (
+					'<h2 class="sec">Antigüedad del stock</h2><p class="hola">Marca los vehículos que llevan mucho tiempo en el inventario: se pintan en amarillo y en rojo en el inventario y en el panel.</p>' +
+					'<div class="panel"><label for="an_a">Amarillo desde (días)</label><input id="an_a" type="number" min="1" max="999" inputmode="numeric" value="' +
+					AJ.antiguedad.amarillo +
+					'"><label for="an_r">Rojo desde (días)</label><input id="an_r" type="number" min="2" max="999" inputmode="numeric" value="' +
+					AJ.antiguedad.rojo +
+					'"><button type="button" class="btn full" data-a="angu" style="margin-top:14px">Guardar</button></div>'
+				);
+			}
+			ACC.angu = async function () {
+				var a = parseInt($("#an_a").value, 10),
+					r = parseInt($("#an_r").value, 10);
+				if (!(a >= 1 && r > a && r <= 999)) {
+					toast("El rojo debe ser mayor que el amarillo");
+					return;
+				}
+				if (!(await guardaAjuste("antiguedad", { amarillo: a, rojo: r }))) {
+					toast("No se pudo guardar. ¿Ejecutaste mejoras_parte1.sql?", 3500);
+					return;
+				}
+				AJ.antiguedad = { amarillo: a, rojo: r };
+				toast("Guardado");
+			};
+
+			/* ----- Traslados entre sucursales ----- */
+			// Admin y jefe trasladan cualquier vehículo en stock; el preparador, los de su sucursal
+			function puedeTrasl(v) {
+				return !v.fechaSalida && (esAdm() || (perfil.rol === "preparador" && v.sucursalId === perfil.sucursal_id));
+			}
+			async function trasladar(id) {
+				var v = data.filter(function (x) {
+					return x.id === id;
+				})[0];
+				if (!v) return;
+				var r = await db.rpc("sucursales_publicas"),
+					dest = (r.data || []).filter(function (x) {
+						return x.id !== v.sucursalId;
+					});
+				if (!dest.length) {
+					toast("No hay otra sucursal activa a la que trasladar");
+					return;
+				}
+				cierraModal();
+				var m = document.createElement("div");
+				m.id = "modal";
+				m.className = "modal";
+				m.setAttribute("role", "dialog");
+				m.setAttribute("aria-modal", "true");
+				m.innerHTML =
+					'<div class="mp"><div class="mh"><b>Trasladar vehículo</b><button type="button" class="ib" data-a="xm" aria-label="Cerrar">&times;</button></div>' +
+					'<div class="ed"><p class="hola" style="margin:6px 0 0"><b>' +
+					esc(v.modelo) +
+					" " +
+					esc(v.version) +
+					"</b> · " +
+					esc(v.vin) +
+					"<br>Está en " +
+					esc(sucNombre(v.sucursalId) || "su sucursal") +
+					'.</p><label for="tr_d">Sucursal de destino</label><select id="tr_d"><option value="">Elegir sucursal</option>' +
+					dest
+						.map(function (x) {
+							return '<option value="' + x.id + '">' + esc(x.nombre) + "</option>";
+						})
+						.join("") +
+					'</select><label for="tr_u">Inventario en el destino <small>(opcional)</small></label><select id="tr_u"><option value="">Mantener «' +
+					esc(v.ubic) +
+					"»</option>" +
+					UBIC.map(function (x) {
+						return "<option>" + esc(x) + "</option>";
+					}).join("") +
+					'</select><label for="tr_n">Nota <small>(opcional)</small></label><input id="tr_n" autocomplete="off" placeholder="Ej: lo pidió el cliente de Bellavista">' +
+					'<div class="err" id="tr_e" role="alert"></div><div class="vb"><button type="button" class="btn" data-a="trgo" data-id="' +
+					v.id +
+					'">Trasladar</button><button type="button" class="btn g" data-a="xm">Cancelar</button></div></div></div>';
+				document.body.appendChild(m);
+				document.body.classList.add("mopen");
+				m.addEventListener("mousedown", function (e) {
+					if (e.target === m) cierraModal();
+				});
+			}
+			ACC.trgo = async function (b) {
+				var d = $("#tr_d").value,
+					er = $("#tr_e");
+				if (!d) {
+					er.textContent = "Elige la sucursal de destino.";
+					return;
+				}
+				b.disabled = true;
+				var r = await db.rpc("trasladar_vehiculo", { p_id: b.dataset.id, p_destino: d, p_ubicacion: $("#tr_u").value || null, p_nota: $("#tr_n").value.trim() || null });
+				if (r.error) {
+					b.disabled = false;
+					er.textContent = (r.error.message || "No se pudo trasladar").replace(/^.*?:\s*/, "");
+					return;
+				}
+				cierraModal();
+				toast("Vehículo trasladado");
+				await cargar();
+				renderApp();
+			};
+
+			/* ----- Panel de resumen (admin y jefe) ----- */
+			function barras(titulo, pares) {
+				pares = pares.filter(function (p) {
+					return p[1] > 0;
+				});
+				if (!pares.length) return "";
+				var mx = Math.max.apply(
+					null,
+					pares.map(function (p) {
+						return p[1];
+					}),
+				);
+				return (
+					'<div class="bars"><h3>' +
+					titulo +
+					"</h3>" +
+					pares
+						.map(function (p) {
+							return '<div class="br"><span title="' + esc(p[0]) + '">' + esc(p[0]) + '</span><div class="tr"><i style="width:' + Math.round((p[1] * 100) / mx) + '%"></i></div><b>' + p[1] + "</b></div>";
+						})
+						.join("") +
+					"</div>"
+				);
+			}
+			function contar(l, f) {
+				var c = {};
+				l.forEach(function (x) {
+					var k = f(x) || "—";
+					c[k] = (c[k] || 0) + 1;
+				});
+				return Object.keys(c)
+					.map(function (k) {
+						return [k, c[k]];
+					})
+					.sort(function (a, b) {
+						return b[1] - a[1];
+					});
+			}
+			function stat(n, t, k) {
+				return '<div class="stat ' + (k || "") + '"><b>' + n + "</b><small>" + t + "</small></div>";
+			}
+			function panelVista() {
+				var s = stock(),
+					mes = hoy().slice(0, 7),
+					act = ent.filter(function (e) {
+						return e.estado !== "Entregado";
+					}),
+					dd = function (e) {
+						return dias(e.fecha_entrega);
+					},
+					n = function (f) {
+						return act.filter(f).length;
+					},
+					rojos = s.filter(function (v) {
+						return antig(v) >= AJ.antiguedad.rojo;
+					}),
+					amar = s.filter(function (v) {
+						return antig(v) >= AJ.antiguedad.amarillo && antig(v) < AJ.antiguedad.rojo;
+					}),
+					viejos = s
+						.slice()
+						.sort(function (a, b) {
+							return antig(b) - antig(a);
+						})
+						.slice(0, 5),
+					mediana = s.length
+						? s
+								.map(antig)
+								.sort(function (a, b) {
+									return a - b;
+								})[Math.floor(s.length / 2)]
+						: 0;
+				return (
+					head("Panel de resumen") +
+					sucBar(1) +
+					'<h2 class="sec">Entregas</h2><div class="stats">' +
+					stat(
+						n(function (e) {
+							return dd(e) < 0;
+						}),
+						"Atrasadas",
+						"al",
+					) +
+					stat(
+						n(function (e) {
+							return dd(e) === 0;
+						}),
+						"Hoy",
+						"wa",
+					) +
+					stat(
+						n(function (e) {
+							return dd(e) === 1;
+						}),
+						"Mañana",
+					) +
+					stat(
+						n(function (e) {
+							return dd(e) >= 0 && dd(e) <= 7;
+						}),
+						"Próx. 7 días",
+					) +
+					stat(
+						n(function (e) {
+							return e.estado === "Lista para entregar";
+						}),
+						"Listas",
+						"ok",
+					) +
+					stat(
+						n(function (e) {
+							return !e.preparador || e.preparador === "Sin asignar";
+						}),
+						"Sin preparador",
+						"wa",
+					) +
+					stat(
+						ent.filter(function (e) {
+							return e.estado === "Entregado" && String(e.fecha_entrega).slice(0, 7) === mes;
+						}).length,
+						"Entregadas este mes",
+					) +
+					'</div><h2 class="sec">Inventario</h2><div class="stats">' +
+					stat(s.length, "En stock") +
+					stat(
+						data.filter(function (v) {
+							return v.fechaSalida && String(v.fechaSalida).slice(0, 7) === mes;
+						}).length,
+						"Salidas este mes",
+					) +
+					stat(mediana + " d", "Antigüedad típica") +
+					stat(amar.length, "Amarillo (" + AJ.antiguedad.amarillo + "+ días)", "wa") +
+					stat(rojos.length, "Rojo (" + AJ.antiguedad.rojo + "+ días)", "al") +
+					"</div>" +
+					(SUC.length > 1 && !sucSel
+						? barras(
+								"Stock por sucursal",
+								contar(s, function (v) {
+									return sucNombre(v.sucursalId);
+								}),
+							)
+						: "") +
+					barras(
+						"Stock por modelo",
+						contar(s, function (v) {
+							return v.modelo;
+						}),
+					) +
+					barras(
+						"Stock por inventario",
+						contar(s, function (v) {
+							return v.ubic;
+						}),
+					) +
+					barras(
+						"Stock por estado",
+						contar(s, function (v) {
+							return v.estado || "Disponible";
+						}),
+					) +
+					barras(
+						"Entregas activas por estado",
+						contar(act, function (e) {
+							return e.estado;
+						}),
+					) +
+					(viejos.length
+						? '<div class="bars"><h3>Los 5 más antiguos en stock</h3>' +
+							viejos
+								.map(function (v) {
+									return (
+										'<div class="top5"><div><b>' +
+										esc(v.modelo) +
+										" " +
+										esc(v.version) +
+										"</b><small>" +
+										esc(v.vin) +
+										(invTodas() ? " · " + esc(sucNombre(v.sucursalId)) : "") +
+										"</small></div><div>" +
+										(tagAnt(v) || '<span class="tag res">' + antig(v) + " días</span>") +
+										"</div></div>"
+									);
+								})
+								.join("") +
+							"</div>"
+						: "")
+				);
+			}
+
+			/* ----- Mis tareas (preparador) ----- */
+			// Entregas por preparar que son mías, o que nadie ha tomado todavía
+			function misTareas() {
+				var yo = String(perfil.nombre || "")
+					.trim()
+					.toLowerCase();
+				return ent
+					.filter(function (e) {
+						if (e.estado === "Entregado") return false;
+						var p = String(e.preparador || "")
+							.trim()
+							.toLowerCase();
+						return p === yo || p === "" || p === "sin asignar";
+					})
+					.sort(function (a, b) {
+						var x = a.fecha_entrega + " " + hh(a),
+							y = b.fecha_entrega + " " + hh(b);
+						return x > y ? 1 : x < y ? -1 : 0;
+					});
+			}
+			function tareasUrgentes() {
+				return misTareas().filter(function (e) {
+					return dias(e.fecha_entrega) <= 0 && e.estado !== "Lista para entregar";
+				}).length;
+			}
+			function tareasVista() {
+				return head("Mis tareas") + '<p class="hola">Tus entregas por preparar y las que nadie ha tomado en tu sucursal. Cambia el estado y el grabado aquí mismo.</p><div id="tk"></div>';
+			}
+			function pintaTareas() {
+				if (!$("#tk")) return;
+				var l = misTareas(),
+					g = {},
+					ord = ["Atrasadas", "Hoy", "Mañana", "Esta semana", "Más adelante"];
+				if (!l.length) {
+					$("#tk").innerHTML = '<div class="empty">No tienes entregas pendientes. ¡Buen trabajo!</div>';
+					return;
+				}
+				l.forEach(function (e) {
+					var d = dias(e.fecha_entrega),
+						k = d < 0 ? "Atrasadas" : d === 0 ? "Hoy" : d === 1 ? "Mañana" : d <= 7 ? "Esta semana" : "Más adelante";
+					(g[k] = g[k] || []).push(e);
+				});
+				var sg = l.filter(function (e) {
+					return e.grabado_patente !== "OK";
+				}).length;
+				$("#tk").innerHTML =
+					'<div class="stats">' +
+					stat((g["Atrasadas"] || []).length, "Atrasadas", "al") +
+					stat((g["Hoy"] || []).length, "Hoy", "wa") +
+					stat((g["Mañana"] || []).length, "Mañana") +
+					stat(sg, "Sin grabado de patente") +
+					"</div>" +
+					ord
+						.filter(function (k) {
+							return g[k];
+						})
+						.map(function (k) {
+							return '<h2 class="sec">' + k + " (" + g[k].length + ")</h2>" + g[k].map(cardE).join("");
+						})
+						.join("");
+			}
+
+			/* ----- Calendario del planificador ----- */
+			function calHtml(f) {
+				if (!calMes) calMes = hoy().slice(0, 7);
+				var y = parseInt(calMes.slice(0, 4), 10),
+					m = parseInt(calMes.slice(5, 7), 10) - 1,
+					nd = new Date(y, m + 1, 0).getDate(),
+					off = (new Date(y, m, 1).getDay() + 6) % 7,
+					por = {},
+					h = hoy(),
+					c = "";
+				f.forEach(function (e) {
+					(por[e.fecha_entrega] = por[e.fecha_entrega] || []).push(e);
+				});
+				["L", "M", "M", "J", "V", "S", "D"].forEach(function (d) {
+					c += '<span class="wd">' + d + "</span>";
+				});
+				for (var i = 0; i < off; i++) c += '<span class="cd ex"></span>';
+				for (var d = 1; d <= nd; d++) {
+					var ds = calMes + "-" + pad2(d),
+						k = (por[ds] || []).length,
+						nv = k === 0 ? 0 : k === 1 ? 1 : k <= 3 ? 2 : 3;
+					c +=
+						'<button type="button" class="cd n' +
+						nv +
+						(ds === h ? " hoy" : "") +
+						(ds === calDia ? " sel" : "") +
+						'" data-a="caldia" data-d="' +
+						ds +
+						'" aria-label="' +
+						d +
+						" de " +
+						MESES[m] +
+						": " +
+						plural(k, "entrega", "entregas") +
+						'" aria-pressed="' +
+						(ds === calDia) +
+						'"><b>' +
+						d +
+						"</b>" +
+						(k ? "<i>" + k + "</i>" : "") +
+						"</button>";
+				}
+				var lista = calDia && calDia.slice(0, 7) === calMes ? por[calDia] || [] : null;
+				return (
+					'<div class="cal"><div class="calh"><button type="button" class="btn g" data-a="calmes" data-s="-1" aria-label="Mes anterior">‹</button><b>' +
+					MESES[m] +
+					" " +
+					y +
+					'</b><button type="button" class="btn g" data-a="calmes" data-s="1" aria-label="Mes siguiente">›</button></div><div class="calg">' +
+					c +
+					'</div><div class="ley"><span>1 entrega</span><span class="l2">2 a 3</span><span class="l3">4 o más</span><button type="button" class="btn g" data-a="calmes" data-s="0" style="min-height:32px;padding:0 12px;margin-left:auto">Hoy</button></div></div>' +
+					(lista
+						? '<h2 class="sec">' + fmt(calDia) + " (" + lista.length + ")</h2>" + (lista.map(cardE).join("") || '<div class="empty">No hay entregas este día.</div>')
+						: '<p class="hola">Toca un día para ver sus entregas.</p>')
+				);
+			}
+			ACC.calmes = function (b) {
+				var sh = parseInt(b.dataset.s, 10);
+				if (!sh) {
+					calMes = hoy().slice(0, 7);
+					calDia = hoy();
+				} else {
+					var y = parseInt(calMes.slice(0, 4), 10),
+						m = parseInt(calMes.slice(5, 7), 10) - 1 + sh,
+						d = new Date(y, m, 1);
+					calMes = d.getFullYear() + "-" + pad2(d.getMonth() + 1);
+				}
+				listaPlan();
+			};
+			ACC.caldia = function (b) {
+				calDia = calDia === b.dataset.d ? "" : b.dataset.d;
+				listaPlan();
+			};
+
+			// Exporta las entregas que se ven (con sus filtros) a CSV o Excel
+			function exportarPlan(tipo) {
+				if (!pfLast.length) {
+					toast("No hay entregas para exportar con estos filtros");
+					return;
+				}
+				var cab = ["Fecha entrega", "Hora", "Modelo", "Color", "VIN", "Estado", "Grabado de patente", "Vendedor", "Preparador", "Fecha alistamiento", "Fecha inicial", "Campañas", "Accesorios", "Sucursal"];
+				var f = pfLast.map(function (e) {
+					return [fmt(e.fecha_entrega), hh(e), e.modelo, e.color, e.vin, e.estado, e.grabado_patente, e.vendedor, e.preparador, fmt(e.fecha_alistamiento), fmt(e.fecha_inicial), e.campanas, e.accesorios, sucNombre(e.sucursal_id)];
+				});
+				exportaTabla(tipo, "planificador-ford", "Entregas", cab, f);
+			}
+
+			/* ----- Resumen diario por aviso (configurable por admin y jefe) ----- */
+			function seccionResumen() {
+				var c = AJ.resumen,
+					r = c.roles || {},
+					D = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+				return (
+					'<h2 class="sec">Resumen diario por aviso</h2><p class="hola">Cada día, a la hora que elijas (hora de Chile), llega al celular un aviso con lo que hay que hacer ese día. Si una persona no tiene nada pendiente, no recibe aviso.</p>' +
+					'<div class="panel"><label class="chk"><input type="checkbox" id="rs_on"' +
+					(c.activo ? " checked" : "") +
+					'> Enviar el resumen diario</label><label for="rs_h">Hora de envío</label><input type="time" id="rs_h" value="' +
+					esc(c.hora || "08:00") +
+					'"><label>Días de la semana</label><div class="dias" id="rs_d">' +
+					D.map(function (x, i) {
+						return '<button type="button" data-a="rsdia" data-n="' + (i + 1) + '" aria-pressed="' + ((c.dias || []).indexOf(i + 1) > -1) + '">' + x + "</button>";
+					}).join("") +
+					'</div><label>Quién lo recibe</label><label class="chk"><input type="checkbox" id="rs_p"' +
+					(r.preparador !== false ? " checked" : "") +
+					'> Preparadores</label><label class="chk"><input type="checkbox" id="rs_v"' +
+					(r.vendedor !== false ? " checked" : "") +
+					'> Vendedores</label><label class="chk"><input type="checkbox" id="rs_j"' +
+					(r.jefe !== false ? " checked" : "") +
+					'> Admin y jefes</label><button type="button" class="btn full" data-a="rsgu" style="margin-top:16px">Guardar</button><button type="button" class="btn g full" data-a="rspr">Enviarme una prueba ahora</button></div>'
+				);
+			}
+			ACC.rsdia = function (b) {
+				b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true");
+			};
+			ACC.rsgu = async function () {
+				var dias = [];
+				document.querySelectorAll("#rs_d [data-n]").forEach(function (b) {
+					if (b.getAttribute("aria-pressed") === "true") dias.push(parseInt(b.dataset.n, 10));
+				});
+				var h = $("#rs_h").value;
+				if (!/^\d{2}:\d{2}$/.test(h)) {
+					toast("Elige la hora de envío");
+					return;
+				}
+				if (!dias.length) {
+					toast("Elige al menos un día");
+					return;
+				}
+				var v = { activo: $("#rs_on").checked, hora: h, dias: dias, roles: { preparador: $("#rs_p").checked, vendedor: $("#rs_v").checked, jefe: $("#rs_j").checked } };
+				if (!(await guardaAjuste("resumen_diario", v))) {
+					toast("No se pudo guardar. ¿Ejecutaste mejoras_parte1.sql?", 3500);
+					return;
+				}
+				AJ.resumen = v;
+				toast(v.activo ? "Guardado: se enviará a las " + h : "Guardado: el resumen está apagado");
+			};
+			ACC.rspr = async function (b) {
+				b.disabled = true;
+				var r = await db.rpc("resumen_diario", { p_forzar: true });
+				b.disabled = false;
+				if (r.error) {
+					toast("No se pudo enviar. ¿Ejecutaste mejoras_parte3.sql?", 3500);
+					return;
+				}
+				toast(r.data > 0 ? "Listo: te llega un aviso en unos segundos" : "Hoy no hay nada que resumir para ti", 3200);
+			};
+
 			if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
 			window.addEventListener("hashchange", render);
 			iniciar();

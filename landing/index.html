@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventario Ford · Stock y entregas en un solo lugar</title>
+<meta name="description" content="Inventario Ford: control de stock, planificador de entregas, avisos al celular y panel de resumen para concesionarios. Funciona en celular y computador.">
+<meta name="theme-color" content="#003478">
+<style>
+	:root {
+		--bg: #f4f6fa;
+		--card: #fff;
+		--tx: #0d1b2e;
+		--mu: #556070;
+		--pr: #003478;
+		--pr2: #e5edf8;
+		--on: #fff;
+		--bd: #d5dce8;
+		--ok: #136c3a;
+		--warn: #8a5300;
+		--hero: linear-gradient(135deg, #003478, #0f5995);
+	}
+	@media (prefers-color-scheme: dark) {
+		:root {
+			--bg: #060f23;
+			--card: #0e2044;
+			--tx: #eef4ff;
+			--mu: #a9c0e6;
+			--pr: #4da3ff;
+			--pr2: #123a7a;
+			--on: #031026;
+			--bd: #1f3f78;
+			--ok: #3ddc84;
+			--warn: #ffc247;
+			--hero: linear-gradient(135deg, #0b3a8c, #123a7a);
+		}
+	}
+	* {
+		box-sizing: border-box;
+	}
+	html {
+		scroll-behavior: smooth;
+	}
+	body {
+		margin: 0;
+		font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		background: var(--bg);
+		color: var(--tx);
+		line-height: 1.55;
+	}
+	a {
+		color: var(--pr);
+	}
+	.w {
+		max-width: 1120px;
+		margin: 0 auto;
+		padding: 0 20px;
+	}
+	header.top {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: #003478;
+		color: #fff;
+	}
+	header.top .w {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		min-height: 56px;
+	}
+	header.top b {
+		font-size: 18px;
+	}
+	header.top nav {
+		margin-left: auto;
+		display: flex;
+		gap: 4px;
+		flex-wrap: wrap;
+	}
+	header.top nav a {
+		color: #fff;
+		text-decoration: none;
+		padding: 8px 10px;
+		border-radius: 8px;
+		font-size: 14.5px;
+	}
+	header.top nav a:hover {
+		background: rgba(255, 255, 255, 0.15);
+	}
+	.hero {
+		background: var(--hero);
+		color: #fff;
+		padding: 56px 0 64px;
+	}
+	.hero .w {
+		display: grid;
+		grid-template-columns: 1.2fr 0.8fr;
+		gap: 36px;
+		align-items: center;
+	}
+	.hero h1 {
+		font-size: clamp(30px, 5vw, 48px);
+		line-height: 1.1;
+		margin: 0 0 14px;
+	}
+	.hero p {
+		font-size: 19px;
+		opacity: 0.93;
+		margin: 0 0 24px;
+		max-width: 34em;
+	}
+	.btns {
+		display: flex;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+	.b {
+		display: inline-flex;
+		align-items: center;
+		min-height: 48px;
+		padding: 0 22px;
+		border-radius: 12px;
+		font-weight: 700;
+		text-decoration: none;
+		background: #ffc247;
+		color: #1d1400;
+	}
+	.b.g {
+		background: rgba(255, 255, 255, 0.16);
+		color: #fff;
+		border: 1.5px solid rgba(255, 255, 255, 0.5);
+	}
+	.hero .ph {
+		display: flex;
+		justify-content: center;
+		gap: 14px;
+	}
+	.ph img {
+		height: auto;
+		width: 46%;
+		max-width: 210px;
+		border-radius: 18px;
+		box-shadow: 0 18px 50px rgba(0, 10, 40, 0.5);
+		border: 1px solid rgba(255, 255, 255, 0.25);
+	}
+	.ph img:last-child {
+		margin-top: 36px;
+	}
+	section {
+		padding: 56px 0 8px;
+	}
+	h2 {
+		font-size: clamp(24px, 3.4vw, 32px);
+		margin: 0 0 6px;
+		color: var(--pr);
+	}
+	.sub {
+		color: var(--mu);
+		margin: 0 0 26px;
+		max-width: 46em;
+	}
+	.cifras {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		gap: 14px;
+		margin-top: -34px;
+		position: relative;
+	}
+	.cifra {
+		background: var(--card);
+		border: 1px solid var(--bd);
+		border-radius: 16px;
+		padding: 16px 18px;
+		box-shadow: 0 8px 26px rgba(0, 30, 90, 0.12);
+	}
+	.cifra b {
+		display: block;
+		font-size: 28px;
+		color: var(--pr);
+		line-height: 1.1;
+	}
+	.cifra span {
+		color: var(--mu);
+		font-size: 14px;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 16px;
+	}
+	.f {
+		background: var(--card);
+		border: 1px solid var(--bd);
+		border-radius: 16px;
+		padding: 20px;
+	}
+	.f h3 {
+		margin: 0 0 8px;
+		font-size: 18px;
+	}
+	.f p {
+		margin: 0 0 8px;
+		color: var(--mu);
+	}
+	.f ul {
+		margin: 0;
+		padding-left: 18px;
+	}
+	.f li {
+		margin: 3px 0;
+	}
+	.chip {
+		display: inline-block;
+		font-size: 12px;
+		font-weight: 700;
+		padding: 3px 10px;
+		border-radius: 99px;
+		background: var(--pr2);
+		color: var(--pr);
+		margin-bottom: 10px;
+	}
+	.chip.n {
+		background: #ffe9b8;
+		color: #6b4200;
+	}
+	.shots {
+		display: flex;
+		gap: 16px;
+		overflow-x: auto;
+		padding: 6px 2px 18px;
+		scroll-snap-type: x mandatory;
+	}
+	.shots figure {
+		margin: 0;
+		flex: none;
+		width: 220px;
+		scroll-snap-align: start;
+	}
+	.shots img {
+		height: auto;
+		width: 100%;
+		border-radius: 16px;
+		border: 1px solid var(--bd);
+		box-shadow: 0 8px 26px rgba(0, 30, 90, 0.16);
+		display: block;
+	}
+	.shots figcaption {
+		font-size: 13.5px;
+		color: var(--mu);
+		margin-top: 8px;
+		text-align: center;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		background: var(--card);
+		border: 1px solid var(--bd);
+		border-radius: 14px;
+		overflow: hidden;
+		font-size: 15px;
+	}
+	th,
+	td {
+		padding: 11px 14px;
+		text-align: left;
+		border-bottom: 1px solid var(--bd);
+		vertical-align: top;
+	}
+	th {
+		background: var(--pr2);
+		color: var(--pr);
+	}
+	tr:last-child td {
+		border-bottom: 0;
+	}
+	.tw {
+		overflow-x: auto;
+	}
+	.si {
+		color: var(--ok);
+		font-weight: 700;
+	}
+	.no {
+		color: var(--mu);
+	}
+	.cta {
+		margin: 56px 0 0;
+		background: var(--hero);
+		color: #fff;
+		border-radius: 22px;
+		padding: 36px 28px;
+		text-align: center;
+	}
+	.cta h2 {
+		color: #fff;
+	}
+	.cta p {
+		margin: 0 0 20px;
+		opacity: 0.92;
+	}
+	.cta .btns {
+		justify-content: center;
+	}
+	footer {
+		text-align: center;
+		color: var(--mu);
+		font-size: 14px;
+		padding: 36px 20px 48px;
+	}
+	@media (max-width: 820px) {
+		.hero .w {
+			grid-template-columns: 1fr;
+		}
+		.hero .ph {
+			order: -1;
+		}
+		header.top nav a:not(.keep) {
+			display: none;
+		}
+	}
+</style>
+</head>
+<body>
+<header class="top"><div class="w"><b>Inventario Ford</b><nav><a href="#funciones">Funciones</a><a href="#capturas">Capturas</a><a href="#perfiles">Perfiles</a><a href="#specs">Especificaciones</a><a class="keep" href="../manual/">Manuales</a><a class="keep" href="../index.html">Abrir la app</a></nav></div></header>
+
+<div class="hero"><div class="w">
+	<div>
+		<h1>Todo el stock y todas las entregas, en un solo lugar.</h1>
+		<p>Controla el inventario de cada sucursal, programa y prepara las entregas, y avisa al celular de cada persona justo cuando le toca actuar. Sin planillas, sin llamadas de ida y vuelta.</p>
+		<div class="btns"><a class="b" href="../index.html">Abrir la app</a><a class="b g" href="../manual/">Ver los manuales</a></div>
+	</div>
+	<div class="ph"><img src="../manual/img/admin-inicio.webp" alt="Inicio de la app en el celular" width="390" height="800"><img src="../manual/img/panel.webp" alt="Panel de resumen en el celular" width="390" height="800"></div>
+</div></div>
+
+<div class="w cifras">
+	<div class="cifra"><b>5 perfiles</b><span>cada uno ve solo lo suyo</span></div>
+	<div class="cifra"><b>Varias sucursales</b><span>con selector y traslados</span></div>
+	<div class="cifra"><b>Avisos push</b><span>al celular y al computador</span></div>
+	<div class="cifra"><b>Tiempo real</b><span>los cambios se ven al instante</span></div>
+</div>
+
+<section id="funciones"><div class="w">
+	<h2>Lo que hace por tu concesionario</h2>
+	<p class="sub">Pensado para el trabajo diario del salón, el patio y el taller de preparación.</p>
+	<div class="grid">
+		<div class="f"><span class="chip">Inventario</span><h3>Stock siempre al día</h3><ul><li>Ingreso con lectura del VIN por foto (código 2D y OCR)</li><li>Modelo reconocido por el código del VIN</li><li>Salidas, correcciones y deshacer</li><li>Filtros por modelo, ubicación, estado y antigüedad</li><li>Vista en tarjetas o lista</li></ul></div>
+		<div class="f"><span class="chip">Planificador</span><h3>Entregas sin sorpresas</h3><ul><li>Fecha, hora, alistamiento, accesorios, campañas y grabado de patente</li><li>Estados configurables con colores</li><li>Atrasadas, hoy, mañana y próximos días</li><li><b>Calendario mensual</b> con la carga de cada día</li></ul></div>
+		<div class="f"><span class="chip">Avisos</span><h3>Cada persona se entera a tiempo</h3><ul><li>El preparador asignado recibe su entrega nueva</li><li>El vendedor sabe cuándo su auto está listo</li><li>Admin y jefe ven cada cambio</li><li><b>Resumen diario</b> al celular, con hora, días y destinatarios configurables</li></ul></div>
+		<div class="f"><span class="chip n">Nuevo</span><h3>Panel de resumen</h3><ul><li>Entregas atrasadas, de hoy, de mañana y de la semana</li><li>Stock por sucursal, modelo, inventario y estado</li><li>Los 5 autos más antiguos del stock</li></ul></div>
+		<div class="f"><span class="chip n">Nuevo</span><h3>Antigüedad del stock</h3><ul><li>Chips amarillo y rojo según los días en inventario</li><li>Umbrales que define el administrador o el jefe</li><li>Filtro para ver solo los más antiguos</li></ul></div>
+		<div class="f"><span class="chip n">Nuevo</span><h3>Traslados entre sucursales</h3><ul><li>Un botón, con destino, inventario y nota</li><li>Queda en el historial con origen y destino</li><li>Avisa a la sucursal que lo recibe</li></ul></div>
+		<div class="f"><span class="chip n">Nuevo</span><h3>Mis tareas para el preparador</h3><ul><li>Solo lo que le toca preparar, por urgencia</li><li>Cambia estado y grabado desde la misma tarjeta</li><li>Contador de pendientes en el menú</li></ul></div>
+		<div class="f"><span class="chip n">Nuevo</span><h3>Exportar a Excel y CSV</h3><ul><li>Inventario y entregas, respetando los filtros</li><li>Excel real (.xlsx) o CSV con tildes</li></ul></div>
+		<div class="f"><span class="chip">Administración</span><h3>Control total</h3><ul><li>Aprobación de cuentas y roles</li><li>Sucursales, modelos y estados configurables</li><li>Historial de todos los cambios</li><li>Acceso con RUT y claves temporales</li></ul></div>
+	</div>
+</div></section>
+
+<section id="capturas"><div class="w">
+	<h2>Así se ve</h2>
+	<p class="sub">Diseñada primero para el celular, también cómoda en el computador. Modo claro y oscuro.</p>
+	<div class="shots">
+		<figure><img src="../manual/img/admin-inicio.webp" alt="Inicio" loading="lazy" width="390" height="800"><figcaption>Inicio</figcaption></figure>
+		<figure><img src="../manual/img/panel.webp" alt="Panel de resumen" loading="lazy" width="390" height="800"><figcaption>Panel de resumen</figcaption></figure>
+		<figure><img src="../manual/img/calendario.webp" alt="Calendario" loading="lazy" width="390" height="800"><figcaption>Calendario de entregas</figcaption></figure>
+		<figure><img src="../manual/img/tareas.webp" alt="Mis tareas" loading="lazy" width="390" height="800"><figcaption>Mis tareas</figcaption></figure>
+		<figure><img src="../manual/img/trasladar.webp" alt="Traslado" loading="lazy" width="390" height="800"><figcaption>Traslado entre sucursales</figcaption></figure>
+		<figure><img src="../manual/img/resumen-diario.webp" alt="Resumen diario" loading="lazy" width="390" height="800"><figcaption>Resumen diario configurable</figcaption></figure>
+		<figure><img src="../manual/img/inventario-lista.webp" alt="Inventario en lista" loading="lazy" width="390" height="800"><figcaption>Inventario en lista</figcaption></figure>
+	</div>
+</div></section>
+
+<section id="perfiles"><div class="w">
+	<h2>Cada perfil ve lo que necesita</h2>
+	<p class="sub">Los permisos se aplican en la base de datos, no solo en la pantalla.</p>
+	<div class="tw"><table>
+		<thead><tr><th>Función</th><th>Admin</th><th>Jefe</th><th>Preparador</th><th>Vendedor</th><th>Consulta</th></tr></thead>
+		<tbody>
+			<tr><td>Ver inventario</td><td class="si">Todas</td><td class="si">Todas</td><td class="si">Su sucursal</td><td class="si">Todas (lectura)</td><td class="si">Su sucursal</td></tr>
+			<tr><td>Ingresar / dar salida</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Su sucursal</td><td class="no">No</td><td class="no">No</td></tr>
+			<tr><td>Trasladar entre sucursales</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Su sucursal</td><td class="no">No</td><td class="no">No</td></tr>
+			<tr><td>Programar entregas</td><td class="si">Sí</td><td class="si">Sí</td><td class="no">No</td><td class="si">Sí (las suyas)</td><td class="no">No</td></tr>
+			<tr><td>Preparar (estado y grabado)</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Sí</td><td class="no">No</td><td class="no">No</td></tr>
+			<tr><td>Mis tareas</td><td class="no">—</td><td class="no">—</td><td class="si">Sí</td><td class="no">—</td><td class="no">—</td></tr>
+			<tr><td>Panel de resumen</td><td class="si">Sí</td><td class="si">Sí</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+			<tr><td>Cuentas, sucursales y listas</td><td class="si">Sí</td><td class="si">Sí</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+			<tr><td>Configurar resumen y antigüedad</td><td class="si">Sí</td><td class="si">Sí</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+			<tr><td>Recibir avisos</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Sí</td><td class="no">No</td></tr>
+			<tr><td>Exportar a Excel / CSV</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Sí</td><td class="si">Sí</td></tr>
+		</tbody>
+	</table></div>
+</div></section>
+
+<section id="specs"><div class="w">
+	<h2>Especificaciones</h2>
+	<p class="sub">Tecnología simple y estándar, fácil de mantener y de alojar.</p>
+	<div class="grid">
+		<div class="f"><h3>Aplicación</h3><ul><li>Web app instalable (PWA): celular, tablet y computador</li><li>Un solo archivo HTML, sin pasos de compilación</li><li>Hospedada en GitHub Pages</li><li>Modo claro y oscuro, interfaz en español de Chile</li></ul></div>
+		<div class="f"><h3>Datos y acceso</h3><ul><li>Supabase: PostgreSQL, autenticación y tiempo real</li><li>Seguridad por filas (RLS) según rol y sucursal</li><li>Ingreso con RUT validado</li><li>Historial automático de cada cambio</li></ul></div>
+		<div class="f"><h3>Avisos</h3><ul><li>Notificaciones push estándar (VAPID)</li><li>Funcionan con la app cerrada</li><li>Android, Windows, macOS y iPhone (con la app instalada)</li><li>Resumen diario programado en el servidor, hora de Chile</li></ul></div>
+		<div class="f"><h3>Lectura de VIN</h3><ul><li>Código 2D del parabrisas y etiquetas (ZXing)</li><li>Reconocimiento de texto como respaldo (OCR)</li><li>Decodificador externo opcional para modelo y versión</li></ul></div>
+		<div class="f"><h3>Requisitos</h3><ul><li>Chrome, Edge, Brave, Firefox o Safari actualizados</li><li>Conexión a internet</li><li>Cuenta aprobada por un administrador</li></ul></div>
+		<div class="f"><h3>Exportación</h3><ul><li>Excel (.xlsx) y CSV</li><li>Respeta filtros y sucursal elegidos</li></ul></div>
+	</div>
+	<div class="cta"><h2>¿Lista para probarla?</h2><p>Entra, mira los manuales por perfil o revisa cómo funciona cada pantalla.</p><div class="btns"><a class="b" href="../index.html">Abrir la app</a><a class="b g" href="../manual/">Manuales por perfil</a></div></div>
+</div></section>
+
+<footer>Inventario Ford · <a href="../manual/">Manuales</a> · <a href="../index.html">App</a></footer>
+</body>
+</html>

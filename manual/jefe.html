@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual del Jefe · Inventario Ford</title>
+<meta name="description" content="Manual de uso de Inventario Ford para el perfil Jefe.">
+<meta name="theme-color" content="#003478">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="manual.css" rel="stylesheet">
+</head>
+<body data-bs-spy="scroll" data-bs-target="#toc" data-bs-offset="90" tabindex="0">
+<nav class="navbar navbar-expand-lg fixed-top mnav">
+ <div class="container-xl">
+  <a class="navbar-brand fw-bold" href="index.html">Manual · Inventario Ford</a>
+  <div class="d-flex align-items-center gap-2 ms-auto">
+   <div class="dropdown"><button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">Perfil: Jefe</button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="admin.html">Administrador</a></li><li><a class="dropdown-item active" href="jefe.html">Jefe</a></li><li><a class="dropdown-item" href="preparador.html">Preparador</a></li><li><a class="dropdown-item" href="vendedor.html">Vendedor</a></li><li><a class="dropdown-item" href="consulta.html">Solo consulta</a></li><li><hr class="dropdown-divider"></li><li><a class="dropdown-item" href="index.html">Todos los manuales</a></li></ul></div>
+   <button class="btn btn-sm btn-outline-light" id="tema" type="button" aria-label="Cambiar entre modo claro y oscuro">Tema</button>
+   <a class="btn btn-sm btn-warning d-none d-sm-inline" href="../index.html" target="_blank" rel="noopener">Abrir la app</a>
+  </div>
+ </div>
+</nav>
+<header class="mhero"><div class="container-xl"><span class="badge rounded-pill text-bg-light mb-2">Perfil Jefe</span><h1>Manual del Jefe</h1><p class="lead mb-0">Lo mismo que el administrador para operar y configurar; sin poder crear otros administradores.</p></div></header>
+<div class="container-xl py-4">
+ <div class="row g-4">
+  <aside class="col-lg-3 d-print-none"><div class="sticky-lg-top toc-w"><input id="buscar" class="form-control form-control-sm mb-2" type="search" placeholder="Buscar en este manual" aria-label="Buscar en este manual"><div id="toc" class="list-group small"><a class="list-group-item list-group-item-action" href="#resumen">Qué puedes hacer</a><a class="list-group-item list-group-item-action" href="#acceso">Entrar a la app</a><a class="list-group-item list-group-item-action" href="#instalar">Instalarla como app</a><a class="list-group-item list-group-item-action" href="#avisos">Activar los avisos en el celular</a><a class="list-group-item list-group-item-action" href="#apariencia">Modo claro, oscuro y vistas</a><a class="list-group-item list-group-item-action" href="#panel">Panel de resumen</a><a class="list-group-item list-group-item-action" href="#inventario">Ver el inventario</a><a class="list-group-item list-group-item-action" href="#ingresar">Ingresar y dar salida a un vehículo</a><a class="list-group-item list-group-item-action" href="#traslado">Trasladar un vehículo a otra sucursal</a><a class="list-group-item list-group-item-action" href="#planificador">Ver el planificador de entregas</a><a class="list-group-item list-group-item-action" href="#nueva-entrega">Programar una entrega</a><a class="list-group-item list-group-item-action" href="#estados">Estados de la entrega</a><a class="list-group-item list-group-item-action" href="#antiguedad">Configurar la antigüedad del stock</a><a class="list-group-item list-group-item-action" href="#resumen-diario">Configurar el resumen diario</a><a class="list-group-item list-group-item-action" href="#cuentas">Cuentas y sucursales</a><a class="list-group-item list-group-item-action" href="#listas">Modelos, estados y códigos de VIN</a><a class="list-group-item list-group-item-action" href="#historial">Historial de cambios</a><a class="list-group-item list-group-item-action" href="#exportar">Exportar a Excel o CSV</a><a class="list-group-item list-group-item-action" href="#faq">Preguntas frecuentes</a></div></div></aside>
+  <main class="col-lg-9" id="doc"><section id="resumen" class="msec"><h2>Qué puedes hacer</h2><div class="alert alert-info d-flex gap-2" role="note"><div><strong>Diferencia:</strong> Como <b>jefe</b> tienes los mismos permisos que el administrador, salvo que no puedes crear ni nombrar a otros <b>administradores</b>.</div></div>
+<div class="row g-3">
+ <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Todas las sucursales</h3><p class="mb-0">Ves y cambias inventario y entregas de todas. El selector <b>Sucursal</b> arriba filtra una sola o muestra todas.</p></div></div></div>
+ <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Cuentas y sucursales</h3><p class="mb-0">Apruebas cuentas nuevas, asignas rol y sucursal, restableces claves y creas o desactivas sucursales.</p></div></div></div>
+ <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Listas y reglas</h3><p class="mb-0">Defines modelos, estados, colores de estados, la antigüedad del stock y el resumen diario.</p></div></div></div>
+ <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Control</h3><p class="mb-0">Panel de resumen, historial de cambios, traslados y exportación a Excel/CSV.</p></div></div></div>
+</div>
+<figure class="fig"><img src="img/admin-inicio.webp" alt="Inicio del administrador: accesos a Inventario, Planificador, Panel y la sección Administración." loading="lazy" width="390" height="800"><figcaption>Inicio del administrador: accesos a Inventario, Planificador, Panel y la sección Administración.</figcaption></figure></section><section id="acceso" class="msec"><h2>Entrar a la app</h2>
+<p>Abre <a href="https://nachioc.github.io/FordInventory/" target="_blank" rel="noopener">https://nachioc.github.io/FordInventory/</a> en tu celular o computador.</p>
+<ol class="pasos"><li>Escribe tu <b>RUT</b> y tu <b>contraseña</b>, y toca <b>Entrar</b>.</li><li>Si es tu primera vez, toca <b>Crear cuenta</b>, escribe tu nombre, RUT y una contraseña. Luego elige tu <b>sucursal</b> y tu <b>rol</b> y espera la aprobación de un administrador: verás «Cuenta pendiente» hasta entonces (toca <b>Reintentar</b>).</li><li>Si te dieron una clave temporal, la app te pedirá crear una nueva antes de seguir.</li><li>Si no recuerdas tu clave, toca <b>Olvidé mi clave</b> o pídele al administrador que la restablezca.</li></ol>
+<p class="small text-secondary mb-0">El RUT debe ser válido (la app revisa el dígito verificador).</p><div class="alert alert-warning d-flex gap-2" role="note"><div><strong>Para ti:</strong> Si alguien olvida su clave, entra a <b>Cuentas</b>, abre su ficha y toca <b>Restablecer clave</b>. Su clave temporal queda como <code>los 4 últimos dígitos del RUT (sin el dígito verificador)</code> + <code>-Ford</code>, y la app le pide cambiarla al entrar.</div></div></section><section id="instalar" class="msec"><h2>Instalarla como app</h2>
+<p>No necesitas tienda de aplicaciones: se instala desde el navegador y queda con su ícono, como cualquier app.</p>
+<div class="row g-3">
+ <div class="col-md-4"><div class="card h-100"><div class="card-body"><h4 class="h6">Android (Chrome)</h4><p class="mb-0">Menú ⋮ → <b>Instalar app</b> (o «Agregar a la pantalla principal»).</p></div></div></div>
+ <div class="col-md-4"><div class="card h-100"><div class="card-body"><h4 class="h6">iPhone (Safari)</h4><p class="mb-0">Botón Compartir → <b>Agregar a inicio</b>. Es obligatorio para recibir avisos en iPhone.</p></div></div></div>
+ <div class="col-md-4"><div class="card h-100"><div class="card-body"><h4 class="h6">Computador</h4><p class="mb-0">Chrome, Edge o Brave: ícono de instalar al final de la barra de direcciones.</p></div></div></div>
+</div></section><section id="avisos" class="msec"><h2>Activar los avisos en el celular</h2>
+<p>La app te avisa como un WhatsApp, aunque esté cerrada. Recibes: cada cambio en las entregas, los traslados de vehículos y el resumen diario.</p>
+<ol class="pasos"><li>Entra a <b>Alertas</b> (campana).</li><li>En la caja azul toca <b>Activar avisos</b> y acepta el permiso del navegador. La caja desaparece sola cuando ya están activos.</li><li>Toca <b>Enviar aviso de prueba</b> para comprobar que llega.</li><li>Para dejar de recibirlos en ese dispositivo, usa <b>Desactivar avisos</b>.</li></ol>
+<div class="alert alert-warning d-flex gap-2" role="note"><div><strong>Ojo:</strong> En <b>Brave</b> activa antes <i>Configuración → Privacidad → Usar Google Services para mensajería push</i>. En <b>iPhone</b> la app debe estar instalada en inicio. Si no llega nada en un celular, revisa que tenga internet y que Google Play Services esté al día.</div></div>
+<figure class="fig"><img src="img/alertas.webp" alt="Pantalla Alertas: plazos de entrega y avisos recibidos." loading="lazy" width="390" height="800"><figcaption>Pantalla Alertas: plazos de entrega y avisos recibidos.</figcaption></figure></section><section id="apariencia" class="msec"><h2>Modo claro, oscuro y vistas</h2>
+<p>En <b>Inicio</b>, al final, elige <b>Claro</b> u <b>Oscuro</b>. Se recuerda en ese dispositivo.</p>
+<p>Las listas se pueden ver como <b>tarjetas</b>, <b>lista</b> (tabla) y, en el planificador, <b>calendario</b>. Se cambia con los tres botoncitos arriba de la lista y la app recuerda tu elección.</p>
+<p>En el celular, además de los botones del menú inferior, puedes <b>deslizar el dedo a los lados</b> para pasar entre Inicio, Inventario, Planificador y Alertas.</p></section><section id="panel" class="msec"><h2>Panel de resumen</h2>
+<p>Entra por <b>Panel</b> (menú) o por el botón <b>Panel de resumen</b> de Inicio. Muestra al instante, para la sucursal elegida o para todas:</p>
+<ul><li><b>Entregas:</b> atrasadas, hoy, mañana, próximos 7 días, listas, sin preparador y entregadas este mes.</li>
+<li><b>Inventario:</b> en stock, salidas del mes, antigüedad típica y cuántos autos están en amarillo y en rojo.</li>
+<li><b>Gráficos de barras:</b> stock por sucursal, modelo, inventario y estado; entregas activas por estado.</li>
+<li><b>Los 5 más antiguos</b> en stock, para decidir qué mover o promocionar.</li></ul>
+<figure class="fig"><img src="img/panel.webp" alt="Panel de resumen en el celular." loading="lazy" width="390" height="800"><figcaption>Panel de resumen en el celular.</figcaption></figure><figure class="fig"><img src="img/panel-escritorio.webp" alt="El mismo panel en computador." loading="lazy" width="390" height="800"><figcaption>El mismo panel en computador.</figcaption></figure></section><section id="inventario" class="msec"><h2>Ver el inventario</h2>
+<p>Entra por <b>Inventario</b>. Arriba ves cuántos autos hay en stock y cuántos hay en cada inventario (Salón, Vitrina, Patio, Subterráneo, Equipador).</p>
+<ol class="pasos"><li>Elige <b>En stock</b>, <b>Con salida</b> o <b>Todos</b>.</li><li>Filtra por modelo, ubicación, estado o <b>antigüedad</b>, o busca por VIN, versión, color o vendedor.</li><li>Toca <b>Limpiar filtros</b> para volver a ver todo.</li></ol>
+<p><b>Antigüedad:</b> los autos que llevan mucho tiempo sin salir muestran un chip <span class="badge text-bg-warning">amarillo</span> o <span class="badge text-bg-danger">rojo</span> con los días. Los umbrales los define el administrador o el jefe (por defecto 60 y 90 días).</p>
+<figure class="fig"><img src="img/inventario-tarjetas.webp" alt="Inventario en tarjetas: chips de antigüedad y días en inventario." loading="lazy" width="390" height="800"><figcaption>Inventario en tarjetas: chips de antigüedad y días en inventario.</figcaption></figure>
+<figure class="fig"><img src="img/inventario-lista.webp" alt="El mismo inventario en modo lista." loading="lazy" width="390" height="800"><figcaption>El mismo inventario en modo lista.</figcaption></figure></section><section id="ingresar" class="msec"><h2>Ingresar y dar salida a un vehículo</h2>
+<h3 class="h5">Ingresar un vehículo</h3>
+<ol class="pasos"><li>En <b>Inventario</b> toca <b>Ingresar</b>.</li><li>Toca <b>Escanear</b> y fotografía el código cuadrado del parabrisas o la etiqueta del VIN: la app lee el VIN y completa el modelo. También puedes escribir el VIN (17 caracteres, sin I, O ni Q).</li><li>Completa versión, color, fecha de entrada, inventario y estado. Vendedor y observación son opcionales.</li><li>Toca <b>Guardar ingreso</b>. Si el VIN ya está en stock, la app te avisa.</li></ol>
+<figure class="fig"><img src="img/ingresar.webp" alt="Formulario de ingreso con lectura de VIN." loading="lazy" width="390" height="800"><figcaption>Formulario de ingreso con lectura de VIN.</figcaption></figure>
+<h3 class="h5 mt-4">Dar salida</h3>
+<ol class="pasos"><li>En Inventario toca <b>Salida</b>.</li><li>Elige el vehículo y la fecha de salida (no puede ser anterior a la entrada).</li><li>Guarda. Si te equivocaste, en «Con salida» usa <b>Deshacer salida</b>.</li></ol>
+<h3 class="h5 mt-4">Corregir un dato</h3>
+<p>En la tarjeta (o con el lápiz en la lista) toca <b>Actualizar</b>, cambia lo que necesites y guarda. Todo queda en el historial.</p></section><section id="traslado" class="msec"><h2>Trasladar un vehículo a otra sucursal</h2>
+<p>Puedes trasladar cualquier vehículo en stock.</p>
+<ol class="pasos"><li>En el inventario toca <b>Trasladar</b> (en la lista es el icono de flechas).</li><li>Elige la <b>sucursal de destino</b>. Si quieres, cambia el inventario (Salón, Patio…) y escribe una nota.</li><li>Toca <b>Trasladar</b>. El auto aparece de inmediato en la otra sucursal.</li></ol>
+<figure class="fig"><img src="img/trasladar.webp" alt="Ventana de traslado." loading="lazy" width="390" height="800"><figcaption>Ventana de traslado.</figcaption></figure>
+<ul><li>Queda registrado en el <b>historial</b> con el origen y el destino.</li>
+<li>Se avisa a administradores, jefes y preparadores de la sucursal de destino.</li>
+<li>No se puede trasladar un auto con una <b>entrega activa</b>: primero entrégalo o cámbiale la sucursal a la entrega.</li></ul></section><section id="planificador" class="msec"><h2>Ver el planificador de entregas</h2>
+<p>Entra por <b>Planificador</b>. Las entregas se agrupan en <b>Atrasadas, Hoy, Mañana y Próximos días</b>. Las que vencen hoy, mañana o ya vencieron se marcan y suman al número de <b>Alertas</b>.</p>
+<ol class="pasos"><li>Filtra por <b>Activas</b>, <b>Entregadas</b> o <b>Todas</b>, por estado, o busca por VIN, modelo o vendedor.</li><li>Cambia entre <b>tarjetas</b>, <b>lista</b> y <b>calendario</b> con los tres botones de arriba.</li></ol>
+<figure class="fig"><img src="img/planificador.webp" alt="Planificador en tarjetas." loading="lazy" width="390" height="800"><figcaption>Planificador en tarjetas.</figcaption></figure>
+<h3 class="h5 mt-4">Calendario</h3>
+<p>El modo calendario muestra el mes completo. Cada día con entregas lleva el número de entregas y se pinta más fuerte mientras más carga tenga (1, 2 a 3, 4 o más). Toca un día para ver sus entregas debajo; usa ‹ › para cambiar de mes y <b>Hoy</b> para volver.</p>
+<figure class="fig"><img src="img/calendario.webp" alt="Calendario del planificador con el día de hoy seleccionado." loading="lazy" width="390" height="800"><figcaption>Calendario del planificador con el día de hoy seleccionado.</figcaption></figure></section><section id="nueva-entrega" class="msec"><h2>Programar una entrega</h2>
+<ol class="pasos"><li>En el Planificador toca <b>Nueva entrega</b>.</li><li>Escribe el <b>VIN</b>: si el auto está en el inventario, la app completa modelo y color.</li><li>Completa vendedor, fecha y hora de entrega, fecha de alistamiento, accesorios, campañas (recall) y el <b>preparador</b> (elige de la lista o déjalo «Sin asignar»).</li><li>Guarda. Los preparadores de la sucursal reciben un aviso; si elegiste a uno en particular, le llega solo a él.</li></ol>
+<figure class="fig"><img src="img/nueva-entrega.webp" alt="Formulario de nueva entrega." loading="lazy" width="390" height="800"><figcaption>Formulario de nueva entrega.</figcaption></figure>
+<p>Si la entrega se reagenda, cambia la <b>fecha de entrega vigente</b>: la fecha inicial se conserva y la tarjeta muestra «(inicial …)».</p></section><section id="estados" class="msec"><h2>Estados de la entrega</h2>
+<p>El flujo típico es: <span class="badge text-bg-primary">Agendado</span> → <span class="badge text-bg-warning">En preparación</span> → <span class="badge text-bg-success">Lista para entregar</span> → <span class="badge text-bg-secondary">Entregado</span>. «Reagendado» se usa cuando cambia la fecha.</p>
+<ul><li>Al pasar a <b>Lista para entregar</b>, el vendedor recibe «¡Tu entrega está lista!».</li>
+<li>Si el <b>grabado de patente</b> está pendiente, la app pide confirmación antes de marcar «Lista» o «Entregado».</li>
+<li>Al pasar a <b>Entregado</b>, el auto sale del inventario solo.</li></ul></section><section id="antiguedad" class="msec"><h2>Configurar la antigüedad del stock</h2>
+<ol class="pasos"><li>Entra a <b>Configurar inventario</b>.</li><li>Baja hasta <b>Antigüedad del stock</b>.</li><li>Escribe desde cuántos días el auto se marca <span class='badge text-bg-warning'>amarillo</span> y desde cuántos <span class='badge text-bg-danger'>rojo</span> (el rojo debe ser mayor).</li><li>Toca <b>Guardar</b>.</li></ol>
+<p>Vale para todas las sucursales y se refleja en el inventario, el filtro «Antigüedad» y el panel.</p>
+<figure class="fig"><img src="img/config-inventario.webp" alt="Configurar inventario: modelos, estados y antigüedad." loading="lazy" width="390" height="800"><figcaption>Configurar inventario: modelos, estados y antigüedad.</figcaption></figure></section><section id="resumen-diario" class="msec"><h2>Configurar el resumen diario</h2>
+<p>Cada día la app envía un aviso al celular con lo que hay que hacer. Tú decides cuándo y a quién.</p>
+<ol class="pasos"><li>Entra a <b>Configurar planificador</b> y baja a <b>Resumen diario por aviso</b>.</li><li>Activa <b>Enviar el resumen diario</b>.</li><li>Elige la <b>hora</b> (hora de Chile) y los <b>días</b> de la semana.</li><li>Marca quién lo recibe: <b>preparadores</b>, <b>vendedores</b>, <b>admin y jefes</b>.</li><li>Toca <b>Guardar</b> y luego <b>Enviarme una prueba ahora</b> para ver cómo llega.</li></ol>
+<table class="table table-sm"><thead><tr><th>Rol</th><th>Qué dice el resumen</th></tr></thead><tbody>
+<tr><td>Preparador</td><td>Entregas por preparar hoy, mañana y atrasadas (las suyas o sin asignar) y las próximas 3.</td></tr>
+<tr><td>Vendedor</td><td>Sus entregas de hoy y cuántas están listas.</td></tr>
+<tr><td>Admin y jefe</td><td>Entregas de hoy, listas y atrasadas de todas las sucursales.</td></tr></tbody></table>
+<p>Quien no tiene nada pendiente no recibe aviso. El resumen sale una sola vez por día, dentro de las 4 horas siguientes a la hora elegida.</p>
+<div class="alert alert-warning d-flex gap-2" role="note"><div><strong>Una sola vez:</strong> Para que salga solo hay que haber ejecutado <code>mejoras_parte3.sql</code> y activado la extensión <b>pg_cron</b> en Supabase (Database → Extensions). El botón de prueba siempre funciona.</div></div>
+<figure class="fig"><img src="img/resumen-diario.webp" alt="Configuración del resumen diario." loading="lazy" width="390" height="800"><figcaption>Configuración del resumen diario.</figcaption></figure></section><section id="cuentas" class="msec"><h2>Cuentas y sucursales</h2>
+<h3 class="h5">Aprobar una cuenta nueva</h3>
+<ol class="pasos"><li>Entra a <b>Cuentas</b> (o a la sucursal que pidió).</li><li>En <b>Pendientes</b> abre la persona: verás la sucursal y el rol que pidió, ya prellenados.</li><li>Ajusta rol y sucursal si hace falta y toca <b>Guardar</b>: queda activa.</li></ol>
+<figure class="fig"><img src="img/cuentas.webp" alt="Cuentas: pendientes, administradores y personas sin sucursal." loading="lazy" width="390" height="800"><figcaption>Cuentas: pendientes, administradores y personas sin sucursal.</figcaption></figure>
+<h3 class="h5 mt-4">Sucursales</h3>
+<p>En <b>Sucursales</b> creas una nueva (nombre, ciudad y dirección), ves cuántas personas, autos y entregas tiene cada una, y la abres para editarla. Una sucursal con datos no se puede eliminar: <b>desactívala</b> en su lugar.</p>
+<figure class="fig"><img src="img/sucursales.webp" alt="Lista de sucursales con su resumen." loading="lazy" width="390" height="800"><figcaption>Lista de sucursales con su resumen.</figcaption></figure>
+<h3 class="h5 mt-4">Editar personas</h3>
+<p>Toca una persona para cambiar nombre, RUT, rol, sucursal o estado, o para <b>restablecer su clave</b>. Cada persona se ve como tarjeta o como lista.</p></section><section id="listas" class="msec"><h2>Modelos, estados y códigos de VIN</h2>
+<p>En <b>Configurar inventario</b> y <b>Configurar planificador</b> agregas, renombras, ordenas con ▲▼ y quitas modelos y estados. Vale para todas las sucursales.</p>
+<ul><li>Los estados con candado 🔒 son <b>protegidos</b>: la app los usa en filtros y avisos, así que no se renombran ni se quitan, pero sí se les puede cambiar el color.</li>
+<li>Si algo ya se usa, «Quitar» solo lo <b>desactiva</b> para no perder historial.</li>
+<li>Los <b>códigos de VIN</b> (primeros 8 caracteres) enseñan a la app qué modelo es cada auto; se aprenden solos al ingresar y aquí los puedes corregir.</li>
+<li><b>Probar decodificador de VIN</b> muestra qué datos entrega el servicio externo para un VIN.</li></ul></section><section id="historial" class="msec"><h2>Historial de cambios</h2>
+<p>Entra por <b>Historial de cambios</b>. Lista cada ingreso, salida, actualización, eliminación y <span class="badge text-bg-warning">traslado</span> (con su origen → destino), con fecha, hora y quién lo hizo. Puedes invertir el orden y ver tarjetas o lista.</p>
+<figure class="fig"><img src="img/historial.webp" alt="Historial de movimientos." loading="lazy" width="390" height="800"><figcaption>Historial de movimientos.</figcaption></figure></section><section id="exportar" class="msec"><h2>Exportar a Excel o CSV</h2>
+<p>Al final del <b>Inventario</b> y del <b>Planificador</b> hay dos botones: <b>Exportar CSV</b> y <b>Exportar Excel</b>.</p>
+<ul><li>Se exporta <b>lo que estás viendo</b>: respeta los filtros, la búsqueda y la sucursal elegida.</li>
+<li>El inventario incluye la columna <b>Días en inventario</b>.</li>
+<li>El Excel (.xlsx) necesita internet la primera vez; si no hay, la app te baja un CSV, que Excel también abre con tildes bien.</li></ul></section><section id="faq" class="msec"><h2>Preguntas frecuentes</h2><div class="accordion" id="faqjefe"><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqjefe0">Una persona no puede entrar.</button></h3><div id="faqjefe0" class="accordion-collapse collapse" data-bs-parent="#faqjefe"><div class="accordion-body">Revisa en <b>Cuentas</b> que esté activa y con sucursal. Si olvidó su clave, restablécela desde su ficha.</div></div></div><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqjefe1">No me llegan los avisos.</button></h3><div id="faqjefe1" class="accordion-collapse collapse" data-bs-parent="#faqjefe"><div class="accordion-body">Mira la sección «Activar los avisos». Lo más común: el permiso del navegador bloqueado o, en Brave, la opción de Google Services apagada.</div></div></div><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqjefe2">El resumen diario no salió.</button></h3><div id="faqjefe2" class="accordion-collapse collapse" data-bs-parent="#faqjefe"><div class="accordion-body">Comprueba que esté activado, que el día esté marcado, que hayas ejecutado <code>mejoras_parte3.sql</code> y que pg_cron esté activo. Prueba con <b>Enviarme una prueba ahora</b>.</div></div></div><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqjefe3">No puedo trasladar un auto.</button></h3><div id="faqjefe3" class="accordion-collapse collapse" data-bs-parent="#faqjefe"><div class="accordion-body">Probablemente tiene una entrega activa. Entrégala o cámbiale la sucursal primero.</div></div></div><div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqjefe4">¿Puedo ver una sola sucursal?</button></h3><div id="faqjefe4" class="accordion-collapse collapse" data-bs-parent="#faqjefe"><div class="accordion-body">Sí: usa el selector <b>Sucursal</b> arriba. Lo que exportes respeta esa selección.</div></div></div></div></section>
+   <div class="text-center text-secondary small mt-5 mb-3">Inventario Ford · Manual del Jefe · <a href="index.html">Todos los manuales</a> · <a href="#" onclick="window.print();return false">Imprimir</a></div>
+  </main>
+ </div>
+</div>
+<button id="arriba" class="btn btn-primary rounded-circle d-print-none" type="button" aria-label="Volver arriba" hidden>↑</button>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="manual.js"></script>
+</body>
+</html>
