@@ -1506,6 +1506,165 @@
 			.dtx.bad {
 				border-color: var(--bad);
 			}
+			/* ===== CALENDARIO Y SELECTOR DE HORA ===== */
+			.pk {
+				position: fixed;
+				z-index: 500;
+				background: var(--card);
+				color: var(--tx);
+				border: 1px solid var(--bd);
+				border-radius: 18px;
+				box-shadow: 0 18px 48px rgba(0, 20, 60, 0.32);
+				padding: 12px;
+				font-size: 15px;
+				user-select: none;
+			}
+			.pk button {
+				font: inherit;
+				color: inherit;
+				background: none;
+				border: 0;
+				cursor: pointer;
+				-webkit-tap-highlight-color: transparent;
+			}
+			.pkh {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				margin-bottom: 8px;
+			}
+			.pkt {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				min-height: 40px;
+				border-radius: 10px;
+				font-weight: 700;
+				font-size: 16px;
+				text-transform: capitalize;
+			}
+			button.pkt:hover,
+			.pkn:hover {
+				background: var(--pr2);
+			}
+			.pkn {
+				width: 40px;
+				height: 40px;
+				flex: none;
+				border-radius: 10px;
+				color: var(--pr);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.pk svg {
+				width: 18px;
+				height: 18px;
+			}
+			.pkw,
+			.pkg {
+				display: grid;
+				grid-template-columns: repeat(7, 1fr);
+				gap: 2px;
+			}
+			.pkw {
+				text-align: center;
+				color: var(--mu);
+				font-size: 12px;
+				font-weight: 700;
+				text-transform: uppercase;
+				margin-bottom: 4px;
+			}
+			.pkd {
+				height: 40px;
+				border-radius: 12px;
+				font-weight: 600;
+			}
+			.pkd.o {
+				color: var(--mu);
+				font-weight: 400;
+				opacity: 0.55;
+			}
+			.pkd.t {
+				box-shadow: inset 0 0 0 1.5px var(--pr);
+				color: var(--pr);
+			}
+			.pkd:hover,
+			.pkg6 button:hover,
+			.pkm button:hover {
+				background: var(--pr2);
+			}
+			.pk .s,
+			.pk .s:hover {
+				background: var(--pr);
+				color: var(--on);
+				box-shadow: none;
+			}
+			.pkm {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 6px;
+			}
+			.pkm button {
+				height: 48px;
+				border-radius: 12px;
+				font-weight: 600;
+				text-transform: capitalize;
+			}
+			.pkf {
+				display: flex;
+				justify-content: space-between;
+				gap: 8px;
+				margin-top: 10px;
+				padding-top: 8px;
+				border-top: 1px solid var(--bd);
+			}
+			.pkf button {
+				min-height: 40px;
+				padding: 0 14px;
+				border-radius: 10px;
+				font-weight: 700;
+				color: var(--pr);
+			}
+			.pkf button:hover {
+				background: var(--pr2);
+			}
+			.pkf .pkok {
+				background: var(--pr);
+				color: var(--on);
+			}
+			.pkf .pkok:hover {
+				background: var(--pr);
+				opacity: 0.9;
+			}
+			.pkdisp {
+				text-align: center;
+				font-size: 34px;
+				font-weight: 800;
+				letter-spacing: 2px;
+				font-variant-numeric: tabular-nums;
+				margin: 2px 0 6px;
+			}
+			.pks {
+				color: var(--mu);
+				font-size: 12px;
+				font-weight: 700;
+				text-transform: uppercase;
+				margin: 8px 2px 4px;
+			}
+			.pkg6 {
+				display: grid;
+				grid-template-columns: repeat(6, 1fr);
+				gap: 4px;
+			}
+			.pkg6 button {
+				height: 40px;
+				border-radius: 10px;
+				font-weight: 600;
+				font-variant-numeric: tabular-nums;
+			}
 			.mo {
 				display: block;
 			}
@@ -5021,12 +5180,270 @@
 					h.addEventListener("input", sync);
 					h.addEventListener("change", sync);
 					b.onclick = function () {
-						try {
-							h.showPicker();
-						} catch (e) {
-							h.focus();
-							h.click();
+						PK.abre("fecha", h, w);
+					};
+					sync();
+				});
+			}
+
+			// ======================================================================
+			// CALENDARIO Y SELECTOR DE HORA PROPIOS (con el diseño de la app)
+			// ======================================================================
+
+			var PK = (function () {
+				var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+					IZQ = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+					DER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+					ABA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+					box = null, // la ventanita abierta
+					cfg = null; // qué campo está editando
+
+				function cierra() {
+					if (box) box.remove();
+					box = null;
+					cfg = null;
+				}
+				// Escribe el valor en el campo y avisa del cambio
+				function pon(h, v) {
+					h.value = v;
+					h.dispatchEvent(new Event("input", { bubbles: true }));
+					h.dispatchEvent(new Event("change", { bubbles: true }));
+				}
+				// Coloca la ventanita bajo el campo (o arriba si abajo no cabe)
+				function pos() {
+					if (!box || !cfg) return;
+					if (!document.body.contains(cfg.h)) return cierra();
+					var r = cfg.anc.getBoundingClientRect(),
+						W = Math.min(320, window.innerWidth - 24);
+					box.style.width = W + "px";
+					var x = Math.min(Math.max(12, r.left), window.innerWidth - W - 12),
+						alto = box.offsetHeight,
+						y = r.bottom + 6;
+					if (y + alto > window.innerHeight - 8) y = r.top - alto - 6 >= 8 ? r.top - alto - 6 : Math.max(8, window.innerHeight - alto - 8);
+					box.style.left = x + "px";
+					box.style.top = y + "px";
+				}
+
+				// --- Calendario ---
+				function pintaCal() {
+					var c = cfg,
+						sel = c.h.value,
+						hy = hoy(),
+						h;
+					if (c.modo === "meses") {
+						h =
+							'<div class="pkh"><button type="button" class="pkn" data-k="ay" aria-label="Año anterior">' +
+							IZQ +
+							'</button><div class="pkt">' +
+							c.y +
+							'</div><button type="button" class="pkn" data-k="sy" aria-label="Año siguiente">' +
+							DER +
+							'</button></div><div class="pkm">' +
+							MESES.map(function (m, i) {
+								return '<button type="button" data-k="m" data-i="' + i + '"' + (i === c.m ? ' class="s"' : "") + ">" + m.slice(0, 3) + "</button>";
+							}).join("") +
+							"</div>";
+					} else {
+						var ini = new Date(c.y, c.m, 1),
+							off = (ini.getDay() + 6) % 7, // la semana parte en lunes
+							g = "";
+						for (var i = 0; i < 42; i++) {
+							var d = new Date(c.y, c.m, 1 - off + i),
+								iso = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+							g +=
+								'<button type="button" data-k="d" data-v="' +
+								iso +
+								'" class="pkd' +
+								(d.getMonth() !== c.m ? " o" : "") +
+								(iso === hy ? " t" : "") +
+								(iso === sel ? " s" : "") +
+								'">' +
+								d.getDate() +
+								"</button>";
 						}
+						h =
+							'<div class="pkh"><button type="button" class="pkn" data-k="am" aria-label="Mes anterior">' +
+							IZQ +
+							'</button><button type="button" class="pkt" data-k="tit" aria-label="Elegir mes y año">' +
+							MESES[c.m] +
+							" " +
+							c.y +
+							ABA +
+							'</button><button type="button" class="pkn" data-k="sm" aria-label="Mes siguiente">' +
+							DER +
+							'</button></div><div class="pkw"><span>lu</span><span>ma</span><span>mi</span><span>ju</span><span>vi</span><span>sá</span><span>do</span></div><div class="pkg">' +
+							g +
+							'</div><div class="pkf"><button type="button" data-k="del">Borrar</button><button type="button" data-k="hoy">Hoy</button></div>';
+					}
+					box.innerHTML = h;
+					pos();
+				}
+
+				// --- Hora ---
+				function pintaHora() {
+					var c = cfg,
+						hs = "",
+						ms = "",
+						i,
+						v;
+					for (i = 0; i < 24; i++) {
+						v = pad2(i);
+						hs += '<button type="button" data-k="hh" data-v="' + v + '"' + (v === c.hh ? ' class="s"' : "") + ">" + v + "</button>";
+					}
+					for (i = 0; i < 60; i += 5) {
+						v = pad2(i);
+						ms += '<button type="button" data-k="mm" data-v="' + v + '"' + (v === c.mm ? ' class="s"' : "") + ">" + v + "</button>";
+					}
+					box.innerHTML =
+						'<div class="pkdisp">' +
+						(c.hh || "--") +
+						":" +
+						(c.mm || "--") +
+						'</div><div class="pks">Hora</div><div class="pkg6">' +
+						hs +
+						'</div><div class="pks">Minutos</div><div class="pkg6">' +
+						ms +
+						'</div><div class="pkf"><button type="button" data-k="del">Borrar</button><button type="button" class="pkok" data-k="ok">Listo</button></div>';
+					pos();
+				}
+				// Guarda la hora elegida (si falta algo, completa con 00)
+				function guardaHora() {
+					if (cfg.hh) pon(cfg.h, cfg.hh + ":" + (cfg.mm || "00"));
+				}
+
+				// Abre el selector para un campo (tipo: "fecha" u "hora")
+				function abre(tipo, h, anc) {
+					if (cfg && cfg.h === h) return cierra();
+					cierra();
+					box = document.createElement("div");
+					box.className = "pk";
+					box.setAttribute("role", "dialog");
+					document.body.appendChild(box);
+					cfg = { tipo: tipo, h: h, anc: anc };
+					if (tipo === "fecha") {
+						var v = /^(\d{4})-(\d{2})/.exec(h.value) || /^(\d{4})-(\d{2})/.exec(hoy());
+						cfg.y = +v[1];
+						cfg.m = +v[2] - 1;
+						cfg.modo = "dias";
+						pintaCal();
+					} else {
+						var m = /^(\d{2}):(\d{2})/.exec(h.value);
+						cfg.hh = m ? m[1] : "";
+						cfg.mm = m ? m[2] : "";
+						pintaHora();
+					}
+				}
+
+				// Clics dentro de la ventanita
+				document.addEventListener("click", function (e) {
+					var b = e.target.closest && e.target.closest(".pk [data-k]");
+					if (!b || !cfg) return;
+					var k = b.dataset.k,
+						c = cfg;
+					if (k === "d") {
+						pon(c.h, b.dataset.v);
+						return cierra();
+					}
+					if (k === "del") {
+						pon(c.h, "");
+						return cierra();
+					}
+					if (k === "hoy") {
+						pon(c.h, hoy());
+						return cierra();
+					}
+					if (k === "ok") return cierra();
+					if (k === "hh") {
+						c.hh = b.dataset.v;
+						guardaHora();
+						return pintaHora();
+					}
+					if (k === "mm") {
+						c.hh = c.hh || "09";
+						c.mm = b.dataset.v;
+						guardaHora();
+						return cierra();
+					}
+					if (k === "am" || k === "sm") {
+						c.m += k === "sm" ? 1 : -1;
+						if (c.m > 11) (c.m = 0), c.y++;
+						if (c.m < 0) (c.m = 11), c.y--;
+					} else if (k === "tit") c.modo = "meses";
+					else if (k === "ay") c.y--;
+					else if (k === "sy") c.y++;
+					else if (k === "m") {
+						c.m = +b.dataset.i;
+						c.modo = "dias";
+					}
+					pintaCal();
+				});
+				// Clic fuera, Escape, cambio de página o de tamaño: cierra o recoloca
+				document.addEventListener("mousedown", function (e) {
+					if (box && !(e.target.closest && (e.target.closest(".pk") || e.target.closest(".dtb")))) cierra();
+				});
+				document.addEventListener("keydown", function (e) {
+					if (box && e.key === "Escape") cierra();
+				});
+				window.addEventListener("hashchange", cierra);
+				window.addEventListener("resize", pos);
+				window.addEventListener("scroll", pos, true);
+				return { abre: abre, cierra: cierra };
+			})();
+
+			// Convierte los campos de hora a HH:MM con selector propio
+			function horas() {
+				document.querySelectorAll("#app input[type=time]").forEach(function (h) {
+					if (h.dataset.fx) return;
+					h.dataset.fx = "1";
+					var w = document.createElement("div");
+					w.className = "dt";
+					h.parentNode.insertBefore(w, h);
+					var t = document.createElement("input");
+					t.type = "text";
+					t.inputMode = "numeric";
+					t.placeholder = "HH:MM";
+					t.maxLength = 5;
+					t.autocomplete = "off";
+					t.className = "dtx";
+					var lb = document.querySelector('label[for="' + h.id + '"]');
+					t.setAttribute("aria-label", lb ? lb.textContent : "Hora");
+					var b = document.createElement("button");
+					b.type = "button";
+					b.className = "dtb";
+					b.setAttribute("aria-label", "Elegir hora");
+					b.innerHTML = svg("reloj");
+					w.appendChild(t);
+					w.appendChild(b);
+					w.appendChild(h);
+					h.classList.add("dth");
+					h.tabIndex = -1;
+					h.setAttribute("aria-hidden", "true");
+					var sync = function () {
+						t.value = _vd.get.call(h);
+					};
+					Object.defineProperty(h, "value", {
+						get: function () {
+							return _vd.get.call(h);
+						},
+						set: function (v) {
+							_vd.set.call(h, v);
+							sync();
+						},
+						configurable: true,
+					});
+					t.oninput = function () {
+						var d = t.value.replace(/\D/g, "").slice(0, 4);
+						if (d.length === 1 && +d > 2) d = "0" + d; // 9 -> 09
+						var o = d.length > 2 ? d.slice(0, 2) + ":" + d.slice(2) : d,
+							ok = /^([01]\d|2[0-3]):[0-5]\d$/.test(o);
+						t.value = o;
+						_vd.set.call(h, ok ? o : "");
+						t.classList.toggle("bad", o.length === 5 && !ok);
+					};
+					h.addEventListener("input", sync);
+					h.addEventListener("change", sync);
+					b.onclick = function () {
+						PK.abre("hora", h, w);
 					};
 					sync();
 				});
@@ -5827,6 +6244,7 @@
 				ojos();
 				agrupa();
 				fechas();
+				horas();
 			}).observe(document.getElementById("app"), { childList: true, subtree: true });
 			var SI =
 					'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
