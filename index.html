@@ -2882,6 +2882,10 @@
 			function esIOS() {
 				return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 			}
+			// ¿Es un celular o tablet? (si no, es un computador)
+			function esCel() {
+				return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+			}
 			function esApp() {
 				return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 			}
@@ -2969,14 +2973,16 @@
 			async function pintaPush() {
 				var el = $("#pushbox");
 				if (!el) return;
+				var cel = esCel(),
+					vend = perfil.rol === "vendedor";
 				var caja = function (txt, btns) {
-					return '<div class="panel pushc"><b>Avisos en este celular</b><p class="hola">' + txt + "</p>" + (btns || "") + "</div>";
+					return '<div class="panel pushc"><b>' + (cel ? "Avisos en este celular" : "Avisos en este computador") + '</b><p class="hola">' + txt + "</p>" + (btns || "") + "</div>";
 				};
 				if (!pushSoportado()) {
 					el.innerHTML =
 						esIOS() && !esApp()
 							? caja("En iPhone primero instala la app: toca Compartir y luego «Añadir a pantalla de inicio». Ábrela desde ese icono y vuelve aquí para activar los avisos.")
-							: caja("Este navegador no permite avisos al celular. Prueba con Chrome o instala la app.");
+							: caja("Este navegador no permite avisos" + (cel ? " al celular" : " en el computador") + ". Prueba con Chrome" + (cel ? " o instala la app" : "") + ".");
 					return;
 				}
 				if (Notification.permission === "denied") {
@@ -2986,11 +2992,14 @@
 				var sub = Notification.permission === "granted" ? await pushSub() : null;
 				el.innerHTML = sub
 					? caja(
-							"✅ Este dispositivo recibirá un aviso cuando se cree o cambie una entrega, aunque la app esté cerrada.",
+							"✅ " +
+								(cel ? "Este celular" : "Este computador") +
+								(vend ? " recibirá un aviso cuando una de tus entregas esté lista" : " recibirá un aviso cuando se cree o cambie una entrega") +
+								(cel ? ", aunque la app esté cerrada." : "."),
 							'<div class="pushb"><button type="button" class="btn g" data-a="pushprueba">Probar aviso</button><button type="button" class="btn g" data-a="pushoff">Desactivar</button></div>',
 						)
 					: caja(
-							"Activa los avisos para enterarte al tiro de las entregas que hay que preparar, sin abrir la app.",
+							"Activa los avisos para enterarte al tiro de las entregas que " + (vend ? "están listas" : "hay que preparar") + (cel ? ", sin abrir la app." : "."),
 							'<div class="pushb"><button type="button" class="btn" data-a="pushon">Activar avisos</button></div>',
 						);
 			}
@@ -3028,7 +3037,7 @@
 			}
 			// Carga los avisos del usuario (admin, jefe, preparador)
 			async function cargarNotifs() {
-				if (perfil.rol !== "admin" && perfil.rol !== "jefe" && perfil.rol !== "preparador") {
+				if (!recibeAvisos()) {
 					notifs = [];
 					return;
 				}
@@ -3039,6 +3048,10 @@
 					.order("created_at", { ascending: false })
 					.limit(50);
 				notifs = r.data || [];
+			}
+			// Roles que reciben avisos (el vendedor solo cuando su entrega queda lista)
+			function recibeAvisos() {
+				return !!perfil && ["admin", "jefe", "preparador", "vendedor"].indexOf(perfil.rol) > -1;
 			}
 			function alertasPlazo() {
 				return ent.filter(function (e) {
@@ -5561,7 +5574,7 @@
 			}
 			function alertasVista() {
 				var al = alertasPlazo(),
-					ver = perfil.rol === "admin" || perfil.rol === "jefe" || perfil.rol === "preparador";
+					ver = recibeAvisos();
 				var nu = notifs.filter(function (n) {
 						return !n.leida;
 					}),
@@ -5600,7 +5613,7 @@
 					"</div>";
 				if (ver) {
 					h = h.replace('<h2 class="sec">Plazos de entrega', '<div id="pushbox"></div><h2 class="sec">Plazos de entrega');
-					h += '<h2 class="sec">Cambios en entregas (' + nu.length + " sin leer)</h2>";
+					h += '<h2 class="sec">' + (perfil.rol === "vendedor" ? "Entregas listas" : "Cambios en entregas") + " (" + nu.length + " sin leer)</h2>";
 					if (nu.length)
 						h +=
 							'<button class="btn g full" id="mk" style="margin-top:0;margin-bottom:14px">Marcar todas como leídas</button>';
