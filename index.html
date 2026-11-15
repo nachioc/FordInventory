@@ -2413,6 +2413,177 @@
 					grid-column: 1/-1;
 				}
 			}
+			.hcam {
+				list-style: none;
+				margin: 4px 0 0;
+				padding: 0;
+				display: grid;
+				gap: 3px;
+				font-size: 13px;
+			}
+			.hcam .ant {
+				color: var(--mu);
+				text-decoration: line-through;
+			}
+			.hcam .des {
+				font-weight: 700;
+			}
+			/* Botón Agregar: mismo diseño que «Nueva entrega» */
+			.btn.add {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				background: var(--pr);
+				color: #fff;
+				border: 0;
+				border-radius: 14px;
+				padding: 0 16px 0 7px;
+				min-height: 44px;
+				font: inherit;
+				font-weight: 700;
+				box-shadow: 0 2px 6px rgba(0, 20, 60, 0.2);
+				white-space: nowrap;
+			}
+			.btn.add .arw {
+				width: 28px;
+				height: 28px;
+			}
+			.btn.add .arw svg {
+				width: 17px;
+				height: 17px;
+			}
+			.crow .btn.add {
+				padding: 0 10px 0 6px;
+				gap: 6px;
+				font-size: 14px;
+			}
+			.btn.add.full {
+				width: 100%;
+			}
+			/* Panel: barras / torta */
+			.pvis {
+				display: flex;
+				gap: 8px;
+				align-items: center;
+				flex-wrap: wrap;
+				margin: 4px 0 12px;
+			}
+			.pvis .seg {
+				margin-left: 0;
+			}
+			.pvis .btn {
+				margin-left: auto;
+			}
+			.pie {
+				display: flex;
+				gap: 18px;
+				align-items: center;
+				flex-wrap: wrap;
+			}
+			.pie svg {
+				width: 150px;
+				height: 150px;
+				flex: none;
+			}
+			.pie svg text {
+				fill: var(--tx);
+				font-weight: 800;
+				font-size: 22px;
+			}
+			.pie svg text.sm {
+				fill: var(--mu);
+				font-size: 10px;
+				font-weight: 600;
+			}
+			.pie ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				flex: 1;
+				min-width: 160px;
+				display: grid;
+				gap: 6px;
+				font-size: 14px;
+			}
+			.pie li {
+				display: grid;
+				grid-template-columns: 12px minmax(0, 1fr) auto;
+				gap: 8px;
+				align-items: center;
+			}
+			.pie li i {
+				width: 12px;
+				height: 12px;
+				border-radius: 4px;
+			}
+			.pie li span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.pie ul {
+				max-width: 460px;
+			}
+			.hgs {
+				flex-wrap: nowrap;
+				overflow-x: auto;
+				-webkit-overflow-scrolling: touch;
+				padding-bottom: 4px;
+			}
+			.hgs .chip {
+				flex: none;
+			}
+			.pie li small {
+				color: var(--mu);
+				margin-left: 4px;
+			}
+			.psolo {
+				display: none;
+			}
+			/* Configurar inventario: búsqueda y orden de modelos */
+			.catbar {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+				gap: 8px;
+				margin: 0 0 8px;
+			}
+			@media (max-width: 599px) {
+				.catbar {
+					grid-template-columns: 1fr;
+				}
+			}
+			@media print {
+				@page {
+					margin: 12mm;
+				}
+				html,
+				body {
+					background: #fff !important;
+				}
+				#nav,
+				.pvis,
+				.back,
+				.hd button,
+				.sucsel,
+				.toast,
+				.acts {
+					display: none !important;
+				}
+				.psolo {
+					display: block;
+					margin: 0 0 10px;
+				}
+				.bars,
+				.stat,
+				.pie {
+					break-inside: avoid;
+				}
+				* {
+					-webkit-print-color-adjust: exact;
+					print-color-adjust: exact;
+				}
+			}
 		</style>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
 	</head>
@@ -2553,6 +2724,9 @@
 					canal = null;
 				}
 				await quitaPush(); // este celular deja de recibir los avisos de esta cuenta
+				try {
+					await db.rpc("registrar_evento", { p_entidad: "sesión", p_accion: "cerró sesión" });
+				} catch (e) {}
 				await db.auth.signOut();
 				sesion = null;
 				perfil = null;
@@ -2643,6 +2817,7 @@
 				}
 				sesion = r.data.session;
 				await cargarTodo();
+				evento("sesión", "inició sesión");
 				render();
 			}
 			// Crea una cuenta nueva con RUT
@@ -3550,6 +3725,7 @@
 			// Descarga una tabla como CSV (punto y coma, con tildes bien en Excel) o como Excel real (.xlsx)
 			function exportaTabla(tipo, base, hoja, cab, filas) {
 				var nom = base + "-" + hoy();
+				evento("exportación", "exportó " + base + " (" + (tipo === "xlsx" ? "Excel" : "CSV") + ")", filas.length + " filas");
 				function comoCsv() {
 					var r = filas.map(function (f) {
 						return f
@@ -4684,7 +4860,7 @@
 					head("Sucursales") +
 					'<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" data-cb="1" placeholder="Ej: Santiago" autocomplete="off">' +
 					dlCiudades() +
-					'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Agregar sucursal</button></form>' +
+					'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn add full" type="submit">' + btnMas("Agregar sucursal") + '</button></form>' +
 					'<h2 class="sec">Sucursales (' +
 					SUC.length +
 					')</h2><div class="vmrow">' +
@@ -5025,7 +5201,7 @@
 										);
 									})
 									.join("") +
-								'</select><label for="an">Nombre <small>(opcional)</small></label><input id="an" autocomplete="off" placeholder="Nombre y apellido"><label for="ar">Rol en esta sucursal</label><select id="ar"><option>jefe</option><option selected>vendedor</option><option>preparador</option><option>consulta</option></select><div class="err" id="err2" role="alert"></div><button class="btn full" type="submit">Agregar a esta sucursal</button></form>'
+								'</select><label for="an">Nombre <small>(opcional)</small></label><input id="an" autocomplete="off" placeholder="Nombre y apellido"><label for="ar">Rol en esta sucursal</label><select id="ar"><option>jefe</option><option selected>vendedor</option><option>preparador</option><option>consulta</option></select><div class="err" id="err2" role="alert"></div><button class="btn add full" type="submit">' + btnMas("Agregar a esta sucursal") + '</button></form>'
 							: '<div class="panel">No hay cuentas pendientes. Pídele a la persona que toque «Crear cuenta» en la pantalla de inicio; aparecerá aquí.</div>');
 				}
 				a.innerHTML = h;
@@ -5190,7 +5366,10 @@
 			// LISTAS EDITABLES: modelos y estados
 			// ======================================================================
 
-			function filaCat(k, x, i, n) {
+			function btnMas(t) {
+				return '<i class="arw up">' + svg("plus") + "</i><span>" + t + "</span>";
+			}
+			function filaCat(k, x, i, n, off) {
 				var c = CFG[k],
 					lock = x.protegido;
 				return (
@@ -5200,6 +5379,8 @@
 					k +
 					'" data-id="' +
 					x.id +
+					'" data-nm="' +
+					esc(String(x.nombre).toLowerCase()) +
 					'"><input data-a2="ren" value="' +
 					esc(x.nombre) +
 					'" aria-label="Nombre"' +
@@ -5215,14 +5396,49 @@
 							"</select>"
 						: "") +
 					'<button type="button" class="btn g" data-a="up" aria-label="Subir"' +
-					(i === 0 ? " disabled" : "") +
+					(i === 0 || off ? " disabled" : "") +
 					'>▲</button><button type="button" class="btn g" data-a="dn" aria-label="Bajar"' +
-					(i === n - 1 ? " disabled" : "") +
+					(i === n - 1 || off ? " disabled" : "") +
 					">▼</button>" +
 					(lock
 						? '<span class="tag">🔒 Protegido</span>'
 						: '<button type="button" class="btn d" data-a="rm">Quitar</button>') +
 					"</div>"
+				);
+			}
+			var CATQ = {},
+				CATO = {};
+			function ordenaModelos(l) {
+				var o = CATO.modelo || "man",
+					q = (CATQ.modelo || "").toLowerCase().trim(),
+					n = {};
+				stock().forEach(function (v) {
+					n[v.modelo] = (n[v.modelo] || 0) + 1;
+				});
+				var r = l.filter(function (x) {
+					return !q || String(x.nombre).toLowerCase().indexOf(q) > -1;
+				});
+				if (o === "az") r.sort(function (a, b) { return a.nombre.localeCompare(b.nombre, "es"); });
+				else if (o === "za") r.sort(function (a, b) { return b.nombre.localeCompare(a.nombre, "es"); });
+				else if (o === "mas") r.sort(function (a, b) { return (n[b.nombre] || 0) - (n[a.nombre] || 0) || a.nombre.localeCompare(b.nombre, "es"); });
+				else if (o === "menos") r.sort(function (a, b) { return (n[a.nombre] || 0) - (n[b.nombre] || 0) || a.nombre.localeCompare(b.nombre, "es"); });
+				return r;
+			}
+			function barraModelos() {
+				var o = CATO.modelo || "man";
+				function op(v, t) {
+					return '<option value="' + v + '"' + (o === v ? " selected" : "") + ">" + t + "</option>";
+				}
+				return (
+					'<div class="catbar"><input id="cq" type="search" placeholder="Buscar modelo" aria-label="Buscar modelo" autocomplete="off" value="' +
+					esc(CATQ.modelo || "") +
+					'"><select id="co" aria-label="Ordenar modelos">' +
+					op("man", "Orden: el mío (▲▼)") +
+					op("mas", "Mayor a menor stock") +
+					op("menos", "Menor a mayor stock") +
+					op("az", "Nombre A → Z") +
+					op("za", "Nombre Z → A") +
+					"</select></div>"
 				);
 			}
 			function seccionCat(k) {
@@ -5265,12 +5481,14 @@
 								.join("") +
 							"</select>"
 						: "") +
-					'<button type="button" class="btn" data-a="add">Agregar</button></div>' +
-					ac
+					'<button type="button" class="btn add" data-a="add">' + btnMas("Agregar") + "</button></div>" +
+					(k === "modelo" ? barraModelos() : "") +
+					(k === "modelo" ? ordenaModelos(ac) : ac)
 						.map(function (x, i) {
-							return filaCat(k, x, i, ac.length);
+							return filaCat(k, x, i, ac.length, k === "modelo" && ((CATO.modelo || "man") !== "man" || !!CATQ.modelo));
 						})
 						.join("") +
+					(k === "modelo" && CATQ.modelo && !ordenaModelos(ac).length ? '<div class="empty">Ningún modelo coincide.</div>' : "") +
 					(ia.length
 						? '<h2 class="sec">Desactivados</h2>' +
 							ia
@@ -5310,7 +5528,7 @@
 					'<h2 class="sec">Códigos de VIN (' + CV.length + ")</h2>" +
 					'<p class="hola">Con esto la app reconoce el modelo al ingresar un auto: usa los 8 primeros caracteres del VIN. Se aprende solo de los autos que se ingresan; aquí puedes corregirlo o agregar más.</p>' +
 					'<div class="crow cv add"><input id="cv_n" placeholder="Ej: 8AFBR01C" maxlength="8" autocapitalize="characters" autocomplete="off" aria-label="Código de 8 caracteres">' +
-					'<select id="cv_m" aria-label="Modelo">' + optsM("") + '</select><button type="button" class="btn" data-a="cvadd">Agregar</button></div>' +
+					'<select id="cv_m" aria-label="Modelo">' + optsM("") + '</select><button type="button" class="btn add" data-a="cvadd">' + btnMas("Agregar") + '</button></div>' +
 					(CV.map(function (c) {
 						return (
 							'<div class="crow cv" data-cv="' + esc(c.codigo) + '"><span class="cvc">' + esc(c.codigo) + "</span>" +
@@ -5591,13 +5809,13 @@
 			}
 
 			/* ===== Vistas lista/tarjeta, tema, fechas DD/MM/AAAA ===== */
-			var VM = { inv: "cards", plan: "cards", hist: "cards", suc: "cards", per: "cards" },
+			var VM = { inv: "list", plan: "cal", hist: "list", suc: "list", per: "list" },
 				HR = [],
 				hdir = "desc";
 			try {
-				var _vm = JSON.parse(localStorage.getItem("vm") || "{}");
+				var _vm = JSON.parse(localStorage.getItem("vm2") || "{}");
 				for (var _k in _vm)
-					if (VM[_k] !== undefined) VM[_k] = _vm[_k] === "list" ? "list" : _vm[_k] === "cal" && _k === "plan" ? "cal" : "cards";
+					if (VM[_k] !== undefined && _k !== "plan") VM[_k] = _vm[_k] === "cards" ? "cards" : "list";
 			} catch (e) {}
 			try {
 				var _t = localStorage.getItem("tema");
@@ -5683,11 +5901,44 @@
 					"<span>Oscuro</span></button></div>"
 				);
 			}
+			/* registra en el historial eventos que no son cambios de datos (exportar, entrar, salir) */
+			function evento(entidad, accion, registro, detalle) {
+				try {
+					var q = db.rpc("registrar_evento", { p_entidad: entidad, p_accion: accion, p_registro: registro || null, p_detalle: detalle || null });
+					if (q && q.then) q.then(function () {}, function () {});
+				} catch (e) {}
+			}
+			document.addEventListener("input", function (e) {
+				if (!e.target || e.target.id !== "cq") return;
+				var antes = CATQ.modelo;
+				CATQ.modelo = e.target.value;
+				if (antes && !e.target.value.trim()) {
+					refresca();
+					if ($("#cq")) $("#cq").focus();
+					return;
+				}
+				var q = e.target.value.toLowerCase().trim(),
+					n = 0;
+				document.querySelectorAll('.crow[data-k="modelo"][data-nm]').forEach(function (r) {
+					var ok = !q || r.dataset.nm.indexOf(q) > -1;
+					r.hidden = !ok;
+					r.style.display = ok ? "" : "none";
+					if (ok) n++;
+				});
+				document.querySelectorAll('.crow[data-k="modelo"][data-nm] [data-a="up"],.crow[data-k="modelo"][data-nm] [data-a="dn"]').forEach(function (b) {
+					b.disabled = !!q || (CATO.modelo || "man") !== "man" || b.disabled;
+				});
+			});
+			document.addEventListener("change", function (e) {
+				if (!e.target || e.target.id !== "co") return;
+				CATO.modelo = e.target.value;
+				refresca();
+			});
 			/* modo tarjeta / lista */
 			function setVM(k, m) {
 				VM[k] = m;
 				try {
-					localStorage.setItem("vm", JSON.stringify(VM));
+					localStorage.setItem("vm2", JSON.stringify(VM));
 				} catch (e) {}
 			}
 			function vmBar(k) {
@@ -5917,11 +6168,106 @@
 			// ======================================================================
 
 			// Color de cada tipo de movimiento en el historial
-			var HC = { ingreso: "dis", salida: "ven", "salida deshecha": "o", "eliminación": "o", "actualización": "res", traslado: "am" };
+			var HC = {
+				ingreso: "dis",
+				registro: "dis",
+				"creación": "dis",
+				salida: "ven",
+				"salida deshecha": "o",
+				"eliminación": "o",
+				"actualización": "res",
+				"cambio de estado": "am",
+				"cambio de acceso": "am",
+				"reasignación": "am",
+				"grabado de patente": "am",
+				traslado: "am",
+			};
+			// Grupos para filtrar
+			var HG = [
+				["", "Todo"],
+				["veh", "Vehículos"],
+				["ent", "Entregas"],
+				["cue", "Cuentas"],
+				["suc", "Sucursales"],
+				["cat", "Modelos y estados"],
+				["aju", "Ajustes"],
+				["act", "Sesiones y exportaciones"],
+			];
+			var hGrp = "",
+				hQ = "";
+			function hGrupo(h) {
+				var e = h.entidad || "vehículo";
+				if (e === "vehículo") return "veh";
+				if (e === "entrega") return "ent";
+				if (e === "cuenta") return "cue";
+				if (e === "sucursal") return "suc";
+				if (e === "ajuste") return "aju";
+				if (e === "sesión" || e === "exportación" || e === "avisos") return "act";
+				return "cat";
+			}
+			// Nombre legible de cada campo
+			var HN = {
+				fecha_entrega: "Fecha de entrega",
+				hora_entrega: "Hora",
+				fecha_alistamiento: "Fecha de alistamiento",
+				fecha_ingreso: "Fecha de ingreso",
+				fecha_salida: "Fecha de salida",
+				grabado_patente: "Grabado de patente",
+				sucursal_id: "Sucursal",
+				sucursal_pedida: "Sucursal pedida",
+				rol_pedido: "Rol pedido",
+				clave_cambiada: "Clave cambiada",
+				estado_inv: "Estado",
+				vin: "VIN",
+				rut: "RUT",
+			};
+			function hVal(k, v) {
+				if (v === null || v === undefined || v === "") return "—";
+				if (v === true) return "Sí";
+				if (v === false) return "No";
+				if (k === "sucursal_id" || k === "sucursal_pedida") return typeof sucNombre === "function" ? sucNombre(v) || String(v) : String(v);
+				if (typeof v === "object") v = JSON.stringify(v);
+				v = String(v);
+				if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return isoAfmt(v);
+				return v.length > 60 ? v.slice(0, 57) + "…" : v;
+			}
+			// Texto «campo: antes → después» de un movimiento
+			function hCambios(h) {
+				var c = h.cambios;
+				if (!c || typeof c !== "object") return "";
+				var ks = Object.keys(c);
+				if (!ks.length) return "";
+				return (
+					'<ul class="hcam">' +
+					ks
+						.slice(0, 8)
+						.map(function (k) {
+							var x = c[k] || {};
+							return (
+								"<li><b>" +
+								esc(HN[k] || k.replace(/_/g, " ").replace(/^./, function (m) { return m.toUpperCase(); })) +
+								"</b> " +
+								'<span class="ant">' +
+								esc(hVal(k, x.antes)) +
+								'</span> → <span class="des">' +
+								esc(hVal(k, x.despues)) +
+								"</span></li>"
+							);
+						})
+						.join("") +
+					(ks.length > 8 ? "<li>y " + (ks.length - 8) + " cambios más</li>" : "") +
+					"</ul>"
+				);
+			}
 			// Texto extra de un movimiento del historial (de qué sucursal a cuál se trasladó)
 			function hExtra(h) {
 				var d = h.detalle || {};
 				return h.accion === "traslado" && d.origen ? esc(d.origen) + " → " + esc(d.destino || "") + (d.nota ? " · " + esc(d.nota) : "") : "";
+			}
+			// Qué cosa se tocó
+			function hQue(h) {
+				var d = h.detalle || {};
+				return h.registro || (d.modelo ? [d.modelo, d.version].filter(Boolean).join(" ") + (d.vin ? " · " + d.vin : "") : "");
 			}
 			function hsortT() {
 				hdir = hdir === "desc" ? "asc" : "desc";
@@ -5931,52 +6277,78 @@
 				var a = $("#app");
 				a.innerHTML =
 					head("Historial de cambios") +
-					'<div class="chips"><button type="button" class="chip" id="hsort" onclick="hsortT()"></button>' +
+					'<p class="hola">Aquí queda anotado todo lo que se hace en la app: quién, cuándo y qué cambió (antes → después).</p>' +
+					'<div class="chips hgs" role="group" aria-label="Filtrar por tipo">' +
+					HG.map(function (g) {
+						return '<button type="button" class="chip" data-hg="' + g[0] + '" aria-pressed="' + (hGrp === g[0]) + '">' + g[1] + "</button>";
+					}).join("") +
+					'</div><div class="chips"><button type="button" class="chip" id="hsort" onclick="hsortT()"></button>' +
 					vmBar("hist") +
-					'</div><div id="hl" class="empty">Cargando...</div>';
-				var r = await db.from("historial").select("*").order("fecha", { ascending: false }).limit(300);
+					'</div><div class="tools"><input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
+					esc(hQ) +
+					'"></div><div id="hl" class="empty">Cargando...</div>';
+				var r = await db.from("historial").select("*").order("fecha", { ascending: false }).limit(1500);
 				HR = r.data || [];
 				if ($("#hl")) {
 					$("#hl").className = "";
 					pintaHist();
 				}
 			}
+			document.addEventListener("click", function (e) {
+				var b = e.target.closest && e.target.closest("[data-hg]");
+				if (!b) return;
+				hGrp = b.dataset.hg;
+				document.querySelectorAll("[data-hg]").forEach(function (x) {
+					x.setAttribute("aria-pressed", x.dataset.hg === hGrp);
+				});
+				pintaHist();
+			});
+			document.addEventListener("input", function (e) {
+				if (e.target && e.target.id === "hq") {
+					hQ = e.target.value;
+					pintaHist();
+				}
+			});
 			function pintaHist() {
 				if (!$("#hl")) return;
 				$("#hsort").textContent = "Fecha " + (hdir === "desc" ? "↓ más recientes primero" : "↑ más antiguos primero");
-				if (!HR.length) {
-					$("#hl").innerHTML = '<div class="empty">Sin movimientos.</div>';
-					return;
-				}
-				var l = HR.slice().sort(function (x, y) {
+				var q = hQ.toLowerCase().trim();
+				var l = HR.filter(function (h) {
+					if (hGrp && hGrupo(h) !== hGrp) return false;
+					if (!q) return true;
+					return [h.accion, h.entidad, hQue(h), h.usuario_email, h.cambios ? JSON.stringify(h.cambios) : ""].join(" ").toLowerCase().indexOf(q) > -1;
+				}).sort(function (x, y) {
 					return (new Date(x.fecha) - new Date(y.fecha)) * (hdir === "desc" ? -1 : 1);
 				});
+				if (!l.length) {
+					$("#hl").innerHTML = '<div class="empty">' + (HR.length ? "Nada coincide con el filtro." : "Sin movimientos.") + "</div>";
+					return;
+				}
+				var tag = function (h) {
+					return '<span class="tag ' + (HC[h.accion] || "res") + '">' + esc(h.accion) + "</span>";
+				};
 				if (VM.hist === "list") {
 					$("#hl").innerHTML =
 						'<div class="tw"><table class="tbl ti st"><thead><tr><th class="srt" onclick="hsortT()" title="Cambiar orden">Fecha y hora ' +
 						(hdir === "desc" ? "↓" : "↑") +
-						"</th><th>Acción</th><th>Vehículo</th><th>VIN</th><th>Usuario</th></tr></thead><tbody>" +
+						"</th><th>Acción</th><th>Qué</th><th>Detalle</th><th>Usuario</th></tr></thead><tbody>" +
 						l
 							.map(function (h) {
-								var d = h.detalle || {},
-									fh = fmtDT(h.fecha).split(" ");
+								var fh = fmtDT(h.fecha).split(" ");
 								return (
 									'<tr><td class="dtc" data-l="Fecha" style="white-space:nowrap"><div><b>' +
 									esc(fh[0]) +
 									"</b><small>" +
 									esc(fh.slice(1).join(" ")) +
-									'</small></div></td><td data-l="Acción"><span class="tag ' +
-									(HC[h.accion] || "res") +
-									'">' +
-									esc(h.accion) +
-									"</span>" +
-									(hExtra(h) ? '<small class="sub">' + hExtra(h) + "</small>" : "") +
-									'</td><td data-l="Vehículo"><div><b>' +
-									esc(d.modelo || "") +
+									'</small></div></td><td data-l="Acción">' +
+									tag(h) +
+									'</td><td data-l="Qué"><div><b>' +
+									esc(h.entidad || "vehículo") +
 									'</b><small class="sub">' +
-									esc(d.version || "") +
-									'</small></div></td><td class="vin" data-l="VIN">' +
-									esc(d.vin || "") +
+									esc(hQue(h)) +
+									'</small></div></td><td data-l="Detalle">' +
+									(hExtra(h) ? "<div>" + hExtra(h) + "</div>" : "") +
+									hCambios(h) +
 									'</td><td data-l="Usuario">' +
 									esc(h.usuario_email || "") +
 									"</td></tr>"
@@ -5987,18 +6359,16 @@
 				} else {
 					$("#hl").innerHTML = l
 						.map(function (h) {
-							var d = h.detalle || {};
 							return (
 								'<div class="v"><h3>' +
-								esc(h.accion) +
-								" · " +
-								esc(d.modelo || "") +
+								tag(h) +
 								" " +
-								esc(d.version || "") +
+								esc(h.entidad || "vehículo") +
 								'</h3><div class="vin">' +
-								esc(d.vin || "") +
+								esc(hQue(h)) +
 								"</div>" +
 								(hExtra(h) ? '<div class="m">' + hExtra(h) + "</div>" : "") +
+								hCambios(h) +
 								'<div class="m">' +
 								esc(h.usuario_email || "") +
 								" · " +
@@ -6421,9 +6791,7 @@
 							(al.length === 1 ? " entrega con plazo" : " entregas con plazo") +
 							' para hoy, mañana o vencido</b><small>Toca para ver el detalle</small></span></button>'
 						: "") +
-					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button><button type="button" class="chip" id="psort"></button>' +
-					vmBar("plan") +
-					"</div>" +
+					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button></div>' +
 					'<div class="tools ptb-tools"><select id="pe" aria-label="Estado">' +
 					opts(PEST, "Todos los estados") +
 					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
@@ -6494,10 +6862,13 @@
 					$("#psort").onclick = psortT;
 				}
 				pfLast = f;
-				if (VM.plan === "cal") {
-					$("#pl").innerHTML = calHtml(f);
-					return;
+				if (!calMes) {
+					calMes = hoy().slice(0, 7);
+					calDia = hoy();
 				}
+				$("#pl").innerHTML = calHtml(f);
+				return;
+				/* (las vistas de tarjetas y lista del planificador se quitaron) */
 				if (!f.length) {
 					$("#pl").innerHTML = '<div class="empty">No hay entregas con estos filtros.</div>';
 					return;
@@ -7480,11 +7851,48 @@
 			};
 
 			/* ----- Panel de resumen (admin y jefe) ----- */
+			var PANVIS = "bar",
+				PIE = ["#003478", "#1f9d55", "#e8912d", "#c0392b", "#7b4fc4", "#0e9bb0", "#d6a60f", "#d44f9c", "#6b7a8f"];
+			try {
+				PANVIS = localStorage.getItem("panvis") === "pie" ? "pie" : "bar";
+			} catch (e) {}
+			function torta(titulo, pares) {
+				var tot = pares.reduce(function (a, p) {
+						return a + p[1];
+					}, 0),
+					l = pares.slice(0, 8),
+					r = pares.slice(8).reduce(function (a, p) {
+						return a + p[1];
+					}, 0);
+				if (r) l.push(["Otros", r]);
+				var R0 = 54,
+					C = 2 * Math.PI * R0,
+					off = 0,
+					arcos = l
+						.map(function (p, i) {
+							var d = (p[1] / tot) * C,
+								t = '<circle cx="75" cy="75" r="' + R0 + '" fill="none" stroke="' + PIE[i % PIE.length] + '" stroke-width="26" stroke-dasharray="' + d.toFixed(2) + " " + (C - d).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 75 75)"><title>' + esc(p[0]) + ": " + p[1] + "</title></circle>";
+							off += d;
+							return t;
+						})
+						.join("");
+				return (
+					'<div class="bars"><h3>' + titulo + '</h3><div class="pie"><svg viewBox="0 0 150 150" role="img" aria-label="' + esc(titulo) + '">' + arcos +
+					'<text x="75" y="78" text-anchor="middle">' + tot + '</text><text class="sm" x="75" y="93" text-anchor="middle">TOTAL</text></svg><ul>' +
+					l
+						.map(function (p, i) {
+							return '<li><i style="background:' + PIE[i % PIE.length] + '"></i><span title="' + esc(p[0]) + '">' + esc(p[0]) + "</span><b>" + p[1] + "<small>" + Math.round((p[1] * 100) / tot) + "%</small></b></li>";
+						})
+						.join("") +
+					"</ul></div></div>"
+				);
+			}
 			function barras(titulo, pares) {
 				pares = pares.filter(function (p) {
 					return p[1] > 0;
 				});
 				if (!pares.length) return "";
+				if (PANVIS === "pie") return torta(titulo, pares);
 				var mx = Math.max.apply(
 					null,
 					pares.map(function (p) {
@@ -7554,6 +7962,9 @@
 				return (
 					head("Panel de resumen") +
 					sucBar(1) +
+					'<div class="psolo"><b>Inventario Ford · Panel de resumen</b><br>' + esc(sucSel ? sucNombre(sucSel) : "Todas las sucursales") + " · " + fmt(hoy()) + "</div>" +
+					'<div class="pvis"><div class="seg" role="group" aria-label="Tipo de gráfico"><button type="button" data-a="pvis" data-v="bar" aria-pressed="' + (PANVIS === "bar") + '">Barras</button><button type="button" data-a="pvis" data-v="pie" aria-pressed="' + (PANVIS === "pie") + '">Torta</button></div>' +
+					'<button type="button" class="btn g" data-a="panpdf">' + svg("bajar") + " Exportar PDF</button></div>" +
 					'<h2 class="sec">Entregas</h2><div class="stats">' +
 					stat(
 						n(function (e) {
@@ -7667,6 +8078,29 @@
 						: "")
 				);
 			}
+
+			ACC.pvis = function (b) {
+				PANVIS = b.dataset.v === "pie" ? "pie" : "bar";
+				try {
+					localStorage.setItem("panvis", PANVIS);
+				} catch (e) {}
+				refresca();
+			};
+			ACC.panpdf = function () {
+				var h = document.documentElement,
+					t = h.getAttribute("data-theme");
+				h.setAttribute("data-theme", "light");
+				var fin = function () {
+					if (t) h.setAttribute("data-theme", t);
+					else h.removeAttribute("data-theme");
+					window.removeEventListener("afterprint", fin);
+				};
+				window.addEventListener("afterprint", fin);
+				evento("exportación", "exportó el panel a PDF", sucSel ? sucNombre(sucSel) : "Todas las sucursales");
+				setTimeout(function () {
+					window.print();
+				}, 150);
+			};
 
 			/* ----- Mis tareas (preparador) ----- */
 			// Entregas por preparar que son mías, o que nadie ha tomado todavía

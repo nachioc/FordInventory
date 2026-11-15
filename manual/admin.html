@@ -29,7 +29,7 @@
  <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Todas las sucursales</h3><p class="mb-0">Ves y cambias inventario y entregas de todas. El selector <b>Sucursal</b> arriba filtra una sola o muestra todas.</p></div></div></div>
  <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Cuentas y sucursales</h3><p class="mb-0">Apruebas cuentas nuevas, asignas rol y sucursal, restableces claves y creas o desactivas sucursales.</p></div></div></div>
  <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Listas y reglas</h3><p class="mb-0">Defines modelos, estados, colores de estados, la antigüedad del stock y el resumen diario.</p></div></div></div>
- <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Control</h3><p class="mb-0">Panel de resumen, historial de cambios, traslados y exportación a Excel/CSV.</p></div></div></div>
+ <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h6">Control</h3><p class="mb-0">Panel de resumen (barras o torta, y exportar a PDF), historial total de cambios, traslados y exportación a Excel/CSV.</p></div></div></div>
 </div>
 <figure class="fig"><img src="img/admin-inicio.webp" alt="Inicio del administrador: accesos a Inventario, Planificador, Panel y la sección Administración." loading="lazy" width="390" height="800"><figcaption>Inicio del administrador: accesos a Inventario, Planificador, Panel y la sección Administración.</figcaption></figure></section><section id="acceso" class="msec"><h2>Entrar a la app</h2>
 <p>Abre <a href="https://nachioc.github.io/FordInventory/" target="_blank" rel="noopener">https://nachioc.github.io/FordInventory/</a> en tu celular o computador.</p>
@@ -46,12 +46,13 @@
 <div class="alert alert-warning d-flex gap-2" role="note"><div><strong>Ojo:</strong> En <b>Brave</b> activa antes <i>Configuración → Privacidad → Usar Google Services para mensajería push</i>. En <b>iPhone</b> la app debe estar instalada en inicio. Si no llega nada en un celular, revisa que tenga internet y que Google Play Services esté al día.</div></div>
 <figure class="fig"><img src="img/alertas.webp" alt="Pantalla Alertas: plazos de entrega y avisos recibidos." loading="lazy" width="390" height="800"><figcaption>Pantalla Alertas: plazos de entrega y avisos recibidos.</figcaption></figure></section><section id="apariencia" class="msec"><h2>Modo claro, oscuro y vistas</h2>
 <p>En <b>Inicio</b>, al final, elige <b>Claro</b> u <b>Oscuro</b>. Se recuerda en ese dispositivo.</p>
-<p>Las listas se pueden ver como <b>tarjetas</b>, <b>lista</b> (tabla) y, en el planificador, <b>calendario</b>. Se cambia con los tres botoncitos arriba de la lista y la app recuerda tu elección.</p>
+<p>Los datos se abren siempre en modo <b>lista</b> (tabla) y puedes pasar a <b>tarjetas</b> con los botoncitos de arriba; la app recuerda tu elección. El planificador es solo un <b>calendario</b>.</p>
 <p>En el celular, además de los botones del menú inferior, puedes <b>deslizar el dedo a los lados</b> para pasar entre Inicio, Inventario, Planificador y Alertas.</p></section><section id="panel" class="msec"><h2>Panel de resumen</h2>
 <p>Entra por <b>Panel</b> (menú) o por el botón <b>Panel de resumen</b> de Inicio. Muestra al instante, para la sucursal elegida o para todas:</p>
 <ul><li><b>Entregas:</b> atrasadas, hoy, mañana, próximos 7 días, listas, sin preparador y entregadas este mes.</li>
 <li><b>Inventario:</b> en stock, salidas del mes, antigüedad típica y cuántos autos están en amarillo y en rojo.</li>
-<li><b>Gráficos de barras:</b> stock por sucursal, modelo, inventario y estado; entregas activas por estado.</li>
+<li><b>Gráficos</b> de stock por sucursal, modelo, inventario y estado, y de entregas activas por estado. Cámbialos entre <b>Barras</b> y <b>Torta</b> con el selector de arriba; la app recuerda tu elección.</li>
+<li><b>Exportar PDF:</b> el botón de arriba abre la impresión del panel (con fecha y sucursal); elige «Guardar como PDF».</li>
 <li><b>Los 5 más antiguos</b> en stock, para decidir qué mover o promocionar.</li></ul>
 <figure class="fig"><img src="img/panel.webp" alt="Panel de resumen en el celular." loading="lazy" width="390" height="800"><figcaption>Panel de resumen en el celular.</figcaption></figure><figure class="fig"><img src="img/panel-escritorio.webp" alt="El mismo panel en computador." loading="lazy" width="390" height="800"><figcaption>El mismo panel en computador.</figcaption></figure></section><section id="inventario" class="msec"><h2>Ver el inventario</h2>
 <p>Entra por <b>Inventario</b>. Arriba ves cuántos autos hay en stock y cuántos hay en cada inventario (Salón, Vitrina, Patio, Subterráneo, Equipador).</p>
@@ -73,8 +74,8 @@
 <li>Se avisa a administradores, jefes y preparadores de la sucursal de destino.</li>
 <li>No se puede trasladar un auto con una <b>entrega activa</b>: primero entrégalo o cámbiale la sucursal a la entrega.</li></ul></section><section id="planificador" class="msec"><h2>Ver el planificador de entregas</h2>
 <p>Entra por <b>Planificador</b>. Las entregas se agrupan en <b>Atrasadas, Hoy, Mañana y Próximos días</b>. Las que vencen hoy, mañana o ya vencieron se marcan y suman al número de <b>Alertas</b>.</p>
-<ol class="pasos"><li>Filtra por <b>Activas</b>, <b>Entregadas</b> o <b>Todas</b>, por estado, o busca por VIN, modelo o vendedor.</li><li>Cambia entre <b>tarjetas</b>, <b>lista</b> y <b>calendario</b> con los tres botones de arriba.</li></ol>
-<figure class="fig"><img src="img/planificador.webp" alt="Planificador en tarjetas." loading="lazy" width="390" height="800"><figcaption>Planificador en tarjetas.</figcaption></figure>
+<ol class="pasos"><li>Filtra por <b>Activas</b>, <b>Entregadas</b> o <b>Todas</b>, por estado, o busca por VIN, modelo o vendedor.</li><li>Las entregas se ven en un <b>calendario</b>: toca un día para ver sus entregas.</li></ol>
+<figure class="fig"><img src="img/planificador.webp" alt="Planificador en calendario." loading="lazy" width="390" height="800"><figcaption>Planificador en calendario.</figcaption></figure>
 <h3 class="h5 mt-4">Calendario</h3>
 <p>El modo calendario muestra el mes completo. Cada día con entregas lleva el número de entregas y se pinta más fuerte mientras más carga tenga (1, 2 a 3, 4 o más). Toca un día para ver sus entregas debajo; usa ‹ › para cambiar de mes y <b>Hoy</b> para volver.</p>
 <figure class="fig"><img src="img/calendario.webp" alt="Calendario del planificador con el día de hoy seleccionado." loading="lazy" width="390" height="800"><figcaption>Calendario del planificador con el día de hoy seleccionado.</figcaption></figure></section><section id="nueva-entrega" class="msec"><h2>Programar una entrega</h2>
@@ -108,9 +109,10 @@
 <p>En <b>Configurar inventario</b> y <b>Configurar planificador</b> agregas, renombras, ordenas con ▲▼ y quitas modelos y estados. Vale para todas las sucursales.</p>
 <ul><li>Los estados con candado 🔒 son <b>protegidos</b>: la app los usa en filtros y avisos, así que no se renombran ni se quitan, pero sí se les puede cambiar el color.</li>
 <li>Si algo ya se usa, «Quitar» solo lo <b>desactiva</b> para no perder historial.</li>
+<li>Los <b>modelos</b> tienen buscador (lupa) y un selector para ordenarlos: tu orden con ▲▼, mayor a menor stock, menor a mayor, o A → Z / Z → A. Con un orden distinto al tuyo, ▲▼ se desactivan.</li>
 <li>Los <b>códigos de VIN</b> (primeros 8 caracteres) enseñan a la app qué modelo es cada auto; se aprenden solos al ingresar y aquí los puedes corregir.</li>
 <li><b>Probar decodificador de VIN</b> muestra qué datos entrega el servicio externo para un VIN.</li></ul></section><section id="historial" class="msec"><h2>Historial de cambios</h2>
-<p>Entra por <b>Historial de cambios</b>. Lista cada ingreso, salida, actualización, eliminación y <span class="badge text-bg-warning">traslado</span> (con su origen → destino), con fecha, hora y quién lo hizo. Puedes invertir el orden y ver tarjetas o lista.</p>
+<p>Entra por <b>Historial de cambios</b>. Anota <b>absolutamente todo</b>: ingresos, salidas, cambios en entregas (estado, preparador, fechas…), cuentas y roles, sucursales, modelos, estados, códigos VIN, ajustes, <span class="badge text-bg-warning">traslados</span>, inicios y cierres de sesión y exportaciones. Cada cambio muestra <b>campo: antes → después</b>, con fecha, hora y quién lo hizo. Filtra por tipo con los botones de arriba, busca por persona, VIN o campo, invierte el orden y elige lista o tarjetas.</p>
 <figure class="fig"><img src="img/historial.webp" alt="Historial de movimientos." loading="lazy" width="390" height="800"><figcaption>Historial de movimientos.</figcaption></figure></section><section id="exportar" class="msec"><h2>Exportar a Excel o CSV</h2>
 <p>Al final del <b>Inventario</b> y del <b>Planificador</b> hay dos botones: <b>Exportar CSV</b> y <b>Exportar Excel</b>.</p>
 <ul><li>Se exporta <b>lo que estás viendo</b>: respeta los filtros, la búsqueda y la sucursal elegida.</li>

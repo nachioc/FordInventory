@@ -32,7 +32,7 @@ Secciones comentadas con bloques `// ====`: sesión, utilidades (`esc`, `fmt`, `
 
 Convenciones:
 - Acciones por delegación: `ACC.nombre = function (btn) {...}` y `data-a="nombre"` en el HTML.
-- Vistas lista/tarjeta/calendario: `VM` (se guarda en localStorage `vm`). Botones con `vmBar(k)`.
+- Vistas: `VM` (localStorage `vm2`). **Por defecto todo abre en lista**; se puede pasar a tarjetas con `vmBar(k)`. El planificador es solo calendario (`calHtml`). Botones «Agregar»: clase `.btn.add` + `btnMas(texto)` (mismo diseño que «Nueva entrega»). Panel: `PANVIS` barras/torta (`torta()`), PDF con `window.print()` + CSS `@media print`. Configurar inventario: búsqueda y orden de modelos (`CATQ`, `CATO`).
 - Modales: `.modal > .mp`, se cierran con `cierraModal()`.
 - Tokens de color en `:root` (azul Ford en claro; azul vivo en oscuro). No hardcodear colores: usar `var(--pr)`, `--ok`, `--warn`, `--bad`, `--badbg`, etc.
 - Los datos del usuario siempre pasan por `esc()` antes de ir a `innerHTML`.
@@ -48,12 +48,13 @@ Tablas: `perfiles`, `sucursales`, `vehiculos`, `entregas`, `notificaciones`, `hi
 
 - `ajustes(clave, valor jsonb)`: `antiguedad {amarillo, rojo}` y `resumen_diario {activo, hora, dias[1-7], roles{preparador,vendedor,jefe}}`; `resumen_ultimo` lo usa el servidor. Lectura para cualquier rol, escritura solo `es_admin()`.
 - RPC: `trasladar_vehiculo(p_id, p_destino, p_ubicacion, p_nota)`, `resumen_diario(p_forzar)`, `sucursales_publicas()`, `pedir_acceso`, `restablecer_clave`, `renombrar_catalogo`, `preparadores_sucursal`, `email_de_rut`.
-- Triggers: historial de vehículos (`log_vehiculo`, se silencia con `app.silencio`), `notificar_entrega()` (avisa solo al preparador asignado; "Sin asignar" → todos los de la sucursal), "entregado" da salida al auto.
+- Historial total (`mejoras_parte4.sql`): trigger genérico `auditar()` en vehiculos, entregas, perfiles, sucursales, modelos, estados_*, codigos_vin y ajustes (guarda `entidad`, `registro`, `cambios` {campo:{antes,despues}}); `registrar_evento(entidad, accion, registro, detalle)` para sesión, exportación y avisos desde la app (`evento()`). Los cambios masivos con `app.silencio` no se repiten por fila.
+- Triggers: (el historial de vehículos ahora lo hace `auditar()`), `notificar_entrega()` (avisa solo al preparador asignado; "Sin asignar" → todos los de la sucursal), "entregado" da salida al auto.
 - `resumen_diario()` corre con **pg_cron** cada 15 min (hora `America/Santiago`) y inserta en `notificaciones`; el webhook existente lo manda como push.
 
 ### Orden de ejecución de los SQL (SQL Editor de Supabase)
 
-1. `supabase_setup.sql` 2. `planificador_parte1–4` 3. `roles_parte1–4` 4. `jefe_parte1–3` 5. `sucursales_parte1–7` 6. `fase2_parte1–6` 7. `fase3_parte1` 8. `rut_admin` 9. `jefe_total_parte1–4` 10. `vendedor_sync` 11. `codigos_vin_parte1–2` 12. `push_parte1` 13. `vendedor_aviso` 14. `orden_bd` 15. `indices` 16. `mejoras_parte1–3` (activar antes la extensión **pg_cron**).
+1. `supabase_setup.sql` 2. `planificador_parte1–4` 3. `roles_parte1–4` 4. `jefe_parte1–3` 5. `sucursales_parte1–7` 6. `fase2_parte1–6` 7. `fase3_parte1` 8. `rut_admin` 9. `jefe_total_parte1–4` 10. `vendedor_sync` 11. `codigos_vin_parte1–2` 12. `push_parte1` 13. `vendedor_aviso` 14. `orden_bd` 15. `indices` 16. `mejoras_parte1–3` (activar antes la extensión **pg_cron**) 17. `mejoras_parte4` (historial total).
 
 Los archivos se pueden correr más de una vez. Si el editor muestra "RUN QUERY", es solo la confirmación de Supabase.
 
