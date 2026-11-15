@@ -437,6 +437,23 @@
 				word-break: break-all;
 				letter-spacing: 0.3px;
 			}
+			/* Datos de la tarjeta, uno bajo otro: etiqueta a la izquierda y valor a la derecha */
+			.dl {
+				display: grid;
+				grid-template-columns: max-content 1fr;
+				gap: 4px 14px;
+				margin: 10px 0 2px;
+				font-size: 14px;
+			}
+			.dl > span:nth-child(odd) {
+				color: var(--mu);
+			}
+			.dl > span:nth-child(even) {
+				color: var(--tx);
+				font-weight: 600;
+				min-width: 0;
+				overflow-wrap: anywhere;
+			}
 			.tag {
 				display: inline-block;
 				border-radius: 99px;
@@ -2624,12 +2641,13 @@
 							(v.estado || "Disponible") +
 							"</span>" +
 							tagSucI(v.sucursalId) +
-							'<span class="m">Entrada ' +
-							fmt(v.fechaEntrada) +
-							(o ? " · Salida " + fmt(v.fechaSalida) : "") +
-							"</span></div>" +
-							(v.vendedor ? '<div class="m">Vendedor: ' + esc(v.vendedor) + "</div>" : "") +
-							(v.obs ? '<div class="m">' + esc(v.obs) + "</div>" : "") +
+							"</div>" +
+							filas([
+								["Entrada", fmt(v.fechaEntrada)],
+								["Salida", o ? fmt(v.fechaSalida) : ""],
+								["Vendedor", esc(v.vendedor)],
+								["Observación", esc(v.obs)],
+							]) +
 							'<div class="vb">' +
 							(o ? '<button class="btn g" onclick="deshacer(\'' + v.id + "')\">Deshacer salida</button>" : "") +
 							'<button class="btn g" onclick="actualizar(\'' +
@@ -3384,6 +3402,18 @@
 					return x.id === id;
 				})[0];
 				return s ? s.nombre : "";
+			}
+			// Lista de datos uno bajo otro: filas([["Etiqueta", "valor (ya escapado)"], ...]); omite las filas sin valor
+			function filas(a) {
+				var h = a
+					.filter(function (x) {
+						return x && x[1];
+					})
+					.map(function (x) {
+						return "<span>" + x[0] + "</span><span>" + x[1] + "</span>";
+					})
+					.join("");
+				return h ? '<div class="dl">' + h + "</div>" : "";
 			}
 			function tagSucI(id) {
 				return invTodas() && id ? '<span class="tag">' + esc(sucNombre(id)) + "</span>" : "";
@@ -5667,23 +5697,14 @@
 					"</span>" +
 					(tuya ? '<span class="tag res">Tuya</span>' : "") +
 					"</div>" +
-					'<div class="m">Entrega: <b>' +
-					fmt(e.fecha_entrega) +
-					" " +
-					hh(e) +
-					"</b>" +
-					(e.fecha_entrega !== e.fecha_inicial ? " (inicial " + fmt(e.fecha_inicial) + ")" : "") +
-					"</div>" +
-					'<div class="m">Alistamiento: ' +
-					fmt(e.fecha_alistamiento) +
-					" · Vendedor: " +
-					esc(e.vendedor) +
-					"</div>" +
-					(e.campanas ? '<div class="m">Campañas: ' + esc(e.campanas) + "</div>" : "") +
-					(e.accesorios ? '<div class="m">Accesorios: ' + esc(e.accesorios) + "</div>" : "") +
-					'<div class="m">Preparador: ' +
-					esc(e.preparador) +
-					"</div>" +
+					filas([
+						["Entrega", fmt(e.fecha_entrega) + " " + hh(e) + (e.fecha_entrega !== e.fecha_inicial ? " (inicial " + fmt(e.fecha_inicial) + ")" : "")],
+						["Alistamiento", fmt(e.fecha_alistamiento)],
+						["Vendedor", esc(e.vendedor)],
+						["Preparador", esc(e.preparador)],
+						["Campañas", esc(e.campanas)],
+						["Accesorios", esc(e.accesorios)],
+					]) +
 					accE(e) +
 					"</div>"
 				);
