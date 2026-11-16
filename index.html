@@ -4944,6 +4944,9 @@
 					'<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>' +
 					(me ? "" : '<button type="button" class="btn d" data-a="qp">Quitar acceso</button>') +
 					(!me && u.rut ? '<button type="button" class="btn g" data-a="rc">Restablecer clave</button>' : "") +
+					(!me && (perfil.rol === "admin" || (u.rol !== "admin" && u.rol !== "jefe"))
+						? '<button type="button" class="btn d" data-a="eu" data-n="' + esc(u.nombre || u.rut || u.email) + '">Eliminar usuario</button>'
+						: "") +
 					"</div></div>"
 				);
 			}
@@ -5312,6 +5315,25 @@
 					return;
 				var x = await db.rpc("restablecer_clave", { uid: uid });
 				toast(x.error ? "No se pudo restablecer" : "Clave restablecida");
+			};
+			ACC.eu = async function (b) {
+				var uid = b.closest(".ed").dataset.uid,
+					n = b.dataset.n || "esta persona";
+				if (
+					!confirm(
+						"¿Eliminar a «" + n + "» del sistema?\n\nSu cuenta se borra para siempre y ya no podrá entrar. Sus entregas y vehículos se conservan, y las entregas que tenía como preparador quedan «Sin asignar».",
+					)
+				)
+					return;
+				var x = await db.rpc("eliminar_usuario", { uid: uid });
+				if (x.error) {
+					toast(/Solo un administrador|último|propia/.test(x.error.message || "") ? x.error.message : "No se pudo eliminar (¿ejecutaste mejoras_parte6.sql?)");
+					return;
+				}
+				toast("Usuario eliminado");
+				cierraModal();
+				await cargarTodo();
+				render();
 			};
 			ACC.qp = async function (b) {
 				var ed = b.closest(".ed"),
