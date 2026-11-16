@@ -2461,25 +2461,10 @@
 			.btn.add.full {
 				width: 100%;
 			}
-			/* Fila de agregar: todo el ancho se reparte, el botón rellena el espacio */
-			.crow.add {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 8px;
-			}
-			.crow.add input {
-				flex: 2 1 200px;
-				min-width: 0;
-			}
-			.crow.add select {
-				flex: 1 1 140px;
-				min-width: 0;
-			}
-			.crow.add .btn.add {
-				flex: 1 1 150px;
-				width: auto;
-				min-height: 44px;
-				height: 44px;
+			/* Fila de agregar alineada con las filas de abajo: el botón ocupa el mismo bloque que ▲ ▼ Quitar */
+			.crow.add:not(.cv) > .btn.add {
+				grid-column: -4 / -1;
+				width: 100%;
 				font-size: 15px;
 			}
 			/* Panel: barras / torta */
@@ -2565,9 +2550,17 @@
 			/* Configurar inventario: búsqueda y orden de modelos */
 			.catbar {
 				display: grid;
-				grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+				grid-template-columns: minmax(0, 1fr) 216px;
 				gap: 8px;
-				margin: 0 0 8px;
+				align-items: center;
+				background: var(--card);
+				border: 1px solid var(--bd);
+				border-radius: 12px;
+				padding: 10px;
+				margin-bottom: 8px;
+			}
+			.catbar select {
+				width: 100%;
 			}
 			@media (max-width: 599px) {
 				.catbar {
