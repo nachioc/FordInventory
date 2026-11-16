@@ -2629,7 +2629,7 @@
 				editId = null;
 			var KEY = "inventario-ford-v1",
 				data = [],
-				filtro = { q: "", ubic: "", modelo: "", est: "stock", ven: "" };
+				filtro = { q: "", ubic: "", modelo: "", est: "todos", ven: "" };
 			var SB_URL = "https://gvpvnonksgiqlbxiuugf.supabase.co",
 				SB_KEY = "sb_publishable_W8AKcqspBXlUpohpzNklyw_O6MWnJ2r";
 			var db = supabase.createClient(SB_URL, SB_KEY, { auth: { flowType: "implicit" } }),
@@ -3402,7 +3402,7 @@
 					lista();
 				};
 				$("#lim").onclick = function () {
-					filtro = { q: "", ubic: "", modelo: "", est: "stock", ven: "", ant: "" };
+					filtro = { q: "", ubic: "", modelo: "", est: "todos", ven: "", ant: "" };
 					$("#fa").value = "";
 					$("#fm").value = "";
 					$("#fu").value = "";
@@ -3950,7 +3950,7 @@
 				canal = null,
 				editE = null,
 				prefE = null,
-				pf = { q: "", est: "activas", ven: "" };
+				pf = { q: "", est: "todas", ven: "" };
 
 
 			// ======================================================================
@@ -6838,7 +6838,7 @@
 					listaPlan();
 				};
 				$("#plim").onclick = function () {
-					pf = { q: "", est: "activas", ven: "" };
+					pf = { q: "", est: "todas", ven: "" };
 					$("#pe").value = "";
 					$("#pq").value = "";
 					listaPlan();
