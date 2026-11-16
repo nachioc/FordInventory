@@ -2467,6 +2467,52 @@
 				width: 100%;
 				font-size: 15px;
 			}
+			/* Ventana de editar cuenta */
+			.eda {
+				display: grid;
+				gap: 10px;
+				margin-top: 16px;
+			}
+			.eda .btn {
+				width: 100%;
+				min-height: 46px;
+			}
+			.eda2 {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+				gap: 8px;
+			}
+			.zona {
+				border-top: 1px solid var(--bd);
+				padding-top: 12px;
+				margin-top: 4px;
+				display: grid;
+				gap: 8px;
+			}
+			.zona small {
+				color: var(--mu);
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				font-size: 11px;
+			}
+			.lb {
+				display: none;
+			}
+			@media (max-width: 760px) {
+				.tbl.st td.ac.pe .ib {
+					width: 100%;
+					height: 44px;
+					display: flex;
+					gap: 8px;
+					align-items: center;
+					justify-content: center;
+				}
+				.tbl.st td.ac.pe .lb {
+					display: inline;
+					font-weight: 700;
+				}
+			}
 			/* Panel: barras / torta */
 			.pvis {
 				display: flex;
@@ -4941,11 +4987,16 @@
 					">" +
 					optsSuc(sucV, "Sin sucursal fija (todas)") +
 					'</select><p class="m" style="margin:4px 0 0">Admin y jefe pueden trabajar en todas las sucursales; dejar vacío es lo normal para ellos.</p>' +
-					'<div class="vb"><button type="button" class="btn" data-a="gp">Guardar</button>' +
-					(me ? "" : '<button type="button" class="btn d" data-a="qp">Quitar acceso</button>') +
-					(!me && u.rut ? '<button type="button" class="btn g" data-a="rc">Restablecer clave</button>' : "") +
+					'<div class="eda"><button type="button" class="btn full" data-a="gp">Guardar cambios</button>' +
+					(me
+						? ""
+						: '<div class="eda2"><button type="button" class="btn d" data-a="qp">Quitar acceso</button>' +
+							(u.rut ? '<button type="button" class="btn g" data-a="rc">Restablecer clave</button>' : "") +
+							"</div>") +
 					(!me && (perfil.rol === "admin" || (u.rol !== "admin" && u.rol !== "jefe"))
-						? '<button type="button" class="btn d" data-a="eu" data-n="' + esc(u.nombre || u.rut || u.email) + '">Eliminar usuario</button>'
+						? '<div class="zona"><small>Zona de peligro</small><button type="button" class="btn d full" data-a="eu" data-n="' +
+							esc(u.nombre || u.rut || u.email) +
+							'">Eliminar usuario</button></div>'
 						: "") +
 					"</div></div>"
 				);
@@ -5029,14 +5080,14 @@
 								(pd ? "o" : "dis") +
 								'">' +
 								(pd ? "Pendiente" : "Activa") +
-								'</span></td><td class="ac">' +
+								'</span></td><td class="ac pe">' +
 								(ro
 									? ""
 									: '<button type="button" class="ib" data-a="ep" data-uid="' +
 										u.id +
 										'" title="Editar" aria-label="Editar">' +
 										svg("edit") +
-										"</button>") +
+										'<span class="lb">Editar</span></button>') +
 								"</td></tr>"
 							);
 						})
