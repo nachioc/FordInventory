@@ -2461,6 +2461,27 @@
 			.btn.add.full {
 				width: 100%;
 			}
+			/* Fila de agregar: todo el ancho se reparte, el botón rellena el espacio */
+			.crow.add {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.crow.add input {
+				flex: 2 1 200px;
+				min-width: 0;
+			}
+			.crow.add select {
+				flex: 1 1 140px;
+				min-width: 0;
+			}
+			.crow.add .btn.add {
+				flex: 1 1 150px;
+				width: auto;
+				min-height: 44px;
+				height: 44px;
+				font-size: 15px;
+			}
 			/* Panel: barras / torta */
 			.pvis {
 				display: flex;
