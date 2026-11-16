@@ -3367,7 +3367,7 @@
 						return '<div class="stat"><b>' + c[x] + "</b><small>" + x + "</small></div>";
 					}).join("") +
 					"</div>" +
-					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Con salida</button><button class="chip" data-e="todos">Todos</button>' +
+					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="todos">Todos</button><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Con salida</button>' +
 					vmBar("inv") +
 					"</div>" +
 					'<div class="tools"><select id="fm" aria-label="Modelo">' +
@@ -5475,7 +5475,9 @@
 					c.tit +
 					" (" +
 					ac.length +
-					')</h2><div class="crow add ' +
+					')</h2>' +
+					(k === "modelo" ? barraModelos() : "") +
+					'<div class="crow add ' +
 					(c.color ? "col" : "nc") +
 					'" data-k="' +
 					k +
@@ -5496,7 +5498,6 @@
 							"</select>"
 						: "") +
 					'<button type="button" class="btn add" data-a="add">' + btnMas("Agregar") + "</button></div>" +
-					(k === "modelo" ? barraModelos() : "") +
 					(k === "modelo" ? ordenaModelos(ac) : ac)
 						.map(function (x, i) {
 							return filaCat(k, x, i, ac.length, k === "modelo" && ((CATO.modelo || "man") !== "man" || !!CATQ.modelo));
@@ -6805,7 +6806,7 @@
 							(al.length === 1 ? " entrega con plazo" : " entregas con plazo") +
 							' para hoy, mañana o vencido</b><small>Toca para ver el detalle</small></span></button>'
 						: "") +
-					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button><button class="chip" data-p="todas">Todas</button></div>' +
+					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="todas">Todas</button><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button></div>' +
 					'<div class="tools ptb-tools"><select id="pe" aria-label="Estado">' +
 					opts(PEST, "Todos los estados") +
 					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
