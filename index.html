@@ -3308,7 +3308,7 @@
 					"</select>" +
 					'<label for="u">Versión</label><select id="u" disabled><option value="">Primero elige un modelo</option></select>' +
 					'<div class="panel hide" id="det" style="margin-top:14px"></div>' +
-					'<div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Continuar</button></form>'
+					'<div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Trasladar</button></form>'
 				);
 			}
 			function bindTraslado() {
@@ -3547,8 +3547,7 @@
 							]) +
 							'<div class="vb">' +
 							(o ? '<button class="btn g" onclick="deshacer(\'' + v.id + "')\">Deshacer salida</button>" : "") +
-							(puedeTrasl(v) ? '<button class="btn g" onclick="trasladar(\'' + v.id + "')\">Trasladar</button>" : "") +
-							'<button class="btn g" onclick="actualizar(\'' +
+														'<button class="btn g" onclick="actualizar(\'' +
 							v.id +
 							"')\">Actualizar</button>" +
 							'<button class="btn d" onclick="borrar(\'' +
@@ -4910,9 +4909,7 @@
 					}).length;
 				a.innerHTML =
 					head("Sucursales") +
-					'<form id="fSuc" novalidate><label for="sn">Nueva sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" data-cb="1" placeholder="Ej: Santiago" autocomplete="off">' +
-					dlCiudades() +
-					'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><button class="btn add full" type="submit">' + btnMas("Agregar sucursal") + '</button></form>' +
+					'<button type="button" class="btn add full" data-a="sucnew">' + btnMas("Agregar sucursal") + "</button>" +
 					'<h2 class="sec">Sucursales (' +
 					SUC.length +
 					')</h2><div class="vmrow">' +
@@ -4920,26 +4917,6 @@
 					'</div><div id="lsuc"></div>';
 				SCN = { cv: cv, ce: ce };
 				pintaSuc();
-				$("#fSuc").onsubmit = async function (e) {
-					e.preventDefault();
-					var n = $("#sn").value.trim(),
-						er = $("#err");
-					if (!n) {
-						er.textContent = "Escribe el nombre de la sucursal.";
-						return;
-					}
-					var x = await db
-						.from("sucursales")
-						.insert({ nombre: n, ciudad: $("#sc").value.trim() || null, direccion: $("#sd").value.trim() || null })
-						.select();
-					if (x.error) {
-						er.textContent =
-							x.error.code === "23505" ? "Ya existe una sucursal con ese nombre." : "No se pudo crear la sucursal.";
-						return;
-					}
-					toast("Sucursal creada");
-					sucursales();
-				};
 				rest();
 			}
 			/* --- Sucursal: detalle y personas --- */
@@ -5170,6 +5147,48 @@
 				if (i) i.focus();
 			};
 			ACC.xm = cierraModal;
+			// Ventana emergente para agregar una sucursal
+			ACC.sucnew = function () {
+				cierraModal();
+				var m = document.createElement("div");
+				m.id = "modal";
+				m.className = "modal";
+				m.setAttribute("role", "dialog");
+				m.setAttribute("aria-modal", "true");
+				m.innerHTML =
+					'<div class="mp"><div class="mh"><b>Agregar sucursal</b><button type="button" class="ib" data-a="xm" aria-label="Cerrar">&times;</button></div>' +
+					'<form id="fSuc" class="ed" novalidate><label for="sn">Nombre de la sucursal</label><input id="sn" placeholder="Ej: Bellavista" autocomplete="off"><label for="sc">Ciudad <small>(opcional, elige o escribe)</small></label><input id="sc" data-cb="1" placeholder="Ej: Santiago" autocomplete="off">' +
+					dlCiudades() +
+					'<label for="sd">Dirección <small>(opcional)</small></label><input id="sd" placeholder="Ej: Av. Providencia 1234" autocomplete="off"><div class="err" id="err" role="alert"></div><div class="vb"><button class="btn add" type="submit">' +
+					btnMas("Agregar sucursal") +
+					'</button><button type="button" class="btn g" data-a="xm">Cancelar</button></div></form></div>';
+				document.body.appendChild(m);
+				document.body.classList.add("mopen");
+				m.addEventListener("mousedown", function (e) {
+					if (e.target === m) cierraModal();
+				});
+				$("#sn").focus();
+				$("#fSuc").onsubmit = async function (e) {
+					e.preventDefault();
+					var n = $("#sn").value.trim(),
+						er = $("#err");
+					if (!n) {
+						er.textContent = "Escribe el nombre de la sucursal.";
+						return;
+					}
+					var x = await db
+						.from("sucursales")
+						.insert({ nombre: n, ciudad: $("#sc").value.trim() || null, direccion: $("#sd").value.trim() || null })
+						.select();
+					if (x.error) {
+						er.textContent = x.error.code === "23505" ? "Ya existe una sucursal con ese nombre." : "No se pudo crear la sucursal.";
+						return;
+					}
+					cierraModal();
+					toast("Sucursal creada");
+					sucursales();
+				};
+			};
 			window.addEventListener("hashchange", cierraModal);
 			document.addEventListener("keydown", function (e) {
 				if (e.key === "Escape") cierraModal();
@@ -6140,8 +6159,7 @@
 								(adm ? "<td>" + esc(sucNombre(v.sucursalId)) + "</td>" : "") +
 								'<td class="ac"><div class="vb">' +
 								(o ? ib("Deshacer salida", "deshacer('" + v.id + "')", "", "undo") : "") +
-								(puedeTrasl(v) ? ib("Trasladar a otra sucursal", "trasladar('" + v.id + "')", "", "swap") : "") +
-								ib("Actualizar", "actualizar('" + v.id + "')", "", "edit") +
+																ib("Actualizar", "actualizar('" + v.id + "')", "", "edit") +
 								ib("Eliminar", "borrar('" + v.id + "')", "btn d", "trash") +
 								"</div></td></tr>"
 							);
