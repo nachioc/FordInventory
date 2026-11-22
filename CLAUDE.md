@@ -40,7 +40,7 @@ Convenciones:
 
 ## Rutas (hash)
 
-`#` Inicio · `#inv` Inventario · `#ingresar` · `#salida` · `#editar` · `#plan` · `#pform` · `#alertas` · `#panel` (admin/jefe) · `#tareas` (preparador) · `#sucursales` · `#sucursal/none` (Cuentas) · `#sucursal/<id>` · `#cfginv` · `#cfgplan` · `#historial`. Un hash sin permiso redirige a Inicio.
+`#` Inicio · `#inv` Inventario · `#ingresar` · `#traslado` (`#salida` redirige aquí) · `#editar` · `#plan` · `#pform` · `#alertas` · `#panel` (admin/jefe) · `#tareas` (preparador) · `#sucursales` · `#sucursal/none` (Cuentas) · `#sucursal/<id>` · `#cfginv` · `#cfgplan` · `#historial`. Un hash sin permiso redirige a Inicio.
 
 ## Base de datos
 
@@ -49,12 +49,12 @@ Tablas: `perfiles`, `sucursales`, `vehiculos`, `entregas`, `notificaciones`, `hi
 - `ajustes(clave, valor jsonb)`: `antiguedad {amarillo, rojo}` y `resumen_diario {activo, hora, dias[1-7], roles{preparador,vendedor,jefe}}`; `resumen_ultimo` lo usa el servidor. Lectura para cualquier rol, escritura solo `es_admin()`.
 - RPC: `trasladar_vehiculo(p_id, p_destino, p_ubicacion, p_nota)`, `resumen_diario(p_forzar)`, `sucursales_publicas()`, `pedir_acceso`, `restablecer_clave`, `renombrar_catalogo`, `preparadores_sucursal`, `email_de_rut`.
 - Historial total (`mejoras_parte4.sql`): trigger genérico `auditar()` en vehiculos, entregas, perfiles, sucursales, modelos, estados_*, codigos_vin y ajustes (guarda `entidad`, `registro`, `cambios` {campo:{antes,despues}}); `registrar_evento(entidad, accion, registro, detalle)` para sesión, exportación y avisos desde la app (`evento()`). Los cambios masivos con `app.silencio` no se repiten por fila.
-- Triggers: (el historial de vehículos ahora lo hace `auditar()`), `notificar_entrega()` (avisa solo al preparador asignado; "Sin asignar" → todos los de la sucursal), "entregado" da salida al auto.
+- Triggers: (el historial de vehículos ahora lo hace `auditar()`), `notificar_entrega()` (avisa solo al preparador asignado; "Sin asignar" → todos los de la sucursal), `entrega_salida` (mejoras_parte7): al pasar una entrega a «Entregado» el auto con ese VIN recibe `fecha_salida`; si se devuelve, se deshace. Un auto sin vender nunca sale: se traslada.
 - `resumen_diario()` corre con **pg_cron** cada 15 min (hora `America/Santiago`) y inserta en `notificaciones`; el webhook existente lo manda como push.
 
 ### Orden de ejecución de los SQL (SQL Editor de Supabase)
 
-1. `supabase_setup.sql` 2. `planificador_parte1–4` 3. `roles_parte1–4` 4. `jefe_parte1–3` 5. `sucursales_parte1–7` 6. `fase2_parte1–6` 7. `fase3_parte1` 8. `rut_admin` 9. `jefe_total_parte1–4` 10. `vendedor_sync` 11. `codigos_vin_parte1–2` 12. `push_parte1` 13. `vendedor_aviso` 14. `orden_bd` 15. `indices` 16. `mejoras_parte1–3` (activar antes la extensión **pg_cron**) 17. `mejoras_parte4` (historial total).
+1. `supabase_setup.sql` 2. `planificador_parte1–4` 3. `roles_parte1–4` 4. `jefe_parte1–3` 5. `sucursales_parte1–7` 6. `fase2_parte1–6` 7. `fase3_parte1` 8. `rut_admin` 9. `jefe_total_parte1–4` 10. `vendedor_sync` 11. `codigos_vin_parte1–2` 12. `push_parte1` 13. `vendedor_aviso` 14. `orden_bd` 15. `indices` 16. `mejoras_parte1–3` (activar antes la extensión **pg_cron**) 17. `mejoras_parte4` (historial total) 18. `mejoras_parte5` (preparador/vendedor por id, estados válidos, índices) 19. `mejoras_parte6` (RPC `eliminar_usuario`) 20. `mejoras_parte7` (salida automática al entregar).
 
 Los archivos se pueden correr más de una vez. Si el editor muestra "RUN QUERY", es solo la confirmación de Supabase.
 

@@ -3014,9 +3014,9 @@
 					cargarEntregas().then(function () {
 						if (vista() === "plan") listaPlan();
 					});
-				if (v === "inicio" || v === "inventario" || v === "salida")
+				if (v === "inicio" || v === "inventario" || v === "traslado")
 					cargar().then(function () {
-						if (vista() === v && (v !== "salida" || !$("#m").value)) renderApp();
+						if (vista() === v && (v !== "traslado" || !$("#tv").value)) renderApp();
 					});
 			}
 			function $(s) {
@@ -3076,9 +3076,10 @@
 			function vista() {
 				var h = location.hash.slice(1).split("/")[0];
 				if (h === "inv" || h === "inventario") return "inicio";
+				if (h === "salida") return "traslado";
 				return [
 					"ingresar",
-					"salida",
+					"traslado",
 					"inventario",
 					"editar",
 					"sucursales",
@@ -3130,9 +3131,9 @@
 					$("#foto").onchange = leerVin;
 					$("#vin").oninput = autoVin;
 					llenar();
-				} else if (v === "salida") {
-					a.innerHTML = salida();
-					bindSalida();
+				} else if (v === "traslado") {
+					a.innerHTML = trasladoVista();
+					bindTraslado();
 				} else if (v === "portada") {
 					a.innerHTML = portada();
 				} else if (v === "plan") {
@@ -3190,7 +3191,8 @@
 					head("Inventario de vehículos") +
 					sucBar(1) +
 					'<div class="big"><button class="bigbtn" onclick="go(\'ingresar\')"><b>Ingresar</b><span>Registrar un vehículo nuevo en el inventario</span></button>' +
-					'<button class="bigbtn s" onclick="go(\'salida\')"><b>Salida</b><span>Registrar la salida de un vehículo</span></button></div>' +
+					(puedeTrasladar() ? '<button class="bigbtn s" onclick="go(\'traslado\')"><b>Traslado</b><span>Mover un vehículo a otra sucursal</span></button>' : "") +
+					"</div>" +
 					'<div class="stats"><div class="stat"><b>' +
 					s.length +
 					'</b><small>En stock</small></div><div class="stat"><b>' +
@@ -3206,13 +3208,13 @@
 				return (
 					head(editId ? "Actualizar vehículo" : "Ingresar vehículo") +
 					'<form id="fIng" novalidate>' +
+					'<label for="vin">VIN <small>17 caracteres</small></label><div class="vinrow"><input id="vin" required maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><button type="button" class="btn g" id="scan">Escanear</button></div><input type="file" id="foto" accept="image/*" capture="environment" class="hide"><div id="scanmsg" role="status" style="color:var(--mu);font-size:14px;margin-top:6px">Apunta al código cuadrado del parabrisas o a la etiqueta del VIN.</div>' +
 					(esAdm() ? '<label for="isuc">Sucursal</label><select id="isuc">' + optsSuc(sucDef()) + "</select>" : "") +
 					'<label for="modelo">Modelo</label><select id="modelo" required>' +
 					opts(MODELOS, "Elegir modelo") +
 					"</select>" +
 					'<label for="version">Versión</label><input id="version" required autocomplete="off">' +
 					'<label for="color">Color</label><input id="color" required autocomplete="off">' +
-					'<label for="vin">VIN <small>17 caracteres</small></label><div class="vinrow"><input id="vin" required maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><button type="button" class="btn g" id="scan">Escanear</button></div><input type="file" id="foto" accept="image/*" capture="environment" class="hide"><div id="scanmsg" role="status" style="color:var(--mu);font-size:14px;margin-top:6px">Apunta al código cuadrado del parabrisas o a la etiqueta del VIN.</div>' +
 					'<label for="fe">Fecha de entrada</label><input type="date" id="fe" value="' +
 					hoy() +
 					'" required>' +
@@ -3292,29 +3294,72 @@
 				toast("Ingreso guardado");
 				go("inv");
 			}
-			function salida() {
+			// Traslado de sucursal (un auto sin vender nunca "sale": la salida real es la entrega al cliente)
+			function puedeTrasladar() {
+				return esAdm() || (perfil && perfil.rol === "preparador");
+			}
+			function trasladoVista() {
 				return (
-					head("Salida de vehículo") +
-					'<form id="fSal" novalidate>' +
+					head("Traslado de vehículo") +
+					'<form id="fTr" novalidate>' +
+					'<label for="tv">VIN <small>completo o los últimos dígitos</small></label><input id="tv" maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><div id="tsug"></div>' +
 					'<label for="m">Modelo</label><select id="m">' +
 					opts(MODELOS, "Elegir modelo") +
 					"</select>" +
 					'<label for="u">Versión</label><select id="u" disabled><option value="">Primero elige un modelo</option></select>' +
 					'<div class="panel hide" id="det" style="margin-top:14px"></div>' +
-					'<label for="fs">Fecha de salida</label><input type="date" id="fs" value="' +
-					hoy() +
-					'">' +
-					'<div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Guardar salida</button></form>'
+					'<div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Continuar</button></form>'
 				);
 			}
-			function bindSalida() {
+			function bindTraslado() {
 				var m = $("#m"),
-					u = $("#u");
+					u = $("#u"),
+					tv = $("#tv"),
+					sel = null;
+				function trasladables() {
+					return stock().filter(puedeTrasl);
+				}
+				function muestra(v) {
+					sel = v || null;
+					var d = $("#det");
+					if (!v) {
+						d.classList.add("hide");
+						return;
+					}
+					d.classList.remove("hide");
+					d.innerHTML =
+						"<b>" + esc(v.modelo) + " " + esc(v.version) + '</b><div class="m">Color ' + esc(v.color) + " · " + esc(v.ubic) + " · " + esc(sucNombre(v.sucursalId) || "") + " · Entrada " + fmt(v.fechaEntrada) + '</div><div class="vin">' + esc(v.vin) + "</div>";
+				}
+				tv.oninput = function () {
+					tv.value = tv.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+					var q = tv.value,
+						l = q.length >= 4 ? trasladables().filter(function (v) { return v.vin.indexOf(q) > -1; }) : [];
+					m.value = "";
+					u.disabled = true;
+					u.innerHTML = '<option value="">Primero elige un modelo</option>';
+					if (l.length === 1) {
+						muestra(l[0]);
+						$("#tsug").innerHTML = "";
+					} else {
+						muestra(null);
+						$("#tsug").innerHTML = l.slice(0, 6).map(function (v) { return '<button type="button" class="btn g" data-tv="' + v.id + '">' + esc(v.modelo) + " " + esc(v.version) + " · " + esc(v.vin.slice(-6)) + "</button>"; }).join("");
+					}
+				};
+				$("#tsug").onclick = function (e) {
+					var b = e.target.closest("[data-tv]");
+					if (!b) return;
+					var v = data.filter(function (x) { return x.id === b.dataset.tv; })[0];
+					if (v) {
+						tv.value = v.vin;
+						muestra(v);
+						$("#tsug").innerHTML = "";
+					}
+				};
 				m.onchange = function () {
-					var l = stock().filter(function (v) {
-						return v.modelo === m.value;
-					});
-					$("#det").classList.add("hide");
+					muestra(null);
+					tv.value = "";
+					$("#tsug").innerHTML = "";
+					var l = trasladables().filter(function (v) { return v.modelo === m.value; });
 					if (!m.value) {
 						u.disabled = true;
 						u.innerHTML = '<option value="">Primero elige un modelo</option>';
@@ -3326,72 +3371,19 @@
 						return;
 					}
 					u.disabled = false;
-					u.innerHTML =
-						'<option value="">Elegir versión</option>' +
-						l
-							.map(function (v) {
-								return (
-									'<option value="' +
-									v.id +
-									'">' +
-									esc(v.version) +
-									" - " +
-									esc(v.color) +
-									" - " +
-									esc(v.vin.slice(-6)) +
-									"</option>"
-								);
-							})
-							.join("");
+					u.innerHTML = '<option value="">Elegir versión</option>' + l.map(function (v) { return '<option value="' + v.id + '">' + esc(v.version) + " - " + esc(v.color) + " - " + esc(v.vin.slice(-6)) + "</option>"; }).join("");
 				};
 				u.onchange = function () {
-					var v = data.filter(function (x) {
-							return x.id === u.value;
-						})[0],
-						d = $("#det");
-					if (!v) {
-						d.classList.add("hide");
-						return;
-					}
-					d.classList.remove("hide");
-					d.innerHTML =
-						"<b>" +
-						esc(v.modelo) +
-						" " +
-						esc(v.version) +
-						'</b><div class="m">Color ' +
-						esc(v.color) +
-						" · " +
-						esc(v.ubic) +
-						" · Entrada " +
-						fmt(v.fechaEntrada) +
-						'</div><div class="vin">' +
-						esc(v.vin) +
-						"</div>";
+					muestra(data.filter(function (x) { return x.id === u.value; })[0]);
+					if (sel) tv.value = sel.vin;
 				};
-				$("#fSal").onsubmit = async function (e) {
+				$("#fTr").onsubmit = function (e) {
 					e.preventDefault();
-					var v = data.filter(function (x) {
-							return x.id === u.value;
-						})[0],
-						f = $("#fs").value,
-						er = $("#err");
-					if (!v) {
-						er.textContent = "Elige el modelo y la versión del vehículo.";
+					if (!sel) {
+						$("#err").textContent = "Escribe el VIN o elige el modelo y la versión del vehículo.";
 						return;
 					}
-					if (!f) {
-						er.textContent = "Elige la fecha de salida.";
-						return;
-					}
-					if (f < v.fechaEntrada) {
-						er.textContent = "La salida no puede ser antes de la entrada (" + fmt(v.fechaEntrada) + ").";
-						return;
-					}
-					v.fechaSalida = f;
-					if (!(await guardarDB(v, er))) return;
-					toast("Salida guardada");
-					go("inv");
+					trasladar(sel.id);
 				};
 			}
 			function inventario() {
@@ -6078,9 +6070,12 @@
 					'<div class="big"><button class="bigbtn" onclick="go(\'ingresar\')"><i class="arw up">' +
 					svg("up") +
 					'</i><span class="tx"><b>Ingresar</b><span>Registrar un vehículo nuevo</span></span></button>' +
-					'<button class="bigbtn s" onclick="go(\'salida\')"><i class="arw dn">' +
-					svg("dn") +
-					'</i><span class="tx"><b>Salida</b><span>Registrar la salida de un vehículo</span></span></button></div>'
+					(puedeTrasladar()
+						? '<button class="bigbtn s" onclick="go(\'traslado\')"><i class="arw dn">' +
+							svg("swap") +
+							'</i><span class="tx"><b>Traslado</b><span>Mover un vehículo a otra sucursal</span></span></button>'
+						: "") +
+					"</div>"
 				);
 			}
 			/* inventario en lista */
@@ -6541,6 +6536,9 @@
 					b.onclick = function () {
 						PK.abre("fecha", h, w);
 					};
+					t.onclick = function () {
+						if (!PK.esta(h)) PK.abre("fecha", h, w);
+					};
 					sync();
 				});
 			}
@@ -6738,7 +6736,7 @@
 				});
 				// Clic fuera, Escape, cambio de página o de tamaño: cierra o recoloca
 				document.addEventListener("mousedown", function (e) {
-					if (box && !(e.target.closest && (e.target.closest(".pk") || e.target.closest(".dtb")))) cierra();
+					if (box && !(e.target.closest && (e.target.closest(".pk") || e.target.closest(".dtb") || e.target.closest(".dtx")))) cierra();
 				});
 				document.addEventListener("keydown", function (e) {
 					if (box && e.key === "Escape") cierra();
@@ -6746,7 +6744,13 @@
 				window.addEventListener("hashchange", cierra);
 				window.addEventListener("resize", pos);
 				window.addEventListener("scroll", pos, true);
-				return { abre: abre, cierra: cierra };
+				return {
+					abre: abre,
+					cierra: cierra,
+					esta: function (h) {
+						return !!(cfg && cfg.h === h);
+					},
+				};
 			})();
 
 			// Convierte los campos de hora a HH:MM con selector propio
@@ -6803,6 +6807,9 @@
 					h.addEventListener("change", sync);
 					b.onclick = function () {
 						PK.abre("hora", h, w);
+					};
+					t.onclick = function () {
+						if (!PK.esta(h)) PK.abre("hora", h, w);
 					};
 					sync();
 				});
@@ -7152,8 +7159,8 @@
 				return (
 					head(ed ? "Editar entrega" : "Nueva entrega") +
 					'<form id="fp" novalidate>' +
-					(esAdm() ? '<label for="psuc">Sucursal</label><select id="psuc">' + optsSuc(sucDef()) + "</select>" : "") +
 					'<label for="pvin">VIN</label><input id="pvin" maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><div id="psug"></div><div id="pinv" style="color:var(--mu);font-size:14px;margin-top:6px"></div>' +
+					(esAdm() ? '<label for="psuc">Sucursal</label><select id="psuc">' + optsSuc(sucDef()) + "</select>" : "") +
 					'<label for="pmod">Modelo</label><select id="pmod">' +
 					opts(MODELOS, "Elegir modelo") +
 					"</select>" +
@@ -7686,7 +7693,7 @@
 								? "panel"
 								: v === "tareas"
 									? "tareas"
-									: ["inicio", "ingresar", "salida", "inventario", "editar"].indexOf(v) > -1
+									: ["inicio", "ingresar", "traslado", "inventario", "editar"].indexOf(v) > -1
 								? "inv"
 								: "home";
 				var it = [["home", "", "Inicio", IC.home]];
