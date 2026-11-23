@@ -2710,7 +2710,28 @@
 				editId = null;
 			var KEY = "inventario-ford-v1",
 				data = [],
-				filtro = { q: "", ubic: "", modelo: "", est: "todos", ven: "" };
+				filtro = { q: "", ubic: "", modelo: "", est: "todos", ven: "", anio: anioHoy() };
+			function anioHoy() {
+				return String(new Date().getFullYear());
+			}
+			// Opciones del selector Año: "Todos" + los años que hay (el actual siempre)
+			function anioOpts(sel, fechas) {
+				var ys = {};
+				ys[anioHoy()] = 1;
+				(fechas || []).forEach(function (f) {
+					if (f) ys[String(f).slice(0, 4)] = 1;
+				});
+				return (
+					'<option value="">Todos los años</option>' +
+					Object.keys(ys)
+						.sort()
+						.reverse()
+						.map(function (y) {
+							return '<option value="' + y + '"' + (y === String(sel) ? " selected" : "") + ">" + y + "</option>";
+						})
+						.join("")
+				);
+			}
 			var SB_URL = "https://gvpvnonksgiqlbxiuugf.supabase.co",
 				SB_KEY = "sb_publishable_W8AKcqspBXlUpohpzNklyw_O6MWnJ2r";
 			var db = supabase.createClient(SB_URL, SB_KEY, { auth: { flowType: "implicit" } }),
@@ -3443,7 +3464,9 @@
 					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="todos">Todos</button><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Con salida</button>' +
 					vmBar("inv") +
 					"</div>" +
-					'<div class="tools"><select id="fm" aria-label="Modelo">' +
+					'<div class="tools"><select id="fy" aria-label="Año">' +
+					anioOpts(filtro.anio, data.map(function (v) { return v.fechaSalida; })) +
+					'</select><select id="fm" aria-label="Modelo">' +
 					opts(MODELOS, "Todos los modelos") +
 					'</select><select id="fu" aria-label="Ubicación">' +
 					opts(UBIC, "Todas las ubicaciones") +
@@ -3463,6 +3486,11 @@
 				);
 			}
 			function bindInv() {
+				$("#fy").value = filtro.anio || "";
+				$("#fy").onchange = function () {
+					filtro.anio = this.value;
+					lista();
+				};
 				$("#fm").value = filtro.modelo;
 				$("#fu").value = filtro.ubic;
 				$("#q").value = filtro.q;
@@ -3475,7 +3503,8 @@
 					lista();
 				};
 				$("#lim").onclick = function () {
-					filtro = { q: "", ubic: "", modelo: "", est: "todos", ven: "", ant: "" };
+					filtro = { q: "", ubic: "", modelo: "", est: "todos", ven: "", ant: "", anio: anioHoy() };
+					$("#fy").value = filtro.anio;
 					$("#fa").value = "";
 					$("#fm").value = "";
 					$("#fu").value = "";
@@ -3516,6 +3545,8 @@
 				var l = data.filter(function (v) {
 					if (filtro.est === "stock" && v.fechaSalida) return false;
 					if (filtro.est === "salidos" && !v.fechaSalida) return false;
+					// Los autos en stock siempre se ven; los que ya salieron, solo los del año elegido
+					if (filtro.anio && v.fechaSalida && String(v.fechaSalida).slice(0, 4) !== filtro.anio) return false;
 					if (filtro.modelo && v.modelo !== filtro.modelo) return false;
 					if (filtro.ubic && v.ubic !== filtro.ubic) return false;
 					if (filtro.ven && (v.estado || "Disponible") !== filtro.ven) return false;
@@ -4022,7 +4053,7 @@
 				canal = null,
 				editE = null,
 				prefE = null,
-				pf = { q: "", est: "todas", ven: "" };
+				pf = { q: "", est: "todas", ven: "", anio: anioHoy() };
 
 
 			// ======================================================================
@@ -6324,6 +6355,8 @@
 				["act", "Sesiones y exportaciones"],
 			];
 			var hGrp = "",
+				hAnio = anioHoy(),
+				hAnios = [],
 				hQ = "";
 			function hGrupo(h) {
 				var e = h.entidad || "vehículo";
@@ -6414,11 +6447,27 @@
 					}).join("") +
 					'</div><div class="chips"><button type="button" class="chip" id="hsort" onclick="hsortT()"></button>' +
 					vmBar("hist") +
-					'</div><div class="tools"><input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
+					 '</div><div class="tools"><select id="hy" aria-label="Año">' +
+					anioOpts(hAnio, hAnios) +
+					'</select><input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
 					esc(hQ) +
 					'"></div><div id="hl" class="empty">Cargando...</div>';
-				var r = await db.from("historial").select("*").order("fecha", { ascending: false }).limit(1500);
+				try {
+					var p0 = await db.from("historial").select("fecha").order("fecha", { ascending: true }).limit(1);
+					hAnios = [];
+					if (p0.data && p0.data[0])
+						for (var y = +String(p0.data[0].fecha).slice(0, 4); y <= +anioHoy(); y++) hAnios.push(String(y));
+				} catch (e) {}
+				if ($("#hy")) $("#hy").innerHTML = anioOpts(hAnio, hAnios);
+				var q0 = db.from("historial").select("*");
+				if (hAnio) q0 = q0.gte("fecha", hAnio + "-01-01").lt("fecha", +hAnio + 1 + "-01-01");
+				var r = await q0.order("fecha", { ascending: false }).limit(1500);
 				HR = r.data || [];
+				if ($("#hy"))
+					$("#hy").onchange = function () {
+						hAnio = this.value;
+						historial();
+					};
 				if ($("#hl")) {
 					$("#hl").className = "";
 					pintaHist();
@@ -6934,7 +6983,9 @@
 							' para hoy, mañana o vencido</b><small>Toca para ver el detalle</small></span></button>'
 						: "") +
 					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="todas">Todas</button><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button></div>' +
-					'<div class="tools ptb-tools"><select id="pe" aria-label="Estado">' +
+					'<div class="tools ptb-tools"><select id="py" aria-label="Año">' +
+					anioOpts(pf.anio, ent.map(function (e) { return e.estado === "Entregado" ? e.fecha_entrega : null; })) +
+					'</select><select id="pe" aria-label="Estado">' +
 					opts(PEST, "Todos los estados") +
 					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
 					'<div class="big np-w"><button class="bigbtn pn np" onclick="editE=null;go(&quot;pform&quot;)"><i class="arw up">' +
@@ -6954,6 +7005,12 @@
 				$("#pexpx").onclick = function () {
 					exportarPlan("xlsx");
 				};
+				$("#py").value = pf.anio || "";
+				$("#py").onchange = function () {
+					pf.anio = this.value;
+					if (pf.anio && calMes) calMes = pf.anio + calMes.slice(4);
+					listaPlan();
+				};
 				$("#pe").value = pf.ven;
 				$("#pq").value = pf.q;
 				$("#pe").onchange = function () {
@@ -6965,7 +7022,8 @@
 					listaPlan();
 				};
 				$("#plim").onclick = function () {
-					pf = { q: "", est: "todas", ven: "" };
+					pf = { q: "", est: "todas", ven: "", anio: anioHoy() };
+					$("#py").value = pf.anio;
 					$("#pe").value = "";
 					$("#pq").value = "";
 					listaPlan();
@@ -6992,6 +7050,8 @@
 						if (pf.est === "activas" && e.estado === "Entregado") return false;
 						if (pf.est === "entregadas" && e.estado !== "Entregado") return false;
 						if (pf.ven && e.estado !== pf.ven) return false;
+						// Las entregas activas siempre se ven; las ya entregadas, solo las del año elegido
+						if (pf.anio && e.estado === "Entregado" && String(e.fecha_entrega).slice(0, 4) !== pf.anio) return false;
 						return !q || [e.vin, e.modelo, e.vendedor, e.color].join(" ").toLowerCase().indexOf(q) > -1;
 					})
 					.sort(function (a, b) {
