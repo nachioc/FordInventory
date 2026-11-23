@@ -1198,6 +1198,21 @@
 			body.r-preparador .act.pn {
 				display: none;
 			}
+			.fyw {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+			.fyw label {
+				margin: 0;
+				font-size: 13px;
+				white-space: nowrap;
+				color: var(--mu);
+			}
+			.fyw select {
+				flex: 1;
+				min-width: 110px;
+			}
 			.nsuc {
 				display: none;
 			}
@@ -2714,6 +2729,10 @@
 			function anioHoy() {
 				return String(new Date().getFullYear());
 			}
+			// Selector "Filtro por año" con su rótulo
+			function anioSel(id, sel, fechas) {
+				return '<div class="fyw"><label for="' + id + '">Filtro por año</label><select id="' + id + '">' + anioOpts(sel, fechas) + "</select></div>";
+			}
 			// Opciones del selector Año: "Todos" + los años que hay (el actual siempre)
 			function anioOpts(sel, fechas) {
 				var ys = {};
@@ -3464,9 +3483,7 @@
 					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="todos">Todos</button><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Con salida</button>' +
 					vmBar("inv") +
 					"</div>" +
-					'<div class="tools"><select id="fy" aria-label="Año">' +
-					anioOpts(filtro.anio, data.map(function (v) { return v.fechaSalida; })) +
-					'</select><select id="fm" aria-label="Modelo">' +
+					'<div class="tools"><select id="fm" aria-label="Modelo">' +
 					opts(MODELOS, "Todos los modelos") +
 					'</select><select id="fu" aria-label="Ubicación">' +
 					opts(UBIC, "Todas las ubicaciones") +
@@ -3477,7 +3494,9 @@
 					AJ.antiguedad.amarillo +
 					' días (amarillo)</option><option value="rj">Desde ' +
 					AJ.antiguedad.rojo +
-					' días (rojo)</option></select><input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar"><button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>' +
+					' días (rojo)</option></select><input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar">' +
+					anioSel("fy", filtro.anio, data.map(function (v) { return v.fechaSalida; })) +
+					'<button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>' +
 					'<div id="lst"></div><div class="acts">' +
 					act("Exportar CSV", null, "", "bajar", 'id="exp"') +
 					act("Exportar Excel", null, "", "bajar", 'id="expx"') +
@@ -6447,11 +6466,11 @@
 					}).join("") +
 					'</div><div class="chips"><button type="button" class="chip" id="hsort" onclick="hsortT()"></button>' +
 					vmBar("hist") +
-					 '</div><div class="tools"><select id="hy" aria-label="Año">' +
-					anioOpts(hAnio, hAnios) +
-					'</select><input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
+					  '</div><div class="tools"><input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
 					esc(hQ) +
-					'"></div><div id="hl" class="empty">Cargando...</div>';
+					'">' +
+					anioSel("hy", hAnio, hAnios) +
+					'</div><div id="hl" class="empty">Cargando...</div>';
 				try {
 					var p0 = await db.from("historial").select("fecha").order("fecha", { ascending: true }).limit(1);
 					hAnios = [];
@@ -6983,11 +7002,11 @@
 							' para hoy, mañana o vencido</b><small>Toca para ver el detalle</small></span></button>'
 						: "") +
 					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="todas">Todas</button><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button></div>' +
-					'<div class="tools ptb-tools"><select id="py" aria-label="Año">' +
-					anioOpts(pf.anio, ent.map(function (e) { return e.estado === "Entregado" ? e.fecha_entrega : null; })) +
-					'</select><select id="pe" aria-label="Estado">' +
+					'<div class="tools ptb-tools"><select id="pe" aria-label="Estado">' +
 					opts(PEST, "Todos los estados") +
-					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
+					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar">' +
+					anioSel("py", pf.anio, ent.map(function (e) { return e.estado === "Entregado" ? e.fecha_entrega : null; })) +
+					'<button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
 					'<div class="big np-w"><button class="bigbtn pn np" onclick="editE=null;go(&quot;pform&quot;)"><i class="arw up">' +
 					svg("plus") +
 					'</i><span class="tx"><b>Nueva entrega</b><span>Programar la entrega de un vehículo</span></span></button></div></div>' +
