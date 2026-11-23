@@ -2812,6 +2812,7 @@
 				if (fs) q = q.eq("sucursal_id", fs);
 				var r = await q;
 				data = (r.data || []).map(deDB);
+				await cargarTraslados();
 			}
 			// Carga perfil, catálogos, sucursales, vehículos, entregas y avisos tras iniciar sesión
 			async function cargarTodo() {
@@ -3075,6 +3076,15 @@
 				}
 				document.body.className = "r-" + perfil.rol + (esAdm() ? " r-admin" : "");
 				var v = vista();
+				// La grúa solo usa Traslados y Alertas; el traslado nuevo lo piden admin, jefe, preparador y vendedor
+				if (perfil.rol === "grua" && ["traslados", "alertas"].indexOf(v) < 0) {
+					go("traslados");
+					return;
+				}
+				if (v === "traslado" && !puedeTrasladar()) {
+					go("traslados");
+					return;
+				}
 				if (["sucursales", "sucursal", "cfginv", "cfgplan", "historial", "panel"].indexOf(v) > -1 && !esAdm()) {
 					go("");
 					return;
@@ -3095,6 +3105,10 @@
 				if (v === "plan")
 					cargarEntregas().then(function () {
 						if (vista() === "plan") listaPlan();
+					});
+				if (v === "traslados")
+					cargarTraslados().then(function () {
+						if (vista() === "traslados") pintaTraslados();
 					});
 				if (v === "inicio" || v === "inventario" || v === "traslado")
 					cargar().then(function () {
@@ -3162,6 +3176,7 @@
 				return [
 					"ingresar",
 					"traslado",
+					"traslados",
 					"inventario",
 					"editar",
 					"sucursales",
@@ -3182,7 +3197,7 @@
 			function head(t) {
 				return (
 					"<header>" +
-					(vista() !== "portada" ? '<button class="back" onclick="go(atras())">‹ Volver</button>' : "") +
+					(vista() !== "portada" && !(perfil && perfil.rol === "grua") ? '<button class="back" onclick="go(atras())">‹ Volver</button>' : "") +
 					"<h1>" +
 					t +
 					'</h1><img class="logo" src="' +
@@ -3234,6 +3249,9 @@
 					}
 					a.innerHTML = pform();
 					bindPform();
+				} else if (v === "traslados") {
+					a.innerHTML = trasladosVista();
+					bindTraslados();
 				} else if (v === "alertas") {
 					a.innerHTML = alertasVista();
 					bindAlertas();
@@ -3273,7 +3291,7 @@
 					head("Inventario de vehículos") +
 					sucBar(1) +
 					'<div class="big"><button class="bigbtn" onclick="go(\'ingresar\')"><b>Ingresar</b><span>Registrar un vehículo nuevo en el inventario</span></button>' +
-					(puedeTrasladar() ? '<button class="bigbtn s" onclick="go(\'traslado\')"><b>Traslado</b><span>Mover un vehículo a otra sucursal</span></button>' : "") +
+					(puedeTrasladar() ? '<button class="bigbtn s" onclick="go(\'traslado\')"><b>Solicitar traslado</b><span>Pedir la grúa para mover un auto</span></button>' : "") +
 					"</div>" +
 					'<div class="stats"><div class="stat"><b>' +
 					s.length +
@@ -3376,13 +3394,56 @@
 				toast("Ingreso guardado");
 				go("inv");
 			}
-			// Traslado de sucursal (un auto sin vender nunca "sale": la salida real es la entrega al cliente)
-			function puedeTrasladar() {
-				return esAdm() || (perfil && perfil.rol === "preparador");
+			// ======================================================================
+			// TRASLADOS CON GRÚA: se piden aquí (ya no por correo) y quedan con su historia
+			// Solicitado → Programado → En tránsito → Recibido (o Cancelado)
+			// ======================================================================
+			var TR = [],
+				SUCP = [],
+				tf = { est: "todos", q: "", anio: anioHoy() },
+				TRE = { Solicitado: "res", Programado: "o", "En tránsito": "am", Recibido: "dis", Cancelado: "ven" };
+			async function cargarTraslados() {
+				try {
+					var r = await db.from("traslados").select("*").order("created_at", { ascending: false }).limit(1000);
+					TR = r.data || [];
+					if (!SUCP.length) {
+						var s2 = await db.rpc("sucursales_publicas");
+						SUCP = s2.data || [];
+					}
+				} catch (e) {
+					TR = [];
+				}
 			}
+			function sucN(id) {
+				var s = SUCP.filter(function (x) {
+					return x.id === id;
+				})[0];
+				return s ? s.nombre : sucNombre(id) || "otra sucursal";
+			}
+			function trActivo(t) {
+				return t.estado === "Solicitado" || t.estado === "Programado" || t.estado === "En tránsito";
+			}
+			function trDe(vid) {
+				return TR.filter(function (t) {
+					return t.vehiculo_id === vid && trActivo(t);
+				})[0];
+			}
+			// Etiqueta del inventario: el auto va en camino o tiene un traslado pedido
+			function tagTr(v) {
+				var t = trDe(v.id);
+				return t ? '<span class="tag am">' + (t.estado === "En tránsito" ? "En tránsito" : "Traslado " + t.estado.toLowerCase()) + " → " + esc(sucN(t.destino_id)) + "</span>" : "";
+			}
+			function puedeTrasladar() {
+				return !!perfil && ["admin", "jefe", "preparador", "vendedor"].indexOf(perfil.rol) > -1;
+			}
+			function trOper() {
+				return esAdm() || perfil.rol === "grua";
+			}
+
+			// --- Pedir un traslado (VIN primero) ---
 			function trasladoVista() {
 				return (
-					head("Traslado de vehículo") +
+					head("Solicitar traslado") +
 					'<form id="fTr" novalidate>' +
 					'<label for="tv">VIN <small>completo o los últimos dígitos</small></label><input id="tv" maxlength="17" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase"><div id="tsug"></div>' +
 					'<label for="m">Modelo</label><select id="m">' +
@@ -3390,7 +3451,15 @@
 					"</select>" +
 					'<label for="u">Versión</label><select id="u" disabled><option value="">Primero elige un modelo</option></select>' +
 					'<div class="panel hide" id="det" style="margin-top:14px"></div>' +
-					'<div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Trasladar</button></form>'
+					'<label for="td">Sucursal de destino</label><select id="td" disabled><option value="">Primero elige el vehículo</option></select>' +
+					'<label for="tfe">Para el día</label><input type="date" id="tfe" value="' +
+					hoy() +
+					'">' +
+					'<label for="tho">Hora <small>(opcional)</small></label><input type="time" id="tho">' +
+					'<label for="tmo">Motivo <small>(opcional)</small></label><select id="tmo"><option value="">Sin especificar</option><option>Pedido de un cliente</option><option>Preparación para entrega</option><option>Exhibición</option><option>Reposición de stock</option><option>Otro</option></select>' +
+					'<label class="chk" for="tur" style="display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" id="tur" style="width:auto"> Es urgente</label>' +
+					'<label for="tno">Nota <small>(opcional)</small></label><input id="tno" autocomplete="off" placeholder="Ej: lo retira el cliente el viernes">' +
+					'<div class="err" id="err" role="alert"></div><button class="btn full" type="submit">Solicitar traslado</button></form>'
 				);
 			}
 			function bindTraslado() {
@@ -3398,24 +3467,45 @@
 					u = $("#u"),
 					tv = $("#tv"),
 					sel = null;
-				function trasladables() {
-					return stock().filter(puedeTrasl);
+				function libres() {
+					return stock().filter(function (v) {
+						return !trDe(v.id);
+					});
+				}
+				function destinos(v) {
+					var d = $("#td");
+					if (!v) {
+						d.disabled = true;
+						d.innerHTML = '<option value="">Primero elige el vehículo</option>';
+						return;
+					}
+					d.disabled = false;
+					d.innerHTML =
+						'<option value="">Elegir sucursal</option>' +
+						SUCP.filter(function (x) {
+							return x.id !== v.sucursalId;
+						})
+							.map(function (x) {
+								return '<option value="' + x.id + '">' + esc(x.nombre) + "</option>";
+							})
+							.join("");
 				}
 				function muestra(v) {
 					sel = v || null;
 					var d = $("#det");
+					destinos(v);
 					if (!v) {
 						d.classList.add("hide");
 						return;
 					}
 					d.classList.remove("hide");
 					d.innerHTML =
-						"<b>" + esc(v.modelo) + " " + esc(v.version) + '</b><div class="m">Color ' + esc(v.color) + " · " + esc(v.ubic) + " · " + esc(sucNombre(v.sucursalId) || "") + " · Entrada " + fmt(v.fechaEntrada) + '</div><div class="vin">' + esc(v.vin) + "</div>";
+						"<b>" + esc(v.modelo) + " " + esc(v.version) + '</b><div class="m">Color ' + esc(v.color) + " · " + esc(v.ubic) + " · Está en " + esc(sucN(v.sucursalId)) + '</div><div class="vin">' + esc(v.vin) + "</div>";
 				}
 				tv.oninput = function () {
 					tv.value = tv.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
 					var q = tv.value,
-						l = q.length >= 4 ? trasladables().filter(function (v) { return v.vin.indexOf(q) > -1; }) : [];
+						l = q.length >= 4 ? libres().filter(function (v) { return v.vin.indexOf(q) > -1; }) : [];
 					m.value = "";
 					u.disabled = true;
 					u.innerHTML = '<option value="">Primero elige un modelo</option>';
@@ -3441,7 +3531,7 @@
 					muestra(null);
 					tv.value = "";
 					$("#tsug").innerHTML = "";
-					var l = trasladables().filter(function (v) { return v.modelo === m.value; });
+					var l = libres().filter(function (v) { return v.modelo === m.value; });
 					if (!m.value) {
 						u.disabled = true;
 						u.innerHTML = '<option value="">Primero elige un modelo</option>';
@@ -3449,7 +3539,7 @@
 					}
 					if (!l.length) {
 						u.disabled = true;
-						u.innerHTML = '<option value="">No hay unidades en stock</option>';
+						u.innerHTML = '<option value="">No hay unidades disponibles</option>';
 						return;
 					}
 					u.disabled = false;
@@ -3459,14 +3549,146 @@
 					muestra(data.filter(function (x) { return x.id === u.value; })[0]);
 					if (sel) tv.value = sel.vin;
 				};
-				$("#fTr").onsubmit = function (e) {
+				$("#fTr").onsubmit = async function (e) {
 					e.preventDefault();
+					var er = $("#err"),
+						btn = $("#fTr button[type=submit]");
 					if (!sel) {
-						$("#err").textContent = "Escribe el VIN o elige el modelo y la versión del vehículo.";
+						er.textContent = "Escribe el VIN o elige el modelo y la versión del vehículo.";
 						return;
 					}
-					trasladar(sel.id);
+					if (!$("#td").value) {
+						er.textContent = "Elige la sucursal de destino.";
+						return;
+					}
+					if (!$("#tfe").value) {
+						er.textContent = "Indica para qué día se necesita.";
+						return;
+					}
+					btn.disabled = true;
+					var r = await db.rpc("solicitar_traslado", {
+						p_vehiculo: sel.id,
+						p_destino: $("#td").value,
+						p_fecha: $("#tfe").value,
+						p_hora: $("#tho").value || null,
+						p_urgente: $("#tur").checked,
+						p_motivo: $("#tmo").value || null,
+						p_nota: $("#tno").value.trim() || null,
+					});
+					if (r.error) {
+						btn.disabled = false;
+						er.textContent = (r.error.message || "No se pudo solicitar el traslado").replace(/^.*?:\s*/, "");
+						return;
+					}
+					toast("Traslado solicitado");
+					await cargarTraslados();
+					go("traslados");
 				};
+			}
+
+			// --- Lista de traslados ---
+			function trasladosVista() {
+				return (
+					head("Traslados") +
+					'<div class="sechd"><h2 class="sec" id="trc">Traslados</h2>' +
+					(puedeTrasladar() ? '<button type="button" class="btn add" onclick="go(&quot;traslado&quot;)">' + btnMas("Solicitar traslado") + "</button>" : "") +
+					"</div>" +
+					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-tt="todos">Todos</button><button class="chip" data-tt="activos">Activos</button><button class="chip" data-tt="Recibido">Recibidos</button><button class="chip" data-tt="Cancelado">Cancelados</button></div>' +
+					'<div class="tools">' +
+					anioSel("ty", tf.anio, TR.map(function (t) { return t.created_at; })) +
+					'<input id="tq" type="search" class="wide" placeholder="Buscar por VIN, modelo, sucursal o persona" aria-label="Buscar"><button class="btn g wide" id="tlim" type="button">Limpiar filtros</button></div>' +
+					'<div id="tl" class="trl"></div>'
+				);
+			}
+			function bindTraslados() {
+				$("#ty").value = tf.anio || "";
+				$("#tq").value = tf.q;
+				$("#ty").onchange = function () {
+					tf.anio = this.value;
+					pintaTraslados();
+				};
+				$("#tq").oninput = function () {
+					tf.q = this.value;
+					pintaTraslados();
+				};
+				$("#tlim").onclick = function () {
+					tf = { est: "todos", q: "", anio: anioHoy() };
+					$("#ty").value = tf.anio;
+					$("#tq").value = "";
+					pintaTraslados();
+				};
+				document.querySelectorAll("[data-tt]").forEach(function (b) {
+					b.onclick = function () {
+						tf.est = b.dataset.tt;
+						pintaTraslados();
+					};
+				});
+				pintaTraslados();
+			}
+			function trAcciones(t) {
+				var op = trOper(),
+					dest = perfil.rol === "preparador" && perfil.sucursal_id === t.destino_id,
+					mio = t.solicitante_id === sesion.user.id,
+					b = function (k, txt, cl) {
+						return '<button type="button" class="btn ' + cl + '" data-a="trn" data-k="' + k + '" data-id="' + t.id + '">' + txt + "</button>";
+					},
+					h = "";
+				if (t.estado === "Solicitado" && op) h += b("programar", "Programar", "g");
+				if ((t.estado === "Solicitado" || t.estado === "Programado") && op) h += b("retirar", "Marcar retirado", "");
+				if (t.estado === "En tránsito" && (op || dest)) h += b("recibir", "Marcar recibido", "");
+				if ((t.estado === "Solicitado" || t.estado === "Programado") && (op || mio)) h += b("cancelar", "Cancelar", "d");
+				return h ? '<div class="vb">' + h + "</div>" : "";
+			}
+			function cardT(t) {
+				var f = String(t.fecha_pedida).split("-"),
+					act = trActivo(t);
+				return (
+					'<div class="v pe' + (t.urgente && act ? " out" : "") + '"><div class="ph1"><div class="pt"><h3>' +
+					esc(t.modelo) + " " + esc(t.version || "") + (t.color ? " · " + esc(t.color) : "") +
+					'</h3><div class="vin">' + esc(t.vin) + '</div></div><div class="pdt" title="Para el ' + fmt(t.fecha_pedida) + '"><b>' +
+					parseInt(f[2], 10) + "</b><span>" + MES3[parseInt(f[1], 10) - 1] + "</span><small>" + String(t.hora_pedida || "").slice(0, 5) + "</small></div></div>" +
+					'<div style="margin:10px 0 4px"><span class="tag ' + (TRE[t.estado] || "res") + '">' + t.estado + "</span>" +
+					(t.urgente && act ? '<span class="tag o">Urgente</span>' : "") + "</div>" +
+					'<p class="trruta"><b>' + esc(sucN(t.origen_id)) + "</b> → <b>" + esc(sucN(t.destino_id)) + "</b></p>" +
+					filas([
+						["Pedido por", esc(t.solicitante) + " · " + fmtDT(t.created_at)],
+						["Para el día", fmt(t.fecha_pedida) + (t.hora_pedida ? " " + String(t.hora_pedida).slice(0, 5) : "")],
+						["Motivo", esc(t.motivo)],
+						["Nota", esc(t.nota)],
+						["Grúa", esc(t.grua)],
+						["Patente", esc(t.patente)],
+						["Retirado", t.retirado_at ? fmtDT(t.retirado_at) : ""],
+						["Recibido", t.recibido_at ? fmtDT(t.recibido_at) : ""],
+						["Cancelado", t.cancelado_at ? fmtDT(t.cancelado_at) : ""],
+						["Observaciones", esc(t.obs)],
+					]) +
+					trAcciones(t) +
+					"</div>"
+				);
+			}
+			function pintaTraslados() {
+				if (!$("#tl")) return;
+				document.querySelectorAll("[data-tt]").forEach(function (b) {
+					b.setAttribute("aria-pressed", b.dataset.tt === tf.est);
+				});
+				var q = tf.q.toLowerCase(),
+					l = TR.filter(function (t) {
+						if (tf.est === "activos" && !trActivo(t)) return false;
+						if ((tf.est === "Recibido" || tf.est === "Cancelado") && t.estado !== tf.est) return false;
+						// Los traslados en curso siempre se ven; los cerrados, solo los del año elegido
+						if (tf.anio && !trActivo(t) && String(t.created_at).slice(0, 4) !== tf.anio) return false;
+						return !q || [t.vin, t.modelo, t.version, t.color, sucN(t.origen_id), sucN(t.destino_id), t.solicitante, t.grua, t.patente].join(" ").toLowerCase().indexOf(q) > -1;
+					}).sort(function (a, b) {
+						var pa = trActivo(a) ? 0 : 1,
+							pb = trActivo(b) ? 0 : 1;
+						if (pa !== pb) return pa - pb;
+						if (pa === 0) return (a.urgente === b.urgente ? 0 : a.urgente ? -1 : 1) || (a.fecha_pedida > b.fecha_pedida ? 1 : a.fecha_pedida < b.fecha_pedida ? -1 : 0);
+						return a.created_at < b.created_at ? 1 : -1;
+					});
+				$("#trc").textContent = "Traslados (" + l.length + ")";
+				$("#tl").innerHTML = l.length
+					? l.map(cardT).join("")
+					: '<div class="empty">' + (puedeTrasladar() ? "No hay traslados con estos filtros. Usa «Solicitar traslado» para pedir el primero." : "No hay traslados con estos filtros.") + "</div>";
 			}
 			function inventario() {
 				var s = stock(),
@@ -3628,6 +3850,7 @@
 							"</span>" +
 							tagAnt(v) +
 							tagSucI(v.sucursalId) +
+							tagTr(v) +
 							"</div>" +
 							filas([
 								["Entrada", fmt(v.fechaEntrada)],
@@ -4233,7 +4456,7 @@
 
 			function atras() {
 				var v = vista();
-				return ["inicio", "sucursales", "historial", "plan", "alertas", "panel", "tareas"].indexOf(v) > -1
+				return ["inicio", "sucursales", "historial", "plan", "alertas", "panel", "tareas", "traslados"].indexOf(v) > -1
 					? ""
 					: v === "pform"
 						? "plan"
@@ -4274,7 +4497,7 @@
 			}
 			// Roles que reciben avisos (el vendedor solo cuando su entrega queda lista)
 			function recibeAvisos() {
-				return !!perfil && ["admin", "jefe", "preparador", "vendedor"].indexOf(perfil.rol) > -1;
+				return !!perfil && ["admin", "jefe", "preparador", "vendedor", "grua"].indexOf(perfil.rol) > -1;
 			}
 			function alertasPlazo() {
 				return ent.filter(function (e) {
@@ -4293,6 +4516,7 @@
 				var v = vista();
 				if (v === "plan") listaPlan();
 				else if (v === "tareas") pintaTareas();
+				else if (v === "traslados") pintaTraslados();
 				else if (v === "alertas" || v === "portada" || v === "panel") renderApp();
 			}
 			function suscribir() {
@@ -4310,6 +4534,12 @@
 					)
 					.on("postgres_changes", { event: "*", schema: "public", table: "entregas" }, function () {
 						cargarEntregas().then(refrescaVista);
+					})
+					.on("postgres_changes", { event: "*", schema: "public", table: "traslados" }, function () {
+						cargarTraslados().then(function () {
+							if (vista() === "inicio") renderApp();
+							else refrescaVista();
+						});
 					})
 					.subscribe();
 			}
@@ -4346,7 +4576,7 @@
 			}
 			var CCOL = { verde: "dis", azul: "res", ambar: "o", gris: "ven" },
 				CNOM = { verde: "Verde", azul: "Azul", ambar: "Ámbar", gris: "Gris" },
-				ROLES = ["admin", "jefe", "vendedor", "preparador", "consulta"];
+				ROLES = ["admin", "jefe", "vendedor", "preparador", "consulta", "grua"];
 			var CFG = {
 				modelo: {
 					t: "modelos",
@@ -5174,7 +5404,7 @@
 				}
 				var gr = function (rol) {
 						return PER.filter(function (u) {
-							return u.activo && u.rol === rol && (rol === "jefe" || u.sucursal_id === id);
+							return u.activo && u.rol === rol && (rol === "jefe" || rol === "grua" || u.sucursal_id === id);
 						});
 					},
 					h = "";
@@ -5183,9 +5413,10 @@
 					["vendedor", "Vendedores"],
 					["preparador", "Preparadores"],
 					["consulta", "Consulta"],
+					["grua", "Grúas"],
 				].forEach(function (p) {
 					var l = gr(p[0]);
-					if (p[0] === "consulta" && !l.length) return;
+					if ((p[0] === "consulta" || p[0] === "grua") && !l.length) return;
 					h +=
 						'<h2 class="sec">' +
 						p[1] +
@@ -5232,6 +5463,57 @@
 				if (i) i.focus();
 			};
 			ACC.xm = cierraModal;
+			// Ventana para confirmar cada paso (grúa y patente, observaciones…)
+			ACC.trn = function (b) {
+				var t = TR.filter(function (x) { return x.id === b.dataset.id; })[0],
+					k = b.dataset.k;
+				if (!t) return;
+				cierraModal();
+				var tit = { programar: "Programar traslado", retirar: "Marcar como retirado", recibir: "Marcar como recibido", cancelar: "Cancelar traslado" }[k],
+					cuerpo =
+						k === "programar" || k === "retirar"
+							? '<label for="tn_g">Grúa o chofer</label><input id="tn_g" autocomplete="off" value="' + esc(t.grua || (perfil.rol === "grua" ? perfil.nombre || "" : "")) + '"><label for="tn_p">Patente de la grúa <small>(opcional)</small></label><input id="tn_p" maxlength="8" autocomplete="off" style="text-transform:uppercase" value="' + esc(t.patente || "") + '">'
+							: '<label for="tn_o">' + (k === "recibir" ? "Observaciones al recibir" : "Motivo") + ' <small>(opcional)</small></label><input id="tn_o" autocomplete="off" placeholder="' + (k === "recibir" ? "Ej: sin daños" : "Ej: el cliente ya no lo necesita") + '">',
+					m = document.createElement("div");
+				m.id = "modal";
+				m.className = "modal";
+				m.setAttribute("role", "dialog");
+				m.setAttribute("aria-modal", "true");
+				m.innerHTML =
+					'<div class="mp"><div class="mh"><b>' + tit + '</b><button type="button" class="ib" data-a="xm" aria-label="Cerrar">&times;</button></div><div class="ed"><p class="hola" style="margin:6px 0 0"><b>' +
+					esc(t.modelo) + " " + esc(t.version || "") + "</b> · " + esc(t.vin) + "<br>" + esc(sucN(t.origen_id)) + " → " + esc(sucN(t.destino_id)) + "</p>" + cuerpo +
+					'<div class="err" id="tn_e" role="alert"></div><div class="vb"><button type="button" class="btn' + (k === "cancelar" ? " d" : "") + '" data-a="trok" data-k="' + k + '" data-id="' + t.id + '">Confirmar</button><button type="button" class="btn g" data-a="xm">Volver</button></div></div></div>';
+				document.body.appendChild(m);
+				document.body.classList.add("mopen");
+				m.addEventListener("mousedown", function (e) {
+					if (e.target === m) cierraModal();
+				});
+				var i = m.querySelector("input");
+				if (i) i.focus();
+			};
+			ACC.trok = async function (b) {
+				var g = $("#tn_g"),
+					p = $("#tn_p"),
+					o = $("#tn_o"),
+					er = $("#tn_e");
+				b.disabled = true;
+				var r = await db.rpc("traslado_avanzar", {
+					p_id: b.dataset.id,
+					p_accion: b.dataset.k,
+					p_grua: g ? g.value.trim() || null : null,
+					p_patente: p ? p.value.trim() || null : null,
+					p_obs: o ? o.value.trim() || null : null,
+				});
+				if (r.error) {
+					b.disabled = false;
+					er.textContent = (r.error.message || "No se pudo guardar").replace(/^.*?:\s*/, "");
+					return;
+				}
+				cierraModal();
+				toast({ programar: "Traslado programado", retirar: "Marcado como retirado", recibir: "Vehículo recibido: ya está en su nueva sucursal", cancelar: "Traslado cancelado" }[b.dataset.k]);
+				await cargar();
+				pintaTraslados();
+			};
 			// Ventana emergente para agregar una sucursal
 			ACC.sucnew = function () {
 				cierraModal();
@@ -6177,7 +6459,7 @@
 					(puedeTrasladar()
 						? '<button class="bigbtn s" onclick="go(\'traslado\')"><i class="arw dn">' +
 							svg("swap") +
-							'</i><span class="tx"><b>Traslado</b><span>Mover un vehículo a otra sucursal</span></span></button>'
+							'</i><span class="tx"><b>Solicitar traslado</b><span>Pedir la grúa para mover un auto</span></span></button>'
 						: "") +
 					"</div>"
 				);
@@ -6235,7 +6517,9 @@
 								(EC[v.estado || "Disponible"] || "res") +
 								'">' +
 								esc(v.estado || "Disponible") +
-								'</span></td><td class="dtc"><div>' +
+								"</span>" +
+								tagTr(v) +
+								'</td><td class="dtc"><div>' +
 								fmt(v.fechaEntrada) +
 								(o ? "" : " " + tagAnt(v)) +
 								'</div></td><td class="dtc">' +
@@ -6367,6 +6651,10 @@
 				"reasignación": "am",
 				"grabado de patente": "am",
 				traslado: "am",
+				"traslado solicitado": "res",
+				"traslado programado": "o",
+				"traslado en tránsito": "am",
+				"traslado cancelado": "ven",
 			};
 			// Grupos para filtrar
 			var HG = [
@@ -6374,6 +6662,7 @@
 				["veh", "Vehículos"],
 				["ent", "Entregas"],
 				["cue", "Cuentas"],
+				["tra", "Traslados"],
 				["suc", "Sucursales"],
 				["cat", "Modelos y estados"],
 				["aju", "Ajustes"],
@@ -6389,6 +6678,7 @@
 				if (e === "entrega") return "ent";
 				if (e === "cuenta") return "cue";
 				if (e === "sucursal") return "suc";
+				if (e === "traslado") return "tra";
 				if (e === "ajuste") return "aju";
 				if (e === "sesión" || e === "exportación" || e === "avisos") return "act";
 				return "cat";
@@ -7794,6 +8084,7 @@
 						'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 16l2 2 4-4"/></svg>',
 					bell: SI + '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>',
 				};
+			IC.swap = SI + '<path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>';
 			IC.chart = SI + '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>';
 			IC.check = SI + '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h9"/></svg>';
 
@@ -7819,18 +8110,22 @@
 					? ""
 					: v === "plan" || v === "pform"
 						? "plan"
-						: v === "alertas"
+						: v === "traslados" || v === "traslado"
+							? "tras"
+							: v === "alertas"
 							? "alertas"
 							: v === "panel"
 								? "panel"
 								: v === "tareas"
 									? "tareas"
-									: ["inicio", "ingresar", "traslado", "inventario", "editar"].indexOf(v) > -1
+									: ["inicio", "ingresar", "inventario", "editar"].indexOf(v) > -1
 								? "inv"
 								: "home";
 				var it = [["home", "", "Inicio", IC.home]];
+				if (perfil.rol === "grua") it = [];
 				if (ad) it.push(["panel", "panel", "Panel", IC.chart]);
-				it.push(["inv", "inv", "Inventario", IC.car], ["plan", "plan", "Planificador", IC.cal]);
+				if (perfil.rol !== "grua") it.push(["inv", "inv", "Inventario", IC.car], ["plan", "plan", "Planificador", IC.cal]);
+				it.push(["tras", "traslados", "Traslados", IC.swap]);
 				if (perfil.rol === "preparador") it.push(["tareas", "tareas", "Mis tareas", IC.check]);
 				it.push(["alertas", "alertas", "Alertas", IC.bell]);
 				var nt = perfil.rol === "preparador" ? tareasUrgentes() : 0;
@@ -8002,82 +8297,6 @@
 				}
 				AJ.antiguedad = { amarillo: a, rojo: r };
 				toast("Guardado");
-			};
-
-			/* ----- Traslados entre sucursales ----- */
-			// Admin y jefe trasladan cualquier vehículo en stock; el preparador, los de su sucursal
-			function puedeTrasl(v) {
-				return !v.fechaSalida && (esAdm() || (perfil.rol === "preparador" && v.sucursalId === perfil.sucursal_id));
-			}
-			async function trasladar(id) {
-				var v = data.filter(function (x) {
-					return x.id === id;
-				})[0];
-				if (!v) return;
-				var r = await db.rpc("sucursales_publicas"),
-					dest = (r.data || []).filter(function (x) {
-						return x.id !== v.sucursalId;
-					});
-				if (!dest.length) {
-					toast("No hay otra sucursal activa a la que trasladar");
-					return;
-				}
-				cierraModal();
-				var m = document.createElement("div");
-				m.id = "modal";
-				m.className = "modal";
-				m.setAttribute("role", "dialog");
-				m.setAttribute("aria-modal", "true");
-				m.innerHTML =
-					'<div class="mp"><div class="mh"><b>Trasladar vehículo</b><button type="button" class="ib" data-a="xm" aria-label="Cerrar">&times;</button></div>' +
-					'<div class="ed"><p class="hola" style="margin:6px 0 0"><b>' +
-					esc(v.modelo) +
-					" " +
-					esc(v.version) +
-					"</b> · " +
-					esc(v.vin) +
-					"<br>Está en " +
-					esc(sucNombre(v.sucursalId) || "su sucursal") +
-					'.</p><label for="tr_d">Sucursal de destino</label><select id="tr_d"><option value="">Elegir sucursal</option>' +
-					dest
-						.map(function (x) {
-							return '<option value="' + x.id + '">' + esc(x.nombre) + "</option>";
-						})
-						.join("") +
-					'</select><label for="tr_u">Inventario en el destino <small>(opcional)</small></label><select id="tr_u"><option value="">Mantener «' +
-					esc(v.ubic) +
-					"»</option>" +
-					UBIC.map(function (x) {
-						return "<option>" + esc(x) + "</option>";
-					}).join("") +
-					'</select><label for="tr_n">Nota <small>(opcional)</small></label><input id="tr_n" autocomplete="off" placeholder="Ej: lo pidió el cliente de Bellavista">' +
-					'<div class="err" id="tr_e" role="alert"></div><div class="vb"><button type="button" class="btn" data-a="trgo" data-id="' +
-					v.id +
-					'">Trasladar</button><button type="button" class="btn g" data-a="xm">Cancelar</button></div></div></div>';
-				document.body.appendChild(m);
-				document.body.classList.add("mopen");
-				m.addEventListener("mousedown", function (e) {
-					if (e.target === m) cierraModal();
-				});
-			}
-			ACC.trgo = async function (b) {
-				var d = $("#tr_d").value,
-					er = $("#tr_e");
-				if (!d) {
-					er.textContent = "Elige la sucursal de destino.";
-					return;
-				}
-				b.disabled = true;
-				var r = await db.rpc("trasladar_vehiculo", { p_id: b.dataset.id, p_destino: d, p_ubicacion: $("#tr_u").value || null, p_nota: $("#tr_n").value.trim() || null });
-				if (r.error) {
-					b.disabled = false;
-					er.textContent = (r.error.message || "No se pudo trasladar").replace(/^.*?:\s*/, "");
-					return;
-				}
-				cierraModal();
-				toast("Vehículo trasladado");
-				await cargar();
-				renderApp();
 			};
 
 			/* ----- Panel de resumen (admin y jefe) ----- */
