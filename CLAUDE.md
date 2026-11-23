@@ -98,3 +98,6 @@ Reemplaza los correos. Estados: Solicitado → Programado → En tránsito → R
 - **grua**: igual que conductor pero no pide traslados; opera los traslados (programar, retirar, recibir).
 - **preparador**: botón «Registrar traslado» en inventario y en Traslados (no «Solicitar traslado»). El auto sale del stock de su sucursal (fecha de salida) y no aparece en la otra; el admin puede «Deshacer salida».
 - Helpers: `soloTras()`, `verTodas()`, `puedeEditarInv()`, `puedeRegistrar()`, `puedeTrasladar()` (admin, jefe, vendedor, conductor).
+- **Sin sucursal fija**: administrador, jefe, conductor, grúa y consulta trabajan en todas las sucursales (`esGlobal()`); consulta, grúa y conductor usan el selector de sucursal del inventario (`verTodas()`). Solo vendedor y preparador exigen sucursal.
+- Traslados y Registros se filtran por **Origen** y **Destino** (`tf.origen`, `tf.destino`), además de modelo, estado y año.
+- `cuentas_prueba.sql`: crea 6 cuentas de prueba (RUT 20.100.001-7 a 20.100.006-8, clave 0001 a 0006) y trae el comando para borrarlas.

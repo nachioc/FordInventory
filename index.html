@@ -3431,7 +3431,7 @@
 				SUCP = [],
 				REG = [],
 				TRST = ["Solicitado", "Programado", "En tránsito", "Recibido", "Cancelado"],
-				tf = { est: "todos", q: "", anio: anioHoy(), modelo: "" },
+				tf = { est: "todos", q: "", anio: anioHoy(), modelo: "", origen: "", destino: "" },
 				TRE = { Solicitado: "res", Programado: "o", "En tránsito": "am", Recibido: "dis", Cancelado: "ven" };
 			async function cargarTraslados() {
 				try {
@@ -3640,6 +3640,9 @@
 					'</select><select id="tst" aria-label="Estado del traslado">' +
 					opts(TRST, "Todos los estados") +
 					"</select>" +
+					'<select id="to" aria-label="Sucursal de origen"><option value="">Origen: todas</option>' + SUCP.map(function (x) { return '<option value="' + x.id + '">Origen: ' + esc(x.nombre) + "</option>"; }).join("") +
+					'</select><select id="tde" aria-label="Sucursal de destino"><option value="">Destino: todas</option>' + SUCP.map(function (x) { return '<option value="' + x.id + '">Destino: ' + esc(x.nombre) + "</option>"; }).join("") +
+					"</select>" +
 					anioSel("ty", tf.anio, TR.concat(REG).map(function (t) { return t.created_at; })) +
 					'<input id="tq" type="search" class="wide" placeholder="Buscar por VIN, modelo, sucursal o persona" aria-label="Buscar"><button class="btn g wide" id="tlim" type="button">Limpiar filtros</button></div>' +
 					'<div id="tl" class="trl"></div><div class="acts">' +
@@ -3656,6 +3659,16 @@
 					tf.modelo = this.value;
 					pintaTraslados();
 				};
+				$("#to").value = tf.origen || "";
+				$("#tde").value = tf.destino || "";
+				$("#to").onchange = function () {
+					tf.origen = this.value;
+					pintaTraslados();
+				};
+				$("#tde").onchange = function () {
+					tf.destino = this.value;
+					pintaTraslados();
+				};
 				$("#tst").onchange = function () {
 					tf.est = this.value || "todos";
 					pintaTraslados();
@@ -3669,7 +3682,9 @@
 					pintaTraslados();
 				};
 				$("#tlim").onclick = function () {
-					tf = { est: "todos", q: "", anio: anioHoy(), modelo: "" };
+					tf = { est: "todos", q: "", anio: anioHoy(), modelo: "", origen: "", destino: "" };
+					$("#to").value = "";
+					$("#tde").value = "";
 					$("#ty").value = tf.anio;
 					$("#tq").value = "";
 					$("#tm").value = "";
@@ -3737,6 +3752,8 @@
 					if (tf.est === "activos" && !trActivo(t)) return false;
 					if (TRST.indexOf(tf.est) > -1 && t.estado !== tf.est) return false;
 					if (tf.modelo && t.modelo !== tf.modelo) return false;
+					if (tf.origen && t.origen_id !== tf.origen) return false;
+					if (tf.destino && t.destino_id !== tf.destino) return false;
 					if (tf.anio && !trActivo(t) && String(t.created_at).slice(0, 4) !== tf.anio) return false;
 					return !q || [t.vin, t.modelo, t.version, t.color, sucN(t.origen_id), sucN(t.destino_id), t.solicitante, t.grua, t.patente].join(" ").toLowerCase().indexOf(q) > -1;
 				}).sort(function (a, b) {
@@ -3751,6 +3768,8 @@
 				var q = tf.q.toLowerCase();
 				return REG.filter(function (r) {
 					if (tf.modelo && r.modelo !== tf.modelo) return false;
+					if (tf.origen && r.origen_id !== tf.origen) return false;
+					if (tf.destino && r.destino_id !== tf.destino) return false;
 					if (tf.anio && String(r.created_at).slice(0, 4) !== tf.anio) return false;
 					return !q || [r.vin, r.modelo, r.version, r.color, sucN(r.origen_id), sucN(r.destino_id), r.creado_por_nombre, r.nota].join(" ").toLowerCase().indexOf(q) > -1;
 				});
@@ -4645,7 +4664,7 @@
 			}
 			// Roles que reciben avisos (el vendedor solo cuando su entrega queda lista)
 			function recibeAvisos() {
-				return !!perfil && ["admin", "jefe", "preparador", "vendedor", "grua"].indexOf(perfil.rol) > -1;
+				return !!perfil && ["admin", "jefe", "preparador", "vendedor", "grua", "conductor"].indexOf(perfil.rol) > -1;
 			}
 			function alertasPlazo() {
 				return ent.filter(function (e) {
@@ -4714,13 +4733,17 @@
 			function esAdm() {
 				return !!perfil && (perfil.rol === "admin" || perfil.rol === "jefe");
 			}
+			// Estos roles no tienen una sucursal fija: trabajan en todas
+			function esGlobal(u) {
+				return !!u && ["admin", "jefe", "grua", "conductor", "consulta"].indexOf(u.rol) > -1;
+			}
 			// Grúa y conductor solo usan inventario (para mirar), traslados y alertas
 			function soloTras() {
 				return !!perfil && (perfil.rol === "grua" || perfil.rol === "conductor");
 			}
 			// Roles que miran el inventario de todas las sucursales con el selector
 			function verTodas() {
-				return !!perfil && ["vendedor", "grua", "conductor"].indexOf(perfil.rol) > -1;
+				return !!perfil && ["vendedor", "grua", "conductor", "consulta"].indexOf(perfil.rol) > -1;
 			}
 			// Grúa y conductor no ingresan ni editan autos
 			function puedeEditarInv() {
@@ -4974,7 +4997,7 @@
 			}
 			// ¿La cuenta está pendiente de aprobación?
 			function pendiente(u) {
-				return u.rol === "admin" || u.rol === "jefe" ? !u.activo : !u.activo || !u.sucursal_id;
+				return esGlobal(u) ? !u.activo : !u.activo || !u.sucursal_id;
 			}
 			document.addEventListener("click", function (e) {
 				var b = e.target.closest && e.target.closest("[data-a]");
@@ -5433,7 +5456,7 @@
 					d +
 					">" +
 					optsSuc(sucV, "Sin sucursal fija (todas)") +
-					'</select><p class="m" style="margin:4px 0 0">Admin y jefe pueden trabajar en todas las sucursales; dejar vacío es lo normal para ellos.</p>' +
+					'</select><p class="m" style="margin:4px 0 0">Administrador, jefe, conductor, grúa y consulta trabajan en todas las sucursales; dejar vacío es lo normal para ellos.</p>' +
 					'<div class="eda"><button type="button" class="btn full" data-a="gp">Guardar cambios</button>' +
 					(me
 						? ""
@@ -5458,7 +5481,7 @@
 				var me = u.id === sesion.user.id,
 					pd = pendiente(u),
 					ro = u.rol === "admin" && perfil.rol !== "admin";
-				var out = u.activo && (u.rol === "admin" || u.rol === "jefe" || u.sucursal_id) ? "" : " out";
+				var out = u.activo && (esGlobal(u) || u.sucursal_id) ? "" : " out";
 				return (
 					'<div class="v pers' +
 					out +
@@ -5504,7 +5527,7 @@
 									? sucNombre(u.sucursal_id)
 									: pd && u.sucursal_pedida
 										? "Solicita: " + sucNombre(u.sucursal_pedida)
-										: u.rol === "admin" || u.rol === "jefe"
+										: esGlobal(u)
 											? "Todas"
 											: "—";
 							return (
@@ -5567,7 +5590,7 @@
 				}
 				var gr = function (rol) {
 						return PER.filter(function (u) {
-							return u.activo && u.rol === rol && (rol === "jefe" || rol === "grua" || rol === "conductor" || u.sucursal_id === id);
+							return u.activo && u.rol === rol && (rol === "jefe" || rol === "grua" || rol === "conductor" || rol === "consulta" || u.sucursal_id === id);
 						});
 					},
 					h = "";
@@ -5867,7 +5890,7 @@
 					rol = q("rol").value,
 					suc = q("suc").value,
 					nom = q("nombre").value.trim();
-				if (rol !== "admin" && rol !== "jefe" && !suc) {
+				if (!esGlobal({ rol: rol }) && !suc) {
 					toast("Elige una sucursal");
 					return;
 				}
