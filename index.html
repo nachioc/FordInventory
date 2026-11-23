@@ -380,6 +380,7 @@
 				gap: 8px;
 				margin-bottom: 12px;
 			}
+			.tools .fyw,
 			.tools .wide,
 			.tools #pe,
 			.tools #pq {
@@ -796,6 +797,7 @@
 				.tools {
 					grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 				}
+				.tools .fyw,
 				.tools .wide,
 				.tools #pe,
 				.tools #pq {
@@ -2434,8 +2436,13 @@
 					height: 30px;
 				}
 				.ptb-tools {
-					grid-template-columns: minmax(170px, 230px) minmax(200px, 1fr) auto auto;
+					grid-template-columns: minmax(170px, 230px) minmax(110px, 140px) minmax(200px, 1fr) auto auto;
 					align-items: stretch;
+				}
+				@media (max-width: 1199px) {
+					.ptb-tools {
+						grid-template-columns: minmax(150px, 1fr) 120px minmax(170px, 1.4fr);
+					}
 				}
 				.calwrap {
 					grid-template-columns: minmax(380px, 540px) minmax(0, 1fr);
