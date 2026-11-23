@@ -262,6 +262,20 @@
 				border-radius: 12px;
 				padding: 12px;
 			}
+			button.stat {
+				font: inherit;
+				text-align: left;
+				color: inherit;
+				cursor: pointer;
+				transition: border-color 0.15s, box-shadow 0.15s;
+			}
+			button.stat:hover {
+				border-color: var(--pr);
+			}
+			button.stat[aria-pressed="true"] {
+				border-color: var(--pr);
+				box-shadow: inset 0 0 0 1px var(--pr);
+			}
 			.stat b {
 				display: block;
 				font-size: 26px;
@@ -3702,11 +3716,11 @@
 					head("Inventario de vehículos") +
 					sucBar(1) +
 					bigsInv() +
-					'<div class="stats"><div class="stat"><b>' +
+					'<div class="stats"><button type="button" class="stat" data-su="" title="Ver todo el stock"><b>' +
 					s.length +
-					"</b><small>En stock</small></div>" +
+					"</b><small>En stock</small></button>" +
 					UBIC.map(function (x) {
-						return '<div class="stat"><b>' + c[x] + "</b><small>" + x + "</small></div>";
+						return '<button type="button" class="stat" data-su="' + esc(x) + '" title="Ver solo ' + esc(x) + '"><b>' + c[x] + "</b><small>" + esc(x) + "</small></button>";
 					}).join("") +
 					"</div>" +
 					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="todos">Todos</button><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Trasladados</button>' +
@@ -3779,6 +3793,15 @@
 						lista();
 					};
 				});
+				// Tocar una tarjeta de arriba filtra por esa ubicación (la de "En stock" quita el filtro)
+				document.querySelectorAll(".stat[data-su]").forEach(function (b) {
+					b.onclick = function () {
+						filtro.ubic = b.dataset.su;
+												filtro.est = "stock"; // los números de las tarjetas cuentan solo el stock
+						$("#fu").value = filtro.ubic;
+						lista();
+					};
+				});
 				$("#exp").onclick = function () {
 					exportarInv("csv");
 				};
@@ -3813,6 +3836,9 @@
 			function lista() {
 				document.querySelectorAll(".chip").forEach(function (b) {
 					b.setAttribute("aria-pressed", b.dataset.e === filtro.est);
+				});
+				document.querySelectorAll(".stat[data-su]").forEach(function (b) {
+					b.setAttribute("aria-pressed", b.dataset.su === (filtro.ubic || ""));
 				});
 				var l = invFiltrado();
 				if (!l.length) {
