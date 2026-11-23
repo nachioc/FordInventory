@@ -40,7 +40,7 @@ Convenciones:
 
 ## Rutas (hash)
 
-`#` Inicio · `#inv` Inventario · `#ingresar` · `#traslado` (`#salida` redirige aquí) · `#editar` · `#plan` · `#pform` · `#alertas` · `#panel` (admin/jefe) · `#tareas` (preparador) · `#sucursales` · `#sucursal/none` (Cuentas) · `#sucursal/<id>` · `#cfginv` · `#cfgplan` · `#historial`. Un hash sin permiso redirige a Inicio.
+`#` Inicio · `#inv` Inventario · `#ingresar` · `#traslado` (pedir; `#salida` redirige aquí) · `#traslados` (lista y seguimiento) · `#editar` · `#plan` · `#pform` · `#alertas` · `#panel` (admin/jefe) · `#tareas` (preparador) · `#sucursales` · `#sucursal/none` (Cuentas) · `#sucursal/<id>` · `#cfginv` · `#cfgplan` · `#historial`. Un hash sin permiso redirige a Inicio.
 
 ## Base de datos
 
@@ -54,7 +54,7 @@ Tablas: `perfiles`, `sucursales`, `vehiculos`, `entregas`, `notificaciones`, `hi
 
 ### Orden de ejecución de los SQL (SQL Editor de Supabase)
 
-1. `supabase_setup.sql` 2. `planificador_parte1–4` 3. `roles_parte1–4` 4. `jefe_parte1–3` 5. `sucursales_parte1–7` 6. `fase2_parte1–6` 7. `fase3_parte1` 8. `rut_admin` 9. `jefe_total_parte1–4` 10. `vendedor_sync` 11. `codigos_vin_parte1–2` 12. `push_parte1` 13. `vendedor_aviso` 14. `orden_bd` 15. `indices` 16. `mejoras_parte1–3` (activar antes la extensión **pg_cron**) 17. `mejoras_parte4` (historial total) 18. `mejoras_parte5` (preparador/vendedor por id, estados válidos, índices) 19. `mejoras_parte6` (RPC `eliminar_usuario`) 20. `mejoras_parte7` (salida automática al entregar).
+1. `supabase_setup.sql` 2. `planificador_parte1–4` 3. `roles_parte1–4` 4. `jefe_parte1–3` 5. `sucursales_parte1–7` 6. `fase2_parte1–6` 7. `fase3_parte1` 8. `rut_admin` 9. `jefe_total_parte1–4` 10. `vendedor_sync` 11. `codigos_vin_parte1–2` 12. `push_parte1` 13. `vendedor_aviso` 14. `orden_bd` 15. `indices` 16. `mejoras_parte1–3` (activar antes la extensión **pg_cron**) 17. `mejoras_parte4` (historial total) 18. `mejoras_parte5` (preparador/vendedor por id, estados válidos, índices) 19. `mejoras_parte6` (RPC `eliminar_usuario`) 20. `mejoras_parte7` (salida automática al entregar) 21. `mejoras_parte8` (traslados con grúa: rol `grua`, tabla `traslados`, RPC `solicitar_traslado` y `traslado_avanzar`). 22. `mejoras_parte9` (revisión: permisos de funciones, relaciones de traslados, limpieza de índices). 23. `mejoras_parte10` (rol `conductor`; grúa y conductor ven el inventario de todas las sucursales en solo lectura; el preparador ya no pide traslados: usa **Registrar traslado**, tabla `registros_traslado` + RPC `registrar_traslado`, que solo deja constancia y descuenta el auto de su sucursal sin agregarlo a la otra). `revision_bd.sql` es una consulta de solo lectura para revisar la base cuando se quiera.
 
 Los archivos se pueden correr más de una vez. Si el editor muestra "RUN QUERY", es solo la confirmación de Supabase.
 
@@ -83,3 +83,18 @@ Se usa un stub de `supabase-js` (intercepta `supabase*.js` en Playwright) con da
 - Íconos de la app aún son imágenes azules de Ford (cambiar a gusto del dueño).
 - `PUSH_SECRET` opcional para blindar la Edge Function.
 - Revisar que el vendedor vea el stock de todas las sucursales en producción (política `ver vehiculos`).
+
+## Filtro por año
+Inventario (`filtro.anio`), Planificador (`pf.anio`) e Historial (`hAnio`, consulta con `gte/lt` sobre `fecha`) parten en el año actual. Los autos en stock y las entregas activas se ven siempre; solo los autos con salida y las entregas ya entregadas se filtran por año. «Todos los años» lo desactiva; «Limpiar filtros» vuelve al año actual. Exportar CSV/Excel respeta el año elegido (sirve de cierre anual).
+
+## Traslados con grúa
+Reemplaza los correos. Estados: Solicitado → Programado → En tránsito → Recibido / Cancelado, sin aprobaciones. Piden admin, jefe, preparador y vendedor; opera la grúa (rol `grua`, solo ve Traslados y Alertas) o admin/jefe; el preparador del destino puede marcar recibido. Al «Recibido» el auto cambia de sucursal solo (`traslado_avanzar`). Todo se escribe en `historial` (entidad `traslado`). El inventario muestra la etiqueta «En tránsito → destino» (`tagTr`). Pendiente futuro: rol específico para quienes piden traslados.
+
+
+## Traslados: vistas y perfiles (parte 10)
+- Traslados se ven en **tarjetas o lista** (`VM.tras`), con filtros de modelo, estado (los 5) y año, y exportan a CSV/Excel (`exportarTr`).
+- Pestaña **Registros** (admin, jefe, preparador): lista de `registros_traslado`, también con filtros y exportación.
+- **conductor**: menú Inventario (solo mirar, con selector de sucursal), Traslados y Alertas; pide traslados entre sucursales; no ingresa ni edita autos.
+- **grua**: igual que conductor pero no pide traslados; opera los traslados (programar, retirar, recibir).
+- **preparador**: botón «Registrar traslado» en inventario y en Traslados (no «Solicitar traslado»). El auto sale del stock de su sucursal (fecha de salida) y no aparece en la otra; el admin puede «Deshacer salida».
+- Helpers: `soloTras()`, `verTodas()`, `puedeEditarInv()`, `puedeRegistrar()`, `puedeTrasladar()` (admin, jefe, vendedor, conductor).
