@@ -2731,7 +2731,7 @@
 			}
 			// Selector "Filtro por año" con su rótulo
 			function anioSel(id, sel, fechas) {
-				return '<div class="fyw"><label for="' + id + '">Filtro por año</label><select id="' + id + '">' + anioOpts(sel, fechas) + "</select></div>";
+				return '<div class="fyw"><select id="' + id + '" aria-label="Filtro por año" title="Filtro por año">' + anioOpts(sel, fechas) + "</select></div>";
 			}
 			// Opciones del selector Año: "Todos" + los años que hay (el actual siempre)
 			function anioOpts(sel, fechas) {
