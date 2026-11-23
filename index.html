@@ -1198,6 +1198,41 @@
 			body.r-preparador .act.pn {
 				display: none;
 			}
+			.nsuc {
+				display: none;
+			}
+			@media (min-width: 900px) {
+				.nsuc {
+					display: block;
+					padding: 2px 6px 12px;
+				}
+				.nsuc label {
+					display: block;
+					margin: 0 0 6px;
+					font-size: 11px;
+					letter-spacing: 0.08em;
+					text-transform: uppercase;
+					color: #b9c9e6;
+				}
+				.nsuc select {
+					width: 100%;
+					font-size: 14px;
+					padding-left: 10px;
+				}
+				.sucsel.mob {
+					display: none;
+				}
+			}
+			.sechd {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				margin: 18px 0 8px;
+			}
+			.sechd h2.sec {
+				margin: 0;
+			}
 			.sucsel {
 				display: flex;
 				align-items: center;
@@ -4418,7 +4453,7 @@
 			function sucBar(inv) {
 				if (esVend() && inv && SUC.length > 1)
 					return (
-						'<div class="sucsel"><label for="ssel">Sucursal</label><select id="ssel"><option value="">Todas las sucursales</option>' +
+						'<div class="sucsel mob"><label for="ssel">Sucursal</label><select id="ssel" data-ssel><option value="">Todas las sucursales</option>' +
 						optsSuc(invSel) +
 						"</select></div>"
 					);
@@ -4428,32 +4463,27 @@
 						: "";
 				if (esAdm())
 					return SUC.length
-						? '<div class="sucsel"><label for="ssel">Sucursal</label><select id="ssel"><option value="">Todas las sucursales</option>' +
+						? '<div class="sucsel mob"><label for="ssel">Sucursal</label><select id="ssel" data-ssel><option value="">Todas las sucursales</option>' +
 								optsSuc(sucSel) +
 								"</select></div>"
 						: "";
 				return SUC.length ? '<p class="hola">Sucursal: <b>' + esc(SUC[0].nombre) + "</b></p>" : "";
 			}
 			function bindSuc() {
-				var s = $("#ssel");
-				if (!s) return;
-				s.value = esVend() ? invSel : sucSel;
-				if (esVend()) {
+				document.querySelectorAll("select[data-ssel]").forEach(function (s) {
+					s.value = esVend() ? invSel : sucSel;
 					s.onchange = async function () {
-						invSel = s.value;
-						await cargar();
+						if (esVend()) invSel = s.value;
+						else {
+							sucSel = s.value;
+							try {
+								sessionStorage.setItem("sucSel", sucSel);
+							} catch (e) {}
+						}
+						await Promise.all([cargar(), esVend() ? 0 : cargarEntregas()]);
 						renderApp();
 					};
-					return;
-				}
-				s.onchange = async function () {
-					sucSel = s.value;
-					try {
-						sessionStorage.setItem("sucSel", sucSel);
-					} catch (e) {}
-					await Promise.all([cargar(), cargarEntregas()]);
-					renderApp();
-				};
+				});
 			}
 			var ICO = {
 				lista: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
@@ -4909,10 +4939,9 @@
 					}).length;
 				a.innerHTML =
 					head("Sucursales") +
-					'<button type="button" class="btn add full" data-a="sucnew">' + btnMas("Agregar sucursal") + "</button>" +
-					'<h2 class="sec">Sucursales (' +
+					'<div class="sechd"><h2 class="sec">Sucursales (' +
 					SUC.length +
-					')</h2><div class="vmrow">' +
+					')</h2><button type="button" class="btn add" data-a="sucnew">' + btnMas("Agregar sucursal") + '</button></div><div class="vmrow">' +
 					vmBar("suc") +
 					'</div><div id="lsuc"></div>';
 				SCN = { cv: cv, ce: ce };
@@ -7731,6 +7760,9 @@
 					'<div class="brand"><img src="' +
 					LOGO +
 					'" alt=""><b>Inventario Ford</b></div>' +
+					(SUC.length > 1 && (ad || (esVend() && ["inicio", "inventario", "traslado"].indexOf(v) > -1))
+						? '<div class="nsuc"><label for="ssel2">Sucursal</label><select id="ssel2" data-ssel><option value="">Todas las sucursales</option>' + optsSuc(esVend() ? invSel : sucSel) + "</select></div>"
+						: "") +
 					it
 						.map(function (x) {
 							return (
