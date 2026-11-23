@@ -3272,7 +3272,7 @@
 					s.length +
 					'</b><small>En stock</small></div><div class="stat"><b>' +
 					(data.length - s.length) +
-					"</b><small>Con salida</small></div></div>" +
+					"</b><small>Trasladados</small></div></div>" +
 					'<div class="acts">' +
 					act("Ver inventario", "go(&quot;inventario&quot;)", "p", "lista") +
 					cfgBtn("cfginv", "Configurar modelos y estados") +
@@ -3480,7 +3480,7 @@
 						return '<div class="stat"><b>' + c[x] + "</b><small>" + x + "</small></div>";
 					}).join("") +
 					"</div>" +
-					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="todos">Todos</button><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Con salida</button>' +
+					'<div class="chips" role="group" aria-label="Estado"><button class="chip" data-e="todos">Todos</button><button class="chip" data-e="stock">En stock</button><button class="chip" data-e="salidos">Trasladados</button>' +
 					vmBar("inv") +
 					"</div>" +
 					'<div class="tools"><select id="fm" aria-label="Modelo">' +
@@ -3494,9 +3494,8 @@
 					AJ.antiguedad.amarillo +
 					' días (amarillo)</option><option value="rj">Desde ' +
 					AJ.antiguedad.rojo +
-					' días (rojo)</option></select><input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar">' +
-					anioSel("fy", filtro.anio, data.map(function (v) { return v.fechaSalida; })) +
-					'<button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>' +
+					' días (rojo)</option></select>' + anioSel("fy", filtro.anio, data.map(function (v) { return v.fechaSalida; })) +
+					'<input class="wide" id="q" type="search" placeholder="Buscar por VIN, versión, color o vendedor" aria-label="Buscar"><button class="btn g wide" id="lim" type="button">Limpiar filtros</button></div>' +
 					'<div id="lst"></div><div class="acts">' +
 					act("Exportar CSV", null, "", "bajar", 'id="exp"') +
 					act("Exportar Excel", null, "", "bajar", 'id="expx"') +
@@ -6466,11 +6465,11 @@
 					}).join("") +
 					'</div><div class="chips"><button type="button" class="chip" id="hsort" onclick="hsortT()"></button>' +
 					vmBar("hist") +
-					  '</div><div class="tools"><input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
-					esc(hQ) +
-					'">' +
+					   '</div><div class="tools">' +
 					anioSel("hy", hAnio, hAnios) +
-					'</div><div id="hl" class="empty">Cargando...</div>';
+					'<input id="hq" type="search" class="wide" placeholder="Buscar por persona, VIN, modelo, campo o acción" aria-label="Buscar en el historial" value="' +
+					esc(hQ) +
+					'"></div><div id="hl" class="empty">Cargando...</div>';
 				try {
 					var p0 = await db.from("historial").select("fecha").order("fecha", { ascending: true }).limit(1);
 					hAnios = [];
@@ -7004,9 +7003,9 @@
 					'<div class="chips" role="group" aria-label="Filtro"><button class="chip" data-p="todas">Todas</button><button class="chip" data-p="activas">Activas</button><button class="chip" data-p="entregadas">Entregadas</button></div>' +
 					'<div class="tools ptb-tools"><select id="pe" aria-label="Estado">' +
 					opts(PEST, "Todos los estados") +
-					'</select><input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar">' +
+					'</select>' +
 					anioSel("py", pf.anio, ent.map(function (e) { return e.estado === "Entregado" ? e.fecha_entrega : null; })) +
-					'<button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
+					'<input id="pq" type="search" placeholder="Buscar VIN, modelo o vendedor" aria-label="Buscar"><button class="btn g wide" id="plim" type="button">Limpiar filtros</button>' +
 					'<div class="big np-w"><button class="bigbtn pn np" onclick="editE=null;go(&quot;pform&quot;)"><i class="arw up">' +
 					svg("plus") +
 					'</i><span class="tx"><b>Nueva entrega</b><span>Programar la entrega de un vehículo</span></span></button></div></div>' +
